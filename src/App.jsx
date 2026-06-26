@@ -4,6 +4,7 @@ import { AppProvider } from './context/AppContext'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Toast from './components/Toast'
+import FloatingWidgets from './components/FloatingWidgets'
 
 // Pages
 import Home from './pages/Home'
@@ -46,6 +47,7 @@ export default function App() {
   return (
     <AppProvider>
       <ScrollToTop />
+      <FloatingWidgets />
       <Layout>
         <Routes>
           {/* Core */}
