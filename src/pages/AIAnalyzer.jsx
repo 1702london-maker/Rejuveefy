@@ -177,14 +177,12 @@ function AnalysisResults({ result, type, previewUrl, onReset }) {
 }
 
 function UploadZone({ onAnalyze, type }) {
-  const inputRef = useRef(null)
+  const id = `file-upload-${type}`
   const [preview, setPreview] = useState(null)
-  const [file, setFile] = useState(null)
   const [dragOver, setDragOver] = useState(false)
 
   const handleFile = (f) => {
     if (!f || !f.type.startsWith('image/')) return
-    setFile(f)
     const reader = new FileReader()
     reader.onload = (e) => setPreview(e.target.result)
     reader.readAsDataURL(f)
@@ -207,17 +205,24 @@ function UploadZone({ onAnalyze, type }) {
           : 'A well-lit selfie with your face clearly visible gives the most accurate results.'}
       </p>
 
-      <input ref={inputRef} type="file" accept="image/*" className="hidden"
-        onChange={e => handleFile(e.target.files[0])} />
+      {/* Hidden input — triggered by label htmlFor */}
+      <input
+        id={id}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }}
+        onChange={e => handleFile(e.target.files[0])}
+      />
 
       {preview ? (
         <div className="mb-5">
           <div className="relative rounded-2xl overflow-hidden mb-3">
             <img src={preview} alt="Preview" className="w-full max-h-64 object-cover rounded-2xl" />
-            <button onClick={() => { setPreview(null); setFile(null) }}
-              className="absolute top-3 right-3 bg-white/90 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white shadow-sm">
+            <label htmlFor={id}
+              className="absolute top-3 right-3 bg-white/90 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white shadow-sm cursor-pointer">
               Change Photo
-            </button>
+            </label>
           </div>
           <button onClick={() => onAnalyze(preview)}
             className="w-full bg-pink-500 text-white font-bold py-3.5 rounded-full hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
@@ -225,31 +230,29 @@ function UploadZone({ onAnalyze, type }) {
           </button>
         </div>
       ) : (
-        <div
+        <label
+          htmlFor={id}
           onDrop={handleDrop}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
-          className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all cursor-pointer
+          className={`flex flex-col items-center border-2 border-dashed rounded-2xl p-10 text-center transition-all cursor-pointer
             ${dragOver ? 'border-pink-500 bg-pink-50' : 'border-pink-200 hover:border-pink-400 hover:bg-pink-50'}`}
-          onClick={() => inputRef.current?.click()}
         >
-          <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mb-4">
             <Upload size={24} className="text-pink-500" />
           </div>
-          <p className="text-sm font-semibold text-gray-800 mb-1">Drop your photo here</p>
-          <p className="text-xs text-gray-400 mb-4">or click to browse</p>
-          <div className="flex justify-center gap-3">
-            <button onClick={e => { e.stopPropagation(); inputRef.current?.click() }}
-              className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-600 transition-colors">
+          <p className="text-sm font-semibold text-gray-800 mb-1">Tap or drop your photo here</p>
+          <p className="text-xs text-gray-400 mb-4">JPG, PNG or WEBP · Max 10MB</p>
+          <div className="flex justify-center gap-3 pointer-events-none">
+            <span className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold">
               <Upload size={15} /> Upload Photo
-            </button>
-            <button onClick={e => { e.stopPropagation(); inputRef.current?.click() }}
-              className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-semibold hover:border-pink-300 transition-colors">
+            </span>
+            <span className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-semibold">
               <Camera size={15} /> Take Photo
-            </button>
+            </span>
           </div>
-          <p className="text-[10px] text-gray-400 mt-3">JPG, PNG or WEBP · Max 10MB · Your privacy is protected</p>
-        </div>
+          <p className="text-[10px] text-gray-400 mt-3">Your privacy is protected · Images are never stored</p>
+        </label>
       )}
 
       <div className="mt-5 grid grid-cols-3 gap-3">
