@@ -40,7 +40,7 @@ const nav = [
       { label: 'Best Sellers', path: '/shop?sort=bestseller' },
     ],
   },
-  { label: 'AI Hair Analyzer', path: '/ai-beauty/hair' },
+  { label: 'AI Analyser', path: '/ai-beauty/hair' },
   {
     label: 'Affiliate', path: '/affiliate',
     sub: [
