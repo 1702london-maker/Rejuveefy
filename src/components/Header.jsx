@@ -6,7 +6,7 @@ import { useApp } from '../context/AppContext'
 const nav = [
   { label: 'Home', path: '/' },
   {
-    label: 'Book a Service', path: '/book',
+    label: 'Book', path: '/book',
     sub: [
       { label: 'Book a Service', path: '/book' },
       { label: 'Braids', path: '/book/braids' },
@@ -20,7 +20,14 @@ const nav = [
       { label: 'Barbers', path: '/book/barbers' },
     ],
   },
-  { label: 'Providers', path: '/providers' },
+  {
+    label: 'Providers', path: '/providers',
+    sub: [
+      { label: 'Find Providers', path: '/providers' },
+      { label: 'Provider Portal', path: '/providers-portal' },
+      { label: 'Join as Provider', path: '/providers-portal' },
+    ],
+  },
   {
     label: 'Shop', path: '/shop',
     sub: [
@@ -33,7 +40,14 @@ const nav = [
       { label: 'Best Sellers', path: '/shop?sort=bestseller' },
     ],
   },
-  { label: 'AI Beauty Analyzer', path: '/ai-analyzer' },
+  { label: 'AI Hair Analyzer', path: '/ai-beauty/hair' },
+  {
+    label: 'Affiliate', path: '/affiliate',
+    sub: [
+      { label: 'Affiliate Programme', path: '/affiliate' },
+      { label: 'Affiliate Portal', path: '/affiliate-portal' },
+    ],
+  },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ]
