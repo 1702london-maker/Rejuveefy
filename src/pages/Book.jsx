@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, MapPin, Calendar, Star, ChevronDown, SlidersHorizontal, ShieldCheck, ArrowRight, Heart, Clock, MapPinIcon } from 'lucide-react'
-import { providers, serviceCategories, services as svcList } from '../data/mockData'
+import { providers, serviceCategories } from '../data/mockData'
 
 const popularServices = [
   { id: 1, name: 'Knotless Braids', category: 'braids', provider: 'Hair By Amara', providerImg: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&h=60&fit=crop', price: 45, rating: 4.9, reviews: 89, duration: '5–6 hrs', verified: true,
