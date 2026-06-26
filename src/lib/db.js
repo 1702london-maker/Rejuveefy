@@ -1,5 +1,30 @@
 import { supabase } from './supabase'
 
+// ── FIELD NORMALISERS ─────────────────────────────────────────────────────────
+// Maps DB column names → names the frontend components already use
+function normaliseProvider(p) {
+  if (!p) return p
+  return {
+    ...p,
+    image: p.image_url || 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=400&fit=crop',
+    category: p.speciality || 'Beauty Professional',
+    startingPrice: p.price_from || 0,
+    reviews: p.review_count || 0,
+    verified: true,
+  }
+}
+
+function normaliseProduct(p) {
+  if (!p) return p
+  return {
+    ...p,
+    image: p.image_url || 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=400&fit=crop',
+    originalPrice: p.compare_price || null,
+    reviews: p.review_count || 0,
+    brand: p.brand || 'Rejuveefy',
+  }
+}
+
 // ── PROVIDERS ─────────────────────────────────────────────────────────────────
 export async function fetchProviders({ featured = false, limit = 50 } = {}) {
   let q = supabase.from('providers').select('*').eq('is_active', true).order('rating', { ascending: false })
@@ -7,7 +32,7 @@ export async function fetchProviders({ featured = false, limit = 50 } = {}) {
   if (limit) q = q.limit(limit)
   const { data, error } = await q
   if (error) throw error
-  return data || []
+  return (data || []).map(normaliseProvider)
 }
 
 export async function fetchProvider(slug) {
@@ -18,7 +43,7 @@ export async function fetchProvider(slug) {
     .eq('is_active', true)
     .single()
   if (error) throw error
-  return data
+  return normaliseProvider(data)
 }
 
 // ── PRODUCTS ──────────────────────────────────────────────────────────────────
@@ -29,7 +54,7 @@ export async function fetchProducts({ category = null, featured = false, limit =
   if (limit) q = q.limit(limit)
   const { data, error } = await q
   if (error) throw error
-  return data || []
+  return (data || []).map(normaliseProduct)
 }
 
 export async function fetchProduct(id) {
@@ -39,7 +64,7 @@ export async function fetchProduct(id) {
     .eq('id', id)
     .single()
   if (error) throw error
-  return data
+  return normaliseProduct(data)
 }
 
 // ── BOOKINGS ──────────────────────────────────────────────────────────────────

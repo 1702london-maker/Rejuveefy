@@ -20,7 +20,9 @@ const navItems = [
 
 function Sidebar() {
   const { pathname } = useLocation()
-  const { user } = useApp()
+  const { userDisplay } = useApp()
+  const name = userDisplay?.name || 'User'
+  const points = userDisplay?.points || 0
 
   return (
     <aside className="hidden lg:block w-64 shrink-0">
@@ -29,10 +31,10 @@ function Sidebar() {
         <div className="p-5 bg-gradient-to-br from-pink-50 to-white border-b border-pink-100">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-pink-200 rounded-2xl flex items-center justify-center">
-              <span className="text-pink-600 font-bold text-lg">{user.name[0]}</span>
+              <span className="text-pink-600 font-bold text-lg">{name[0].toUpperCase()}</span>
             </div>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">{user.name}</p>
+              <p className="font-semibold text-gray-900 text-sm">{name}</p>
               <p className="text-xs text-gray-400">Beauty Enthusiast</p>
             </div>
           </div>
@@ -40,7 +42,7 @@ function Sidebar() {
           <div className="mt-3 bg-pink-500 rounded-xl px-3 py-2 flex items-center justify-between">
             <div>
               <p className="text-[9px] text-pink-100 font-semibold uppercase tracking-wider">Beauty Points</p>
-              <p className="text-white font-bold text-lg leading-none">{user.points.toLocaleString()}</p>
+              <p className="text-white font-bold text-lg leading-none">{points.toLocaleString()}</p>
             </div>
             <div className="text-right">
               <p className="text-[9px] text-pink-100">Next Reward</p>
@@ -68,7 +70,9 @@ function Sidebar() {
 
 // ── MAIN DASHBOARD ────────────────────────────────────────────────────────────
 export function DashboardHome() {
-  const { user } = useApp()
+  const { user, userDisplay } = useApp()
+  const name = userDisplay?.name || 'User'
+  const points = userDisplay?.points || 0
   const [bookings, setBookings] = useState([])
   useEffect(() => {
     if (user?.id) fetchUserBookings(user.id).then(setBookings).catch(() => {})
@@ -84,13 +88,13 @@ export function DashboardHome() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-pink-100 text-xs mb-1">Welcome back,</p>
-                  <h1 className="font-display text-2xl font-bold">Hello, {user.name}! 👋</h1>
+                  <h1 className="font-display text-2xl font-bold">Hello, {name}! 👋</h1>
                   <p className="text-pink-100 text-sm mt-1">You have 1 upcoming appointment this week.</p>
                 </div>
                 <div className="hidden sm:block text-right">
                   <div className="bg-white/20 rounded-xl px-4 py-2">
                     <p className="text-xs text-pink-100">Beauty Points</p>
-                    <p className="font-bold text-2xl">{user.points}</p>
+                    <p className="font-bold text-2xl">{points}</p>
                   </div>
                 </div>
               </div>
@@ -101,7 +105,7 @@ export function DashboardHome() {
               {[
                 { icon: Calendar, label: 'Total Bookings', value: '12', sub: '+2 this month', color: 'bg-blue-50 text-blue-500' },
                 { icon: Star, label: 'Reviews Given', value: '8', sub: '4.8 avg rating', color: 'bg-amber-50 text-amber-500' },
-                { icon: Gift, label: 'Points Earned', value: user.points, sub: '2 rewards available', color: 'bg-pink-50 text-pink-500' },
+                { icon: Gift, label: 'Points Earned', value: points, sub: '2 rewards available', color: 'bg-pink-50 text-pink-500' },
                 { icon: ShoppingBag, label: 'Products Ordered', value: '5', sub: '1 on its way', color: 'bg-green-50 text-green-500' },
               ].map((s) => (
                 <div key={s.label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">

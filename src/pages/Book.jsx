@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, MapPin, Calendar, Star, ChevronDown, SlidersHorizontal, ShieldCheck, ArrowRight, Heart, Clock, MapPinIcon } from 'lucide-react'
-import { providers, serviceCategories } from '../data/mockData'
+import { serviceCategories } from '../data/mockData'
+import { fetchProviders } from '../lib/db'
 
 const popularServices = [
   { id: 1, name: 'Knotless Braids', category: 'braids', provider: 'Hair By Amara', providerImg: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&h=60&fit=crop', price: 45, rating: 4.9, reviews: 89, duration: '5–6 hrs', verified: true,
@@ -13,8 +14,6 @@ const popularServices = [
   { id: 4, name: 'Loc Retwist', category: 'locks', provider: 'Hair By Amara', providerImg: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&h=60&fit=crop', price: 45, rating: 4.9, reviews: 67, duration: '1–2 hrs', verified: true,
     image: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=300&h=200&fit=crop' },
 ]
-
-const topProviders = providers.slice(0, 4)
 
 function Stars({ val = 5 }) {
   return (
@@ -33,11 +32,15 @@ export default function Book() {
   const [locationQ, setLocationQ] = useState(sp.get('location') || '')
   const [dateQ, setDateQ] = useState('')
   const [sortBy, setSortBy] = useState('Popular')
+  const [providers, setProviders] = useState([])
   const navigate = useNavigate()
 
-  const filteredProviders = category
-    ? providers.filter(p => p.services?.some(s => typeof s === 'object' ? s.id.toString().includes(category) : s === category))
-    : providers
+  useEffect(() => {
+    fetchProviders({ limit: 20 }).then(setProviders).catch(() => {})
+  }, [])
+
+  const topProviders = providers.slice(0, 4)
+  const filteredProviders = providers
 
   return (
     <div className="min-h-screen bg-white">
@@ -181,7 +184,7 @@ export default function Book() {
           <div>
             {/* Sort bar */}
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-500"><strong className="text-gray-800">{providers.length} Providers</strong> found</p>
+              <p className="text-sm text-gray-500"><strong className="text-gray-800">{providers.length || '...'} Providers</strong> found</p>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500">Sort by:</span>
                 <select value={sortBy} onChange={e => setSortBy(e.target.value)}
@@ -244,7 +247,7 @@ export default function Book() {
                         </div>
                         <div className="flex items-center justify-between mt-3">
                           <span className="text-lg font-bold text-pink-500">£{s.price}</span>
-                          <Link to={`/providers/${providers[0].slug}/book`}
+                          <Link to={`/providers/${providers[0]?.slug || ''}/book`}
                             className="bg-pink-500 text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-pink-600 transition-colors">
                             Book Now
                           </Link>
