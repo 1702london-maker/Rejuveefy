@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Search, Heart, ShoppingBag, Bell, ChevronDown, X, Menu, User } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../context/AppContext'
 
 const nav = [
@@ -116,16 +117,31 @@ export default function Header() {
                   {item.label}
                   {item.sub && <ChevronDown size={13} className={`transition-transform ${open === item.label ? 'rotate-180' : ''}`} />}
                 </Link>
-                {item.sub && open === item.label && (
-                  <div className="absolute top-full left-0 mt-0.5 w-52 bg-white rounded-xl shadow-modal border border-gray-100 py-1.5 z-50">
-                    {item.sub.map((s) => (
-                      <Link key={s.path} to={s.path}
-                        className="block px-4 py-2 text-[13px] text-gray-600 hover:text-pink-500 hover:bg-pink-50 transition-colors">
-                        {s.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <AnimatePresence>
+                  {item.sub && open === item.label && (
+                    <motion.div
+                      className="absolute top-full left-0 mt-0.5 w-52 bg-white rounded-xl shadow-modal border border-gray-100 py-1.5 z-50"
+                      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      {item.sub.map((s, i) => (
+                        <motion.div
+                          key={s.path}
+                          initial={{ opacity: 0, x: -6 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.03, duration: 0.15 }}
+                        >
+                          <Link to={s.path}
+                            className="block px-4 py-2 text-[13px] text-gray-600 hover:text-pink-500 hover:bg-pink-50 transition-colors">
+                            {s.label}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
           </nav>
@@ -187,43 +203,56 @@ export default function Header() {
       </header>
 
       {/* Mobile drawer */}
-      {mobile && (
-        <div className="fixed inset-0 z-[60] lg:hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setMobile(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white slide-in overflow-y-auto">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-              <span className="font-display font-bold text-lg text-pink-500">Menu</span>
-              <button onClick={() => setMobile(false)}><X size={20} className="text-gray-500" /></button>
-            </div>
-            <div className="p-3 space-y-0.5">
-              {nav.map((item) => (
-                <div key={item.label}>
-                  <Link to={item.path} onClick={() => setMobile(false)}
-                    className="block px-3 py-2.5 text-sm font-semibold text-gray-700 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors">
-                    {item.label}
-                  </Link>
-                  {item.sub && (
-                    <div className="pl-3">
-                      {item.sub.slice(1).map((s) => (
-                        <Link key={s.path} to={s.path} onClick={() => setMobile(false)}
-                          className="block px-3 py-2 text-xs text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors">
-                          {s.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="p-4 border-t border-gray-100 flex flex-col gap-2">
-              <Link to="/login" onClick={() => setMobile(false)}
-                className="w-full text-center border border-pink-500 text-pink-500 py-2.5 rounded-full text-sm font-semibold">Login</Link>
-              <Link to="/register" onClick={() => setMobile(false)}
-                className="w-full text-center bg-pink-500 text-white py-2.5 rounded-full text-sm font-semibold">Sign Up</Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {mobile && (
+          <motion.div
+            className="fixed inset-0 z-[60] lg:hidden"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+          >
+            <div className="absolute inset-0 bg-black/30" onClick={() => setMobile(false)} />
+            <motion.div
+              className="absolute right-0 top-0 bottom-0 w-72 bg-white overflow-y-auto"
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                <span className="font-display font-bold text-lg text-pink-500">Menu</span>
+                <button onClick={() => setMobile(false)}><X size={20} className="text-gray-500" /></button>
+              </div>
+              <div className="p-3 space-y-0.5">
+                {nav.map((item, i) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <Link to={item.path} onClick={() => setMobile(false)}
+                      className="block px-3 py-2.5 text-sm font-semibold text-gray-700 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors">
+                      {item.label}
+                    </Link>
+                    {item.sub && (
+                      <div className="pl-3">
+                        {item.sub.slice(1).map((s) => (
+                          <Link key={s.path} to={s.path} onClick={() => setMobile(false)}
+                            className="block px-3 py-2 text-xs text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors">
+                            {s.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+              <div className="p-4 border-t border-gray-100 flex flex-col gap-2">
+                <Link to="/login" onClick={() => setMobile(false)}
+                  className="w-full text-center border border-pink-500 text-pink-500 py-2.5 rounded-full text-sm font-semibold">Login</Link>
+                <Link to="/register" onClick={() => setMobile(false)}
+                  className="w-full text-center bg-pink-500 text-white py-2.5 rounded-full text-sm font-semibold">Sign Up</Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

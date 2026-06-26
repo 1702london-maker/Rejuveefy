@@ -43,50 +43,55 @@ export default function Book() {
     <div className="min-h-screen bg-white">
 
       {/* Header section */}
-      <div className="bg-pink-50 pt-6 pb-8">
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
-          {/* Breadcrumb */}
-          <p className="text-xs text-gray-400 mb-3">
+      <div className="relative bg-gradient-to-br from-[#FFF0F5] via-white to-[#FFF8FB] pt-10 pb-12 overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-pink-100/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-[1280px] mx-auto px-4 lg:px-6 relative z-10">
+          <p className="text-xs text-gray-400 mb-4">
             <Link to="/" className="hover:text-pink-500">Home</Link>
             <span className="mx-1.5">›</span>
             <span className="text-gray-600">Book a Service</span>
             {category && <><span className="mx-1.5">›</span><span className="text-gray-600 capitalize">{category.replace(/-/g,' ')}</span></>}
           </p>
-          <h1 className="font-display text-2xl font-bold text-gray-900 mb-1">Book a Service</h1>
-          <p className="text-sm text-gray-500 mb-5">Find trusted professionals near you and book your perfect hair or beauty service.</p>
+          <div className="inline-flex items-center gap-2 bg-white border border-pink-200 text-pink-600 text-xs font-semibold px-4 py-1.5 rounded-full shadow-sm mb-4">
+            ✨ 850+ Verified Professionals Ready to Book
+          </div>
+          <h1 className="font-display text-4xl lg:text-5xl font-bold text-gray-900 mb-3 leading-tight">
+            Find & Book Your<br /><span className="text-pink-500">Perfect Beauty Service</span>
+          </h1>
+          <p className="text-gray-500 mb-7 max-w-xl">Trusted hair stylists, beauty experts and natural hair specialists near you. Instant booking, verified providers.</p>
 
           {/* Search bar */}
-          <div className="bg-white rounded-xl border border-gray-200 flex flex-col sm:flex-row overflow-hidden shadow-card">
-            <div className="flex items-center gap-2 flex-1 px-4 py-3 border-b sm:border-b-0 sm:border-r border-gray-100">
+          <div className="bg-white rounded-2xl border border-gray-100 flex flex-col sm:flex-row overflow-hidden shadow-lg max-w-3xl">
+            <div className="flex items-center gap-2 flex-1 px-4 py-3.5 border-b sm:border-b-0 sm:border-r border-gray-100">
               <Search size={15} className="text-gray-400 shrink-0" />
               <input value={serviceQ} onChange={e => setServiceQ(e.target.value)}
-                placeholder="E.g. Knotless Braids..." className="flex-1 text-sm outline-none text-gray-700 placeholder:text-gray-400" />
+                placeholder="E.g. Knotless Braids, Wig Install..." className="flex-1 text-sm outline-none text-gray-700 placeholder:text-gray-400" />
             </div>
-            <div className="flex items-center gap-2 flex-1 px-4 py-3 border-b sm:border-b-0 sm:border-r border-gray-100">
+            <div className="flex items-center gap-2 flex-1 px-4 py-3.5 border-b sm:border-b-0 sm:border-r border-gray-100">
               <MapPin size={15} className="text-gray-400 shrink-0" />
               <input value={locationQ} onChange={e => setLocationQ(e.target.value)}
                 placeholder="City, town or postcode" className="flex-1 text-sm outline-none text-gray-700 placeholder:text-gray-400" />
             </div>
-            <div className="flex items-center gap-2 flex-1 px-4 py-3 border-b sm:border-b-0 sm:border-r border-gray-100">
+            <div className="flex items-center gap-2 flex-1 px-4 py-3.5 border-b sm:border-b-0 sm:border-r border-gray-100">
               <Calendar size={15} className="text-gray-400 shrink-0" />
               <input type="date" value={dateQ} onChange={e => setDateQ(e.target.value)}
                 className="flex-1 text-sm outline-none text-gray-700" />
             </div>
-            <button className="bg-pink-500 text-white px-6 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
-              Search Services
+            <button className="bg-pink-500 text-white px-7 py-3.5 text-sm font-bold hover:bg-pink-600 transition-colors">
+              Search
             </button>
           </div>
 
           {/* Trust badges */}
-          <div className="flex flex-wrap gap-4 mt-4">
+          <div className="flex flex-wrap gap-5 mt-5">
             {[
-              { icon: '✓', label: 'Verified Professionals' },
+              { icon: '✅', label: 'Verified Professionals' },
               { icon: '📅', label: 'Instant Booking' },
               { icon: '💬', label: '24/7 Support' },
               { icon: '🛡️', label: 'Satisfaction Guarantee' },
             ].map((b) => (
-              <div key={b.label} className="flex items-center gap-1.5 text-xs text-gray-500">
-                <span className="text-pink-500">{b.icon}</span>
+              <div key={b.label} className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
+                <span>{b.icon}</span>
                 {b.label}
               </div>
             ))}

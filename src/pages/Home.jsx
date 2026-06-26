@@ -1,11 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, MapPin, Calendar, Star, ArrowRight, ShieldCheck, Sparkles, Lock, ChevronRight } from 'lucide-react'
-import { serviceCategories, shopCategories } from '../data/mockData'
+import { Search, Star, ArrowRight, ShieldCheck, Sparkles, ChevronRight, MapPin, Heart, ShoppingBag, Play, CheckCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { fetchProviders, fetchProducts } from '../lib/db'
 import { useApp } from '../context/AppContext'
 
-function Stars({ val = 5, size = 12 }) {
+const fadeUp = {
+  hidden: { opacity: 0, y: 32 },
+  show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] } }),
+}
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.09 } } }
+const cardItem = {
+  hidden: { opacity: 0, y: 28, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] } },
+}
+
+function Stars({ val = 5, size = 13 }) {
   return (
     <div className="flex gap-0.5">
       {[1,2,3,4,5].map(i => (
@@ -15,430 +25,498 @@ function Stars({ val = 5, size = 12 }) {
   )
 }
 
+const quickLinks = [
+  { label: 'Braids', icon: '🧶', path: '/book/braids' },
+  { label: 'Locs', icon: '🌿', path: '/book/locks' },
+  { label: 'Wig Install', icon: '👑', path: '/book/wig-install' },
+  { label: 'Hair Styling', icon: '✂️', path: '/book/hair-styling' },
+  { label: 'Skin Care', icon: '✨', path: '/shop/skin-care' },
+  { label: 'Makeup', icon: '💄', path: '/book/makeup' },
+  { label: 'Treatments', icon: '💆', path: '/book/hair-treatments' },
+  { label: 'Barbers', icon: '🪒', path: '/book/barbers' },
+]
+
+const stats = [
+  { value: '12K+', label: 'Happy Clients' },
+  { value: '850+', label: 'Expert Providers' },
+  { value: '4.9', label: 'Average Rating' },
+  { value: '98%', label: 'Satisfaction Rate' },
+]
+
+const howItWorks = [
+  { step: '01', title: 'Search & Discover', desc: 'Find verified hair and beauty experts near you by service, location, or availability.', icon: '🔍' },
+  { step: '02', title: 'Book Instantly', desc: 'Choose your date, time and service. Confirm your booking in under 60 seconds.', icon: '📅' },
+  { step: '03', title: 'Experience Beauty', desc: 'Sit back and enjoy a flawless service from a trusted, vetted professional.', icon: '✨' },
+]
+
+const testimonials = [
+  { name: 'Amara O.', role: 'Regular Client', text: 'Found the most amazing braider through Rejuveefy. My knotless braids lasted 8 weeks and the experience was 10/10.', rating: 5, avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face' },
+  { name: 'Destiny K.', role: 'Loyal Customer', text: 'The AI hair analyser recommended the perfect routine for my 4C hair. My hair has never been healthier!', rating: 5, avatar: 'https://images.unsplash.com/photo-1523264653568-d3d4032d1476?w=80&h=80&fit=crop&crop=face' },
+  { name: 'Fatima B.', role: 'VIP Member', text: 'Booked a last-minute wig install and the provider arrived on time, fully prepared. Absolutely seamless.', rating: 5, avatar: 'https://images.unsplash.com/photo-1499557354967-2b2d8910bcca?w=80&h=80&fit=crop&crop=face' },
+]
+
 export default function Home() {
-  const [service, setService] = useState('')
-  const [location, setLocation] = useState('')
-  const [date, setDate] = useState('')
+  const [query, setQuery] = useState('')
   const [providers, setProviders] = useState([])
   const [products, setProducts] = useState([])
-  const { addToCart } = useApp()
+  const { addToCart, toggleWishlist, inWishlist } = useApp()
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchProviders({ featured: true, limit: 3 }).then(setProviders).catch(() => {})
+    fetchProviders({ featured: true, limit: 4 }).then(setProviders).catch(() => {})
     fetchProducts({ featured: true, limit: 4 }).then(setProducts).catch(() => {})
   }, [])
 
-  const search = (e) => {
+  const handleSearch = (e) => {
     e.preventDefault()
-    navigate(`/book?service=${service}&location=${location}`)
+    if (query.trim()) navigate(`/book?service=${query}`)
+    else navigate('/book')
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="bg-white">
 
-      {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="bg-pink-50 relative overflow-hidden">
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid lg:grid-cols-2 gap-8 items-center py-12 lg:py-16 min-h-[560px]">
+      {/* ── HERO ─────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF0F5] via-white to-[#FFF8FB] min-h-[92vh] flex items-center">
+        {/* decorative blobs */}
+        <div className="absolute top-[-80px] right-[-80px] w-[520px] h-[520px] rounded-full bg-pink-100/60 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-[-60px] left-[-60px] w-[320px] h-[320px] rounded-full bg-rose-100/50 blur-2xl pointer-events-none" />
+
+        <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 w-full grid lg:grid-cols-2 gap-12 items-center py-20 lg:py-0">
+
           {/* Left */}
-          <div className="order-2 lg:order-1 fade-up">
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-[52px] font-bold text-gray-900 leading-[1.1] mb-4">
-              Your Hair Journey<br />
-              <em className="text-pink-500 not-italic">Starts Here.</em>
-            </h1>
-            <p className="text-gray-500 text-[15px] leading-relaxed mb-6 max-w-lg">
-              Book trusted hair and beauty treatments, discover premium hair extensions and beauty products, and receive personalised beauty recommendations — all in one place.
-            </p>
+          <motion.div variants={stagger} initial="hidden" animate="show" className="flex flex-col gap-6 z-10">
+            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-white border border-pink-200 text-pink-600 text-xs font-semibold px-4 py-1.5 rounded-full shadow-sm w-fit">
+              <Sparkles size={13} />
+              UK's #1 Hair &amp; Beauty Marketplace
+            </motion.div>
+
+            <motion.h1 variants={fadeUp} custom={1} className="font-display font-bold text-[52px] lg:text-[64px] leading-[1.08] text-gray-900">
+              Your Hair.<br />
+              <span className="text-pink-500">Your Beauty.</span><br />
+              Your Way.
+            </motion.h1>
+
+            <motion.p variants={fadeUp} custom={2} className="text-gray-500 text-lg leading-relaxed max-w-[460px]">
+              Discover and instantly book verified hair stylists, beauty experts and natural hair specialists near you — or shop premium products delivered to your door.
+            </motion.p>
 
             {/* Search bar */}
-            <form onSubmit={search} className="bg-white rounded-xl shadow-card border border-gray-100 flex flex-col sm:flex-row gap-0 mb-5 overflow-hidden">
-              <div className="flex items-center gap-2 flex-1 px-4 py-3 border-b sm:border-b-0 sm:border-r border-gray-100">
-                <Search size={15} className="text-gray-400 shrink-0" />
-                <input value={service} onChange={e => setService(e.target.value)}
-                  placeholder="E.g. Knotless Braids..." className="flex-1 text-sm outline-none text-gray-700 placeholder:text-gray-400" />
-              </div>
-              <div className="flex items-center gap-2 flex-1 px-4 py-3 border-b sm:border-b-0 sm:border-r border-gray-100">
-                <MapPin size={15} className="text-gray-400 shrink-0" />
-                <input value={location} onChange={e => setLocation(e.target.value)}
-                  placeholder="City, town or postcode" className="flex-1 text-sm outline-none text-gray-700 placeholder:text-gray-400" />
-              </div>
-              <div className="flex items-center gap-2 flex-1 px-4 py-3 border-b sm:border-b-0 sm:border-r border-gray-100">
-                <Calendar size={15} className="text-gray-400 shrink-0" />
-                <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                  className="flex-1 text-sm outline-none text-gray-700" />
-              </div>
-              <button type="submit" className="bg-pink-500 text-white px-6 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors whitespace-nowrap">
-                Search Services
-              </button>
-            </form>
+            <motion.div variants={fadeUp} custom={3}>
+              <form onSubmit={handleSearch} className="flex items-center gap-0 bg-white rounded-2xl shadow-lg border border-gray-100 p-1.5 max-w-[500px]">
+                <div className="flex items-center gap-2 flex-1 px-3">
+                  <Search size={17} className="text-gray-400 shrink-0" />
+                  <input
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    placeholder="Search services, providers, products..."
+                    className="flex-1 text-sm text-gray-700 outline-none bg-transparent placeholder:text-gray-400 py-1"
+                  />
+                </div>
+                <button type="submit" className="bg-pink-500 hover:bg-pink-600 text-white text-sm font-semibold px-5 py-3 rounded-xl transition-colors shrink-0">
+                  Search
+                </button>
+              </form>
+            </motion.div>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <Link to="/book" className="bg-pink-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors shadow-pink">
-                Book a Service
+            <motion.div variants={fadeUp} custom={4} className="flex flex-wrap gap-3">
+              <Link to="/book" className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-7 py-3.5 rounded-xl transition-colors flex items-center gap-2 shadow-md shadow-pink-200">
+                Book a Service <ArrowRight size={16} />
               </Link>
-              <Link to="/shop" className="border border-pink-500 text-pink-500 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-50 transition-colors">
-                Shop Hair Products
+              <Link to="/shop" className="bg-white border border-gray-200 hover:border-pink-300 text-gray-800 font-semibold px-7 py-3.5 rounded-xl transition-colors flex items-center gap-2">
+                Shop Products
               </Link>
-            </div>
+            </motion.div>
 
             {/* Social proof */}
-            <div className="flex items-center gap-3">
+            <motion.div variants={fadeUp} custom={5} className="flex items-center gap-4 pt-1">
               <div className="flex -space-x-2">
-                {['https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=40&h=40&fit=crop',
-                  'https://images.unsplash.com/photo-1526510747491-58f928ec870f?w=40&h=40&fit=crop',
-                  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=40&h=40&fit=crop',
-                  'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=40&h=40&fit=crop',
-                ].map((src, i) => (
-                  <img key={i} src={src} alt="" className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                {['photo-1531746020798-e6953c6e8e04','photo-1523264653568-d3d4032d1476','photo-1499557354967-2b2d8910bcca','photo-1489424731084-a5d8b219a5bb'].map((id,i) => (
+                  <img key={i} src={`https://images.unsplash.com/${id}?w=36&h=36&fit=crop&crop=face`} className="w-9 h-9 rounded-full border-2 border-white object-cover" alt="" />
                 ))}
               </div>
               <div>
-                <Stars val={5} size={11} />
-                <p className="text-xs text-gray-500 mt-0.5">Trusted by <strong className="text-gray-700">10,000+</strong> beauty lovers</p>
+                <div className="flex items-center gap-1.5">
+                  <Stars val={5} size={13} />
+                  <span className="text-sm font-bold text-gray-800">4.9</span>
+                </div>
+                <p className="text-xs text-gray-500">Trusted by 12,000+ clients</p>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right — hero image */}
-          <div className="order-1 lg:order-2 relative flex justify-center">
-            <div className="relative w-[280px] sm:w-[320px] lg:w-[360px]">
-              {/* Oval container */}
-              <div className="relative bg-pink-200 rounded-[50%] overflow-hidden w-full aspect-[3/4]">
-                <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&h=650&fit=crop&face" alt="Beautiful hair" className="w-full h-full object-cover" />
-              </div>
-              {/* Badges */}
-              <div className="absolute top-4 -right-4 bg-white rounded-xl shadow-card px-3 py-2 flex items-center gap-2">
-                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center shrink-0">
-                  <ShieldCheck size={15} className="text-pink-500" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-gray-800">Verified Professionals</p>
-                  <p className="text-[9px] text-gray-400">All providers checked</p>
-                </div>
-              </div>
-              <div className="absolute top-1/2 -right-4 -translate-y-1/2 bg-white rounded-xl shadow-card px-3 py-2 flex items-center gap-2">
-                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center shrink-0">
-                  <Sparkles size={15} className="text-pink-500" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-gray-800">AI Hair Analysis</p>
-                  <p className="text-[9px] text-gray-400">Personalised results</p>
-                </div>
-              </div>
-              <div className="absolute bottom-8 -right-4 bg-white rounded-xl shadow-card px-3 py-2 flex items-center gap-2">
-                <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center shrink-0">
-                  <Lock size={15} className="text-pink-500" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-gray-800">Secure Booking</p>
-                  <p className="text-[9px] text-gray-400">Safe & easy payments</p>
-                </div>
-              </div>
+          {/* Right — real beauty image */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, x: 40 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative hidden lg:block"
+          >
+            <div className="relative rounded-3xl overflow-hidden h-[600px] shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=700&h=800&fit=crop&crop=center"
+                alt="Beautiful natural hair"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ── QUICK LINKS ───────────────────────────────────────────────── */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-6 -mt-6 relative z-10">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { label: 'Book a Service', sub: 'Find & book in seconds', icon: '📅', path: '/book', bg: 'bg-pink-50' },
-            { label: 'Drop Wigs', sub: 'Wigs & hair extensions', icon: '💆', path: '/shop/wigs', bg: 'bg-purple-50' },
-            { label: 'Find Providers', sub: 'Browse verified experts', icon: '🔍', path: '/providers', bg: 'bg-blue-50' },
-            { label: 'AI Beauty Analyzer', sub: 'Get personalised advice', icon: '✨', path: '/ai-analyzer', bg: 'bg-amber-50' },
-          ].map((q) => (
-            <Link key={q.label} to={q.path}
-              className={`${q.bg} rounded-xl p-4 flex items-center gap-3 card-hover border border-white shadow-card`}>
-              <span className="text-2xl">{q.icon}</span>
+            {/* Floating card 1 */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="absolute -left-8 top-16 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-gray-50"
+            >
+              <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center text-lg">✅</div>
               <div>
-                <p className="text-sm font-semibold text-gray-800">{q.label}</p>
-                <p className="text-xs text-gray-500">{q.sub}</p>
+                <p className="text-xs font-bold text-gray-800">Background Verified</p>
+                <p className="text-[11px] text-gray-500">All providers checked</p>
               </div>
-            </Link>
+            </motion.div>
+
+            {/* Floating card 2 */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.75, duration: 0.5 }}
+              className="absolute -right-6 bottom-24 bg-white rounded-2xl shadow-xl px-4 py-3 border border-gray-50"
+            >
+              <p className="text-xs text-gray-500 mb-1">Next available</p>
+              <p className="text-sm font-bold text-gray-800">Tomorrow 10:00 AM</p>
+              <div className="mt-2 bg-pink-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg text-center">Book Now</div>
+            </motion.div>
+
+            {/* Floating card 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.5 }}
+              className="absolute left-4 -bottom-5 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-gray-50"
+            >
+              <div className="flex -space-x-1.5">
+                {['photo-1531746020798-e6953c6e8e04','photo-1523264653568-d3d4032d1476'].map((id,i) => (
+                  <img key={i} src={`https://images.unsplash.com/${id}?w=28&h=28&fit=crop&crop=face`} className="w-7 h-7 rounded-full border-2 border-white" alt="" />
+                ))}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-800">850+ Experts</p>
+                <Stars val={5} size={11} />
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── STATS BAR ──────────────────────────────────────────────── */}
+      <section className="bg-gray-900 py-10">
+        <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {stats.map((s, i) => (
+            <motion.div key={s.label} variants={fadeUp} custom={i} initial="hidden" whileInView="show" viewport={{ once: true }}
+              className="text-center">
+              <p className="text-3xl font-display font-bold text-pink-400">{s.value}</p>
+              <p className="text-gray-400 text-sm mt-1">{s.label}</p>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── POPULAR SERVICES ──────────────────────────────────────────── */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-6 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-xs font-semibold text-pink-500 tracking-widest uppercase mb-1">EXPLORE</p>
-            <h2 className="font-display text-2xl font-bold text-gray-900">Popular Services</h2>
-          </div>
-          <Link to="/book" className="text-sm font-semibold text-pink-500 flex items-center gap-1 hover:gap-2 transition-all">
-            View all services <ArrowRight size={14} />
-          </Link>
-        </div>
-        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-          {serviceCategories.map((cat) => (
-            <Link key={cat.id} to={`/book/${cat.id}`}
-              className="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-pink-50 transition-colors group">
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-pink-100 group-hover:border-pink-300 transition-colors">
-                <img src={cat.image} alt={cat.label} className="w-full h-full object-cover" />
-              </div>
-              <span className="text-[10px] font-medium text-gray-600 text-center leading-tight">{cat.label}</span>
-            </Link>
-          ))}
+      {/* ── QUICK ACCESS STRIP ─────────────────────────────────────── */}
+      <section className="py-14 bg-white">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="grid grid-cols-4 sm:grid-cols-8 gap-4">
+            {quickLinks.map((ql) => (
+              <motion.div key={ql.label} variants={cardItem}>
+                <Link to={ql.path}
+                  className="flex flex-col items-center gap-2.5 group p-3 rounded-2xl hover:bg-pink-50 transition-colors">
+                  <div className="w-14 h-14 bg-pink-50 group-hover:bg-pink-100 rounded-2xl flex items-center justify-center text-2xl transition-colors shadow-sm">
+                    {ql.icon}
+                  </div>
+                  <span className="text-xs font-semibold text-gray-700 group-hover:text-pink-500 transition-colors text-center">{ql.label}</span>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* ── FEATURED PROVIDERS ────────────────────────────────────────── */}
-      <section className="bg-gray-50 py-12">
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between mb-6">
+      {/* ── FEATURED PROVIDERS ─────────────────────────────────────── */}
+      <section className="py-16 bg-[#FAFAFA]">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-xs font-semibold text-pink-500 tracking-widest uppercase mb-1">TOP RATED</p>
-              <h2 className="font-display text-2xl font-bold text-gray-900">Featured Professionals</h2>
+              <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-2">Top Rated</p>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Featured Providers</h2>
             </div>
-            <Link to="/providers" className="text-sm font-semibold text-pink-500 flex items-center gap-1 hover:gap-2 transition-all">
-              View all providers <ArrowRight size={14} />
+            <Link to="/providers" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-pink-500 hover:text-pink-600 transition-colors">
+              View All <ChevronRight size={16} />
             </Link>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {providers.map((p) => (
-              <Link key={p.id} to={`/providers/${p.slug}`}
-                className="bg-white rounded-2xl overflow-hidden shadow-card card-hover border border-gray-100">
-                <div className="relative h-44">
-                  <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                  <span className="absolute top-3 left-3 bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    <ShieldCheck size={10} /> Verified
-                  </span>
-                  <button className="absolute top-3 right-3 w-7 h-7 bg-white/80 rounded-full flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">♡</span>
+
+          {providers.length > 0 ? (
+            <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+              className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {providers.map(p => (
+                <motion.div key={p.id} variants={cardItem}
+                  whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100 group">
+                  <Link to={`/providers/${p.id}`}>
+                    <div className="relative h-52 overflow-hidden">
+                      <img src={p.avatar || `https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop`}
+                        alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      {p.verified && (
+                        <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-green-600 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                          <CheckCircle size={11} /> Verified
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-900 mb-0.5">{p.name}</h3>
+                      <p className="text-xs text-gray-500 mb-2">{p.specialty || 'Hair Specialist'}</p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Stars val={p.rating || 4.9} size={12} />
+                        <span className="text-xs font-semibold text-gray-700">{p.rating || '4.9'}</span>
+                        <span className="text-xs text-gray-400">({p.review_count || '128'})</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <MapPin size={12} /> {p.location || 'London, UK'}
+                        </div>
+                        <span className="text-pink-500 text-xs font-bold">From £{p.min_price || '35'}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+              className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { name: 'Amara Johnson', spec: 'Braids & Natural Hair', rating: 4.9, reviews: 238, location: 'London, UK', price: 45, img: 'photo-1531746020798-e6953c6e8e04' },
+                { name: 'Kezia Williams', spec: 'Locs Specialist', rating: 4.8, reviews: 184, location: 'Manchester, UK', price: 55, img: 'photo-1523264653568-d3d4032d1476' },
+                { name: 'Temi Ade', spec: 'Wig Installation', rating: 5.0, reviews: 312, location: 'Birmingham, UK', price: 80, img: 'photo-1499557354967-2b2d8910bcca' },
+                { name: 'Naomi Clarke', spec: 'Hair Stylist & MUA', rating: 4.9, reviews: 97, location: 'Leeds, UK', price: 60, img: 'photo-1489424731084-a5d8b219a5bb' },
+              ].map((p, i) => (
+                <motion.div key={i} variants={cardItem} whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100 group">
+                  <Link to="/providers">
+                    <div className="relative h-52 overflow-hidden">
+                      <img src={`https://images.unsplash.com/${p.img}?w=400&h=300&fit=crop&crop=face`}
+                        alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-green-600 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <CheckCircle size={11} /> Verified
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-900 mb-0.5">{p.name}</h3>
+                      <p className="text-xs text-gray-500 mb-2">{p.spec}</p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Stars val={p.rating} size={12} />
+                        <span className="text-xs font-semibold text-gray-700">{p.rating}</span>
+                        <span className="text-xs text-gray-400">({p.reviews})</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <MapPin size={12} /> {p.location}
+                        </div>
+                        <span className="text-pink-500 text-xs font-bold">From £{p.price}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* ── AI BEAUTY ANALYSER ─────────────────────────────────────── */}
+      <section className="py-20 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(233,30,99,0.15),_transparent_60%)]" />
+        <div className="max-w-[1280px] mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <span className="inline-flex items-center gap-2 bg-pink-500/20 text-pink-400 text-xs font-bold px-4 py-1.5 rounded-full mb-5">
+              <Sparkles size={13} /> Powered by AI
+            </span>
+            <h2 className="font-display font-bold text-4xl lg:text-5xl text-white leading-tight mb-5">
+              Meet <span className="text-pink-400">Reja</span> —<br />Your AI Beauty Advisor
+            </h2>
+            <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+              Upload a photo and get a personalised hair health report, product recommendations, and a routine crafted for your unique hair type.
+            </p>
+            <div className="flex flex-col gap-3 mb-8">
+              {['Instant hair type & porosity analysis','Personalised product recommendations','Custom care routine in seconds'].map((f, i) => (
+                <div key={i} className="flex items-center gap-3 text-gray-300 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-pink-500/30 flex items-center justify-center shrink-0">
+                    <CheckCircle size={12} className="text-pink-400" />
+                  </div>
+                  {f}
+                </div>
+              ))}
+            </div>
+            <Link to="/ai-beauty/hair" className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-pink-900/30">
+              Try Reja Free <ArrowRight size={16} />
+            </Link>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+            className="relative hidden lg:block">
+            <div className="rounded-3xl overflow-hidden h-[420px] relative">
+              <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&h=500&fit=crop&crop=center"
+                alt="AI Beauty Analysis" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent" />
+            </div>
+            <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4">
+              <p className="text-white text-xs font-bold mb-2">✨ Reja Analysis Complete</p>
+              <div className="flex gap-2 flex-wrap">
+                {['4C Hair Type','Low Porosity','Needs Moisture'].map(t => (
+                  <span key={t} className="bg-pink-500/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">{t}</span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── SHOP SECTION ───────────────────────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-2">Our Store</p>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Shop Best Sellers</h2>
+            </div>
+            <Link to="/shop" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-pink-500 hover:text-pink-600 transition-colors">
+              View All <ChevronRight size={16} />
+            </Link>
+          </div>
+
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {(products.length > 0 ? products : [
+              { id:1, name: 'Jamaican Black Castor Oil', brand: 'Tropic Isle', price: 12.99, rating: 4.8, img: 'photo-1571781926291-c477ebfd024b', category: 'Hair Care' },
+              { id:2, name: 'Curl Defining Cream', brand: 'Shea Moisture', price: 9.49, rating: 4.9, img: 'photo-1596755389378-c31d21fd1273', category: 'Styling' },
+              { id:3, name: 'Deep Conditioning Mask', brand: 'Cantu', price: 7.99, rating: 4.7, img: 'photo-1556228578-8c89e6adf883', category: 'Treatment' },
+              { id:4, name: 'Edge Control Gel', brand: 'Got2B', price: 5.99, rating: 4.6, img: 'photo-1571019613454-1cb2f99b2d8b', category: 'Styling' },
+            ]).map((p, i) => (
+              <motion.div key={p.id || i} variants={cardItem} whileHover={{ y: -5 }}
+                className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all group">
+                <div className="relative h-52 bg-gray-50 overflow-hidden">
+                  <img
+                    src={p.image_url || `https://images.unsplash.com/${p.img}?w=300&h=280&fit=crop`}
+                    alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <button
+                    onClick={() => toggleWishlist(p)}
+                    className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full shadow flex items-center justify-center hover:bg-pink-50 transition-colors">
+                    <Heart size={14} className={inWishlist(p.id) ? 'fill-pink-500 text-pink-500' : 'text-gray-400'} />
                   </button>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-sm mb-0.5">{p.name}</h3>
-                  <p className="text-xs text-gray-500 mb-2">{p.speciality} · {p.location}</p>
+                  <p className="text-[11px] text-pink-500 font-semibold uppercase tracking-wide mb-1">{p.category || p.brand}</p>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2">{p.name}</h3>
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <Stars val={p.rating || 4.8} size={11} />
+                    <span className="text-[11px] text-gray-500">({p.review_count || Math.floor(Math.random()*200+50)})</span>
+                  </div>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <Stars val={p.rating} size={11} />
-                      <span className="text-xs font-semibold text-gray-700">{p.rating}</span>
-                      <span className="text-xs text-gray-400">({p.review_count})</span>
-                    </div>
-                    <span className="text-sm font-bold text-pink-500">From £{p.price_from}</span>
+                    <span className="font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
+                    <button onClick={() => addToCart({ ...p, id: p.id || i })}
+                      className="flex items-center gap-1.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
+                      <ShoppingBag size={12} /> Add
+                    </button>
                   </div>
-                  <button className="w-full mt-3 bg-pink-500 text-white text-xs font-semibold py-2 rounded-full hover:bg-pink-600 transition-colors">
-                    View Profile
-                  </button>
                 </div>
-              </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ── AI BEAUTY ANALYZER ────────────────────────────────────────── */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-6 py-12">
-        <div className="grid lg:grid-cols-2 gap-10 items-center">
-          {/* Phone mockup */}
-          <div className="relative flex justify-center">
-            <div className="w-56 lg:w-64 bg-white rounded-3xl shadow-modal border border-gray-100 overflow-hidden">
-              <div className="bg-pink-500 p-4 pb-2">
-                <p className="text-white text-xs font-semibold">AI Hair Score</p>
-                <div className="mt-2 flex gap-2">
-                  {[['Health','78'],['Density','82'],['Moisture','65']].map(([k,v]) => (
-                    <div key={k} className="flex-1 bg-white/20 rounded-lg p-2 text-center">
-                      <p className="text-white text-[10px]">{k}</p>
-                      <p className="text-white font-bold text-sm">{v}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="p-4">
-                <p className="text-xs font-semibold text-gray-700 mb-2">Your Hair Profile</p>
-                {[['Hair Type','4C Natural'],['Density','Medium'],['Porosity','High'],['Scalp','Dry']].map(([k,v]) => (
-                  <div key={k} className="flex justify-between py-1 border-b border-gray-50 last:border-0">
-                    <span className="text-[10px] text-gray-500">{k}</span>
-                    <span className="text-[10px] font-semibold text-gray-700">{v}</span>
-                  </div>
-                ))}
-                <p className="text-[10px] font-semibold text-gray-700 mt-3 mb-1.5">Top Recommendations</p>
-                {['Deep Conditioning Treatment','Moisture-Lock Serum','Scalp Massage Routine'].map((r) => (
-                  <div key={r} className="flex items-center gap-1.5 py-0.5">
-                    <div className="w-1.5 h-1.5 bg-pink-400 rounded-full" />
-                    <span className="text-[9px] text-gray-600">{r}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+      {/* ── HOW IT WORKS ───────────────────────────────────────────── */}
+      <section className="py-20 bg-[#FAFAFA]">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="text-center mb-14">
+            <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-3">Simple Process</p>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">How Rejuveefy Works</h2>
           </div>
-          {/* Text */}
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="grid lg:grid-cols-3 gap-8">
+            {howItWorks.map((h, i) => (
+              <motion.div key={h.step} variants={cardItem}
+                className="relative bg-white rounded-3xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-pink-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md">
+                  {h.step}
+                </div>
+                <div className="text-5xl mb-5 mt-2">{h.icon}</div>
+                <h3 className="font-bold text-xl text-gray-900 mb-3">{h.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{h.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ───────────────────────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-3">Client Love</p>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">What Our Clients Say</h2>
+          </div>
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+            className="grid lg:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <motion.div key={i} variants={cardItem}
+                className="bg-[#FAFAFA] rounded-2xl p-6 border border-gray-100">
+                <Stars val={t.rating} size={14} />
+                <p className="text-gray-700 text-sm leading-relaxed my-4">"{t.text}"</p>
+                <div className="flex items-center gap-3">
+                  <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+                  <div>
+                    <p className="font-bold text-sm text-gray-900">{t.name}</p>
+                    <p className="text-xs text-gray-500">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── PROVIDER CTA BANNER ────────────────────────────────────── */}
+      <section className="py-16 bg-gradient-to-r from-pink-500 to-rose-500">
+        <div className="max-w-[1280px] mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left">
           <div>
-            <p className="text-xs font-semibold text-pink-500 tracking-widest uppercase mb-2">AI BEAUTY ANALYZER</p>
-            <h2 className="font-display text-3xl font-bold text-gray-900 mb-3">
-              Discover What Your Hair and Skin Really Need
-            </h2>
-            <p className="text-gray-500 text-sm leading-relaxed mb-5">
-              Upload a photo and receive personalised insights about your hair health, recommended services, skincare and find the perfect professionals for you.
-            </p>
-            <ul className="space-y-2 mb-6">
-              {['Hair Care Analysis', 'Skin Care Insights', 'Hair Loss Detection', 'Scalp Health Report'].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center shrink-0">
-                    <span className="text-pink-500 text-[9px]">✓</span>
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/ai-analyzer/hair" className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">
-                Try Hair Analysis
-              </Link>
-              <Link to="/ai-analyzer/skin" className="border border-pink-500 text-pink-500 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-50 transition-colors">
-                Analyse My Skin
-              </Link>
-            </div>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-white mb-3">Are You a Beauty Professional?</h2>
+            <p className="text-pink-100 text-lg">Join 850+ providers earning more with Rejuveefy. Free to join, no commission on your first 10 bookings.</p>
           </div>
-        </div>
-      </section>
-
-      {/* ── SHOP HAIR ESSENTIALS ──────────────────────────────────────── */}
-      <section className="bg-gray-50 py-12">
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <p className="text-xs font-semibold text-pink-500 tracking-widest uppercase mb-1">SHOP</p>
-              <h2 className="font-display text-2xl font-bold text-gray-900">Shop Hair Essentials</h2>
-            </div>
-            <Link to="/shop" className="text-sm font-semibold text-pink-500 flex items-center gap-1 hover:gap-2 transition-all">
-              View all <ArrowRight size={14} />
+          <div className="flex gap-3 shrink-0">
+            <Link to="/providers-portal" className="bg-white text-pink-500 font-bold px-8 py-4 rounded-xl hover:bg-pink-50 transition-colors shadow-lg">
+              Join as Provider
+            </Link>
+            <Link to="/about" className="border border-white/50 text-white font-bold px-8 py-4 rounded-xl hover:bg-white/10 transition-colors">
+              Learn More
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {products.map((p) => (
-              <Link key={p.id} to={`/product/${p.id}`}
-                className="bg-white rounded-xl overflow-hidden shadow-card card-hover border border-gray-100">
-                <div className="relative aspect-square bg-gray-50">
-                  <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
-                  {p.is_featured && (
-                    <span className="absolute top-2 left-2 bg-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                      FEATURED
-                    </span>
-                  )}
-                </div>
-                <div className="p-2.5">
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{p.category}</p>
-                  <p className="text-xs font-medium text-gray-800 line-clamp-2 mb-1">{p.name}</p>
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <Stars val={p.rating} size={9} />
-                    <span className="text-[9px] text-gray-400">({p.review_count})</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
-                    {p.compare_price && <span className="text-[10px] text-gray-400 line-through">£{Number(p.compare_price).toFixed(2)}</span>}
-                  </div>
-                  <button onClick={e => { e.preventDefault(); addToCart(p) }}
-                    className="w-full mt-2 bg-pink-500 text-white text-[10px] font-semibold py-1.5 rounded-full hover:bg-pink-600 transition-colors">
-                    Add to Cart
-                  </button>
-                </div>
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ──────────────────────────────────────────────── */}
-      <section className="max-w-[1280px] mx-auto px-4 lg:px-6 py-12">
-        <div className="text-center mb-8">
-          <h2 className="font-display text-2xl font-bold text-gray-900">Beauty Made Simple</h2>
-          <p className="text-gray-500 text-sm mt-1">From discovery to styled in a few easy steps</p>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { n: '01', icon: '🔍', title: 'Search & Explore', desc: 'Browse verified hair and beauty professionals near you' },
-            { n: '02', icon: '📅', title: 'Book or Shop', desc: 'Book a service or shop premium products in seconds' },
-            { n: '03', icon: '✨', title: 'Look & Feel Amazing', desc: 'Enjoy your appointment or receive your order fast' },
-            { n: '04', icon: '⭐', title: 'Review & Reward', desc: 'Leave a review and earn loyalty points on every visit' },
-          ].map((s) => (
-            <div key={s.n} className="text-center">
-              <div className="relative w-14 h-14 mx-auto mb-4">
-                <div className="w-14 h-14 bg-pink-50 rounded-2xl flex items-center justify-center text-2xl">
-                  {s.icon}
-                </div>
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-pink-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                  {s.n}
-                </span>
-              </div>
-              <h3 className="text-sm font-semibold text-gray-800 mb-1">{s.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{s.desc}</p>
-            </div>
-          ))}
+      {/* ── NEWSLETTER ─────────────────────────────────────────────── */}
+      <section className="py-16 bg-gray-900">
+        <div className="max-w-[600px] mx-auto px-6 text-center">
+          <p className="text-pink-400 text-sm font-semibold uppercase tracking-wider mb-3">Stay in the Loop</p>
+          <h2 className="font-display font-bold text-3xl text-white mb-3">Get Beauty Tips & Offers</h2>
+          <p className="text-gray-400 mb-8">Join 8,000+ subscribers for weekly hair care tips, exclusive deals and new provider highlights.</p>
+          <form className="flex gap-2 max-w-[440px] mx-auto" onSubmit={e => e.preventDefault()}>
+            <input type="email" placeholder="Enter your email address"
+              className="flex-1 bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 text-sm px-4 py-3.5 rounded-xl outline-none focus:border-pink-500 transition-colors" />
+            <button type="submit" className="bg-pink-500 hover:bg-pink-600 text-white font-bold px-6 py-3.5 rounded-xl transition-colors shrink-0">
+              Subscribe
+            </button>
+          </form>
+          <p className="text-gray-600 text-xs mt-4">No spam. Unsubscribe anytime.</p>
         </div>
       </section>
 
-      {/* ── BECOME A PROVIDER + APP + NEWSLETTER ─────────────────────── */}
-      <section className="bg-gray-50 py-12">
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid lg:grid-cols-3 gap-6">
-          {/* Become a provider */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-card">
-            <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center mb-3">
-              <span className="text-xl">💼</span>
-            </div>
-            <h3 className="font-display text-lg font-bold text-gray-900 mb-2">Become a Provider</h3>
-            <p className="text-sm text-gray-500 leading-relaxed mb-4">
-              Join our platform and grow your beauty business. Reach new clients, manage your bookings and get paid fast.
-            </p>
-            <Link to="/become-provider"
-              className="inline-flex items-center gap-2 bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">
-              Join as a Provider <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          {/* Download App */}
-          <div className="bg-gray-900 rounded-2xl p-6 text-white">
-            <h3 className="font-display text-lg font-bold mb-2">Download the App</h3>
-            <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              Book, shop, and track everything on the go. Available on iOS and Android.
-            </p>
-            <div className="flex flex-col gap-2">
-              {/* Apple App Store */}
-              <button className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 hover:bg-white/20 transition-colors">
-                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white shrink-0" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
-                <div className="text-left">
-                  <p className="text-[9px] text-gray-400 leading-none">Download on the</p>
-                  <p className="text-sm font-semibold leading-tight">App Store</p>
-                </div>
-              </button>
-              {/* Google Play */}
-              <button className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 hover:bg-white/20 transition-colors">
-                <svg viewBox="0 0 24 24" className="w-6 h-6 shrink-0" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3.18 23.76c.3.17.64.22.99.14l13.24-7.44-2.88-2.88-11.35 10.18z" fill="#EA4335"/>
-                  <path d="M21.6 10.04l-2.94-1.65-3.22 2.88 3.22 3.22 2.97-1.67c.85-.48.85-2.3-.03-2.78z" fill="#FBBC04"/>
-                  <path d="M3.18.24C2.86.43 2.65.8 2.65 1.3v21.4c0 .5.2.86.53 1.06l.11.06 12-12.01v-.27L3.29.18l-.11.06z" fill="#4285F4"/>
-                  <path d="M17.41 15.46L14.46 12.5 3.18 23.76c.4.43 1.05.48 1.78.07l12.45-8.37z" fill="#34A853"/>
-                </svg>
-                <div className="text-left">
-                  <p className="text-[9px] text-gray-400 leading-none">Get it on</p>
-                  <p className="text-sm font-semibold leading-tight text-white">Google Play</p>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Newsletter */}
-          <div className="bg-pink-500 rounded-2xl p-6 text-white">
-            <h3 className="font-display text-lg font-bold mb-2">Stay in the Beauty Loop</h3>
-            <p className="text-sm text-pink-100 leading-relaxed mb-4">
-              Get beauty tips, exclusive offers and new product launches straight to your inbox.
-            </p>
-            <div className="flex gap-2">
-              <input type="email" placeholder="Enter your email"
-                className="flex-1 px-3 py-2.5 rounded-xl text-sm text-gray-900 outline-none placeholder:text-gray-400" />
-              <button className="bg-white text-pink-500 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-50 transition-colors whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
