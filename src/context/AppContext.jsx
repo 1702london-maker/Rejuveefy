@@ -4,11 +4,18 @@ import { supabase } from '../lib/supabase'
 const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
-  const [cart, setCart] = useState([])
-  const [wishlist, setWishlist] = useState([])
+  const [cart, setCart] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('rjyf_cart') || '[]') } catch { return [] }
+  })
+  const [wishlist, setWishlist] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('rjyf_wishlist') || '[]') } catch { return [] }
+  })
   const [toast, setToast] = useState(null)
   const [user, setUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
+
+  useEffect(() => { localStorage.setItem('rjyf_cart', JSON.stringify(cart)) }, [cart])
+  useEffect(() => { localStorage.setItem('rjyf_wishlist', JSON.stringify(wishlist)) }, [wishlist])
 
   // Listen for auth state changes
   useEffect(() => {

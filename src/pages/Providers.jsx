@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Search, MapPin, Star, ShieldCheck, Heart, ChevronDown, SlidersHorizontal, ArrowRight, Phone, Mail, Globe, Clock, CheckCircle, Calendar, MessageCircle, Share2, Flag } from 'lucide-react'
-import { providers } from '../data/mockData'
+import { fetchProviders, fetchProvider, createBooking } from '../lib/db'
+import { useApp } from '../context/AppContext'
 
 function Stars({ val = 5, size = 12 }) {
   return (
@@ -19,10 +20,15 @@ export default function Providers() {
   const [loc, setLoc] = useState('')
   const [sortBy, setSortBy] = useState('Top Rated')
   const [filters, setFilters] = useState({ category: [], rating: '', priceMax: 300 })
+  const [allProviders, setAllProviders] = useState([])
 
-  const filtered = providers.filter(p =>
-    (!q || p.name.toLowerCase().includes(q.toLowerCase()) || p.category.toLowerCase().includes(q.toLowerCase())) &&
-    (!loc || p.city.toLowerCase().includes(loc.toLowerCase()))
+  useEffect(() => {
+    fetchProviders({ limit: 50 }).then(setAllProviders).catch(() => {})
+  }, [])
+
+  const filtered = allProviders.filter(p =>
+    (!q || p.name.toLowerCase().includes(q.toLowerCase()) || (p.speciality || '').toLowerCase().includes(q.toLowerCase())) &&
+    (!loc || (p.location || '').toLowerCase().includes(loc.toLowerCase()) || (p.postcode || '').toLowerCase().includes(loc.toLowerCase()))
   )
 
   return (
@@ -148,12 +154,10 @@ export default function Providers() {
                 <div key={p.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-card card-hover">
                   <div className="flex flex-col sm:flex-row">
                     <div className="sm:w-56 lg:w-64 relative shrink-0">
-                      <img src={p.image} alt={p.name} className="w-full h-48 sm:h-full object-cover" />
-                      {p.verified && (
-                        <span className="absolute top-3 left-3 bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                          <ShieldCheck size={10} /> Verified
-                        </span>
-                      )}
+                      <img src={p.image_url} alt={p.name} className="w-full h-48 sm:h-full object-cover" />
+                      <span className="absolute top-3 left-3 bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                        <ShieldCheck size={10} /> Verified
+                      </span>
                       <button className="absolute top-3 right-3 w-7 h-7 bg-white/80 rounded-full flex items-center justify-center">
                         <Heart size={14} className="text-gray-400" />
                       </button>
@@ -162,10 +166,10 @@ export default function Providers() {
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div>
                           <h3 className="font-semibold text-gray-900 text-base leading-tight">{p.name}</h3>
-                          <p className="text-xs text-gray-500">{p.category}</p>
+                          <p className="text-xs text-gray-500">{p.speciality}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-lg font-bold text-pink-500">£{p.startingPrice}</p>
+                          <p className="text-lg font-bold text-pink-500">£{p.price_from}</p>
                           <p className="text-xs text-gray-400">starting from</p>
                         </div>
                       </div>
@@ -174,9 +178,9 @@ export default function Providers() {
                         <div className="flex items-center gap-1">
                           <Stars val={p.rating} size={12} />
                           <span className="text-xs font-bold text-gray-700">{p.rating}</span>
-                          <span className="text-xs text-gray-400">({p.reviews} reviews)</span>
+                          <span className="text-xs text-gray-400">({p.review_count} reviews)</span>
                         </div>
-                        {p.topRated && (
+                        {p.is_featured && (
                           <span className="text-[10px] font-semibold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">Top Rated</span>
                         )}
                       </div>
@@ -185,13 +189,12 @@ export default function Providers() {
 
                       <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
                         <MapPin size={12} className="text-pink-400" />
-                        {p.city}
-                        <span className="mx-1">·</span>
                         {p.location}
+                        {p.postcode && <><span className="mx-1">·</span>{p.postcode}</>}
                       </div>
 
                       <div className="flex flex-wrap gap-1.5 mb-4">
-                        {p.tags?.slice(0, 4).map(t => (
+                        {(p.tags || []).slice(0, 4).map(t => (
                           <span key={t} className="text-[10px] bg-pink-50 text-pink-600 px-2 py-0.5 rounded-full">{t}</span>
                         ))}
                       </div>
@@ -238,11 +241,23 @@ export default function Providers() {
 export function ProviderProfile() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const provider = providers.find(p => p.slug === slug) || providers[0]
+  const [provider, setProvider] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('About')
   const [liked, setLiked] = useState(false)
 
-  const tabs = ['About', 'Services & Pricing', 'Portfolio', `Reviews (${provider.reviews})`, 'Location']
+  useEffect(() => {
+    fetchProvider(slug)
+      .then(setProvider)
+      .catch(() => setProvider(null))
+      .finally(() => setLoading(false))
+  }, [slug])
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" /></div>
+  if (!provider) return <div className="min-h-screen flex items-center justify-center"><p className="text-gray-500">Provider not found.</p></div>
+
+  const services = Array.isArray(provider.services) ? provider.services : (typeof provider.services === 'string' ? JSON.parse(provider.services) : [])
+  const tabs = ['About', 'Services & Pricing', 'Portfolio', `Reviews (${provider.review_count})`, 'Location']
 
   return (
     <div className="min-h-screen bg-white">
@@ -266,17 +281,17 @@ export function ProviderProfile() {
             <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-card mb-6">
               {/* Banner */}
               <div className="h-32 bg-gradient-to-r from-pink-200 to-pink-100 relative">
-                {provider.banner && <img src={provider.banner} alt="" className="w-full h-full object-cover opacity-60" />}
+                {provider.image_url && <img src={provider.image_url} alt="" className="w-full h-full object-cover opacity-60" />}
               </div>
               <div className="px-5 pb-5">
                 <div className="flex items-end gap-4 -mt-10 mb-3">
-                  <img src={provider.image} alt={provider.name} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-card" />
+                  <img src={provider.image_url} alt={provider.name} className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-card" />
                   <div className="mb-1">
                     <div className="flex items-center gap-2">
                       <h1 className="font-display text-xl font-bold text-gray-900">{provider.name}</h1>
-                      {provider.verified && <ShieldCheck size={16} className="text-pink-500" />}
+                      <ShieldCheck size={16} className="text-pink-500" />
                     </div>
-                    <p className="text-sm text-gray-500">{provider.category}</p>
+                    <p className="text-sm text-gray-500">{provider.speciality}</p>
                   </div>
                   <div className="ml-auto flex gap-2">
                     <button onClick={() => setLiked(!liked)} className={`p-2 rounded-xl border transition-colors ${liked ? 'border-pink-500 bg-pink-50 text-pink-500' : 'border-gray-200 text-gray-400 hover:border-pink-300'}`}>
@@ -293,13 +308,13 @@ export function ProviderProfile() {
                   <div className="flex items-center gap-1.5">
                     <Stars val={provider.rating} size={13} />
                     <span className="text-sm font-bold text-gray-800">{provider.rating}</span>
-                    <span className="text-xs text-gray-400">({provider.reviews} reviews)</span>
+                    <span className="text-xs text-gray-400">({provider.review_count} reviews)</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
                     <MapPin size={13} className="text-pink-400" />
-                    {provider.city}
+                    {provider.location}
                   </div>
-                  {provider.topRated && (
+                  {provider.is_featured && (
                     <span className="text-[10px] font-semibold bg-amber-100 text-amber-600 px-2 py-1 rounded-full flex items-center gap-1">
                       ⭐ Top Rated
                     </span>
@@ -308,7 +323,7 @@ export function ProviderProfile() {
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 mt-3">
-                  {provider.tags?.map(t => (
+                  {(provider.tags || []).map(t => (
                     <span key={t} className="text-[11px] bg-pink-50 text-pink-600 px-2.5 py-1 rounded-full border border-pink-100">{t}</span>
                   ))}
                 </div>
@@ -338,7 +353,7 @@ export function ProviderProfile() {
                   {[
                     { v: `${provider.reviews}+`, l: 'Happy Clients' },
                     { v: '100%', l: 'Positive Reviews' },
-                    { v: `${provider.appointments}+`, l: 'Years Experience' },
+                    { v: `${provider.review_count}+`, l: 'Reviews' },
                     { v: 'Top Rated', l: 'On Rejuveefy' },
                   ].map(s => (
                     <div key={s.l} className="bg-pink-50 rounded-xl p-3 text-center">
@@ -369,8 +384,8 @@ export function ProviderProfile() {
                   <Link to={`/providers/${provider.slug}/book`} className="text-xs text-pink-500 font-semibold">View All Services</Link>
                 </div>
                 <div className="space-y-3">
-                  {provider.services.map((s) => (
-                    <div key={s.id} className="border border-gray-100 rounded-2xl p-4 flex items-start gap-4 card-hover">
+                  {services.map((s, idx) => (
+                    <div key={idx} className="border border-gray-100 rounded-2xl p-4 flex items-start gap-4 card-hover">
                       <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center shrink-0">
                         <span className="text-xl">✂️</span>
                       </div>
@@ -378,21 +393,14 @@ export function ProviderProfile() {
                         <div className="flex items-start justify-between gap-2">
                           <div>
                             <h3 className="text-sm font-semibold text-gray-900">{s.name}</h3>
-                            <p className="text-xs text-gray-500 mt-0.5">{s.desc}</p>
                           </div>
                           <div className="text-right shrink-0">
                             <p className="text-lg font-bold text-gray-900">£{s.price}</p>
                           </div>
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1">
-                              <Stars val={s.rating} size={10} />
-                              <span className="text-[10px] text-gray-500">({s.reviews})</span>
-                            </div>
-                            <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {s.duration}</span>
-                          </div>
-                          <Link to={`/providers/${provider.slug}/book?service=${s.id}`}
+                          <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {s.duration}</span>
+                          <Link to={`/providers/${provider.slug}/book?service=${encodeURIComponent(s.name)}`}
                             className="bg-pink-500 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full hover:bg-pink-600 transition-colors">
                             Book Now
                           </Link>
@@ -403,7 +411,7 @@ export function ProviderProfile() {
                 </div>
                 <div className="text-center mt-3">
                   <p className="text-xs text-gray-400">Not sure what you need?</p>
-                  <button className="text-xs font-semibold text-pink-500 mt-1">Message Amara</button>
+                  <button className="text-xs font-semibold text-pink-500 mt-1">Message {provider.name}</button>
                 </div>
               </div>
             )}
@@ -416,19 +424,11 @@ export function ProviderProfile() {
                   <span className="text-xs text-gray-400">{provider.portfolio?.length || 0} photos</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                  {provider.portfolio?.map((img, i) => (
+                  {(provider.gallery_urls || [provider.image_url]).filter(Boolean).map((img, i) => (
                     <div key={i} className="aspect-square rounded-xl overflow-hidden">
                       <img src={img} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer" />
                     </div>
                   ))}
-                  {(provider.portfolio?.length || 0) > 4 && (
-                    <div className="aspect-square rounded-xl overflow-hidden relative">
-                      <img src={provider.portfolio?.[4]} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">+{(provider.portfolio?.length || 0) - 4}</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -440,7 +440,7 @@ export function ProviderProfile() {
                   <div className="text-center">
                     <p className="font-display text-4xl font-bold text-gray-900">{provider.rating}</p>
                     <Stars val={provider.rating} size={16} />
-                    <p className="text-xs text-gray-400 mt-1">{provider.reviews} reviews</p>
+                    <p className="text-xs text-gray-400 mt-1">{provider.review_count} reviews</p>
                   </div>
                   <div className="flex-1 space-y-1.5">
                     {[5,4,3,2,1].map(n => (
@@ -454,26 +454,27 @@ export function ProviderProfile() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  {provider.reviews_list?.map((r, i) => (
+                  {(provider.reviews || []).map((r, i) => (
                     <div key={i} className="border-b border-gray-100 pb-4 last:border-0">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="w-9 h-9 bg-pink-100 rounded-full flex items-center justify-center">
-                          <span className="text-pink-500 font-bold text-sm">{r.name[0]}</span>
+                          <span className="text-pink-500 font-bold text-sm">U</span>
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-gray-800">{r.name}</p>
+                          <p className="text-sm font-semibold text-gray-800">Customer</p>
                           <div className="flex items-center gap-2">
                             <Stars val={r.rating} size={10} />
-                            <span className="text-[10px] text-gray-400">{r.date}</span>
+                            <span className="text-[10px] text-gray-400">{new Date(r.created_at).toLocaleDateString('en-GB')}</span>
                           </div>
                         </div>
-                        {r.verified && (
-                          <span className="ml-auto text-[10px] text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">Verified Booking</span>
-                        )}
+                        <span className="ml-auto text-[10px] text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">Verified</span>
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">{r.text}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>
                     </div>
                   ))}
+                  {(!provider.reviews || provider.reviews.length === 0) && (
+                    <p className="text-sm text-gray-400 text-center py-6">No reviews yet — be the first to book!</p>
+                  )}
                 </div>
               </div>
             )}
@@ -486,13 +487,13 @@ export function ProviderProfile() {
                   <div className="flex items-start gap-3">
                     <MapPin size={18} className="text-pink-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">{provider.city}</p>
-                      <p className="text-xs text-gray-500">{provider.location}</p>
+                      <p className="text-sm font-semibold text-gray-800">{provider.location}</p>
+                      <p className="text-xs text-gray-500">{provider.postcode}</p>
                     </div>
                   </div>
                 </div>
                 <div className="h-48 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400 text-sm">
-                  📍 Map View — {provider.city}
+                  📍 Map View — {provider.location}
                 </div>
               </div>
             )}
@@ -589,9 +590,20 @@ export function ProviderProfile() {
 export function BookingFlow() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const provider = providers.find(p => p.slug === slug) || providers[0]
+  const { user } = useApp()
+  const [provider, setProvider] = useState(null)
   const [step, setStep] = useState(1)
-  const [selectedService, setSelectedService] = useState(provider.services[0])
+  const [selectedService, setSelectedService] = useState(null)
+
+  useEffect(() => {
+    fetchProvider(slug).then(p => {
+      setProvider(p)
+      const services = Array.isArray(p.services) ? p.services : (typeof p.services === 'string' ? JSON.parse(p.services) : [])
+      setSelectedService(services[0] || null)
+    }).catch(() => {})
+  }, [slug])
+
+  if (!provider) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" /></div>
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [locType, setLocType] = useState('salon')
@@ -657,12 +669,12 @@ export function BookingFlow() {
                 </div>
                 {/* Provider chip */}
                 <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl mt-2">
-                  <img src={provider.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  <img src={provider.image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-gray-900">{provider.name}</p>
                     <div className="flex items-center gap-1">
                       <Stars val={provider.rating} size={10} />
-                      <span className="text-[10px] text-gray-500">{provider.rating} · {provider.city}</span>
+                      <span className="text-[10px] text-gray-500">{provider.rating} · {provider.location}</span>
                     </div>
                   </div>
                   <div className="text-right">
@@ -761,7 +773,24 @@ export function BookingFlow() {
                   <span className="text-xs text-gray-500">Send me a confirmation after booking</span>
                 </label>
 
-                <button onClick={() => navigate(`/booking-confirmation`)}
+                <button onClick={async () => {
+                  if (user && selectedService && selectedDate && selectedTime) {
+                    try {
+                      await createBooking({
+                        user_id: user.id,
+                        provider_id: provider.id,
+                        service_name: selectedService.name,
+                        service_price: selectedService.price,
+                        booking_date: selectedDate,
+                        booking_time: selectedTime,
+                        location_type: locType,
+                        notes,
+                        status: 'pending',
+                      })
+                    } catch {}
+                  }
+                  navigate('/booking-confirmation')
+                }}
                   className="w-full mt-4 bg-pink-500 text-white py-3.5 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
                   Continue to Your Details →
                 </button>
@@ -838,8 +867,15 @@ export function BookingFlow() {
 
 // ── BOOKING CONFIRMATION ──────────────────────────────────────────────────────
 export function BookingConfirmation() {
-  const provider = providers[0]
-  const service = provider.services[0]
+  const { user } = useApp()
+  const [booking, setBooking] = useState(null)
+
+  useEffect(() => {
+    if (!user) return
+    import('../lib/db').then(({ fetchUserBookings }) =>
+      fetchUserBookings(user.id).then(bs => setBooking(bs[0] || null))
+    )
+  }, [user])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -899,14 +935,14 @@ export function BookingConfirmation() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Service</p>
-                    <p className="text-sm font-semibold text-gray-800">{service.name}</p>
+                    <p className="text-sm font-semibold text-gray-800">{booking?.service_name || '—'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <img src={provider.image} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                  <img src={booking?.providers?.image_url} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
                   <div>
                     <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Provider</p>
-                    <p className="text-sm font-semibold text-gray-800 flex items-center gap-1">{provider.name} <ShieldCheck size={12} className="text-pink-500" /></p>
+                    <p className="text-sm font-semibold text-gray-800 flex items-center gap-1">{booking?.providers?.name || '—'} <ShieldCheck size={12} className="text-pink-500" /></p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -915,7 +951,7 @@ export function BookingConfirmation() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Date & Time</p>
-                    <p className="text-sm font-semibold text-gray-800">Wed, 22 May 2024 at 10:00 PM</p>
+                    <p className="text-sm font-semibold text-gray-800">{booking ? `${booking.booking_date} at ${booking.booking_time}` : '—'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -933,7 +969,7 @@ export function BookingConfirmation() {
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="text-gray-500">Service Price</span>
-                  <span className="font-semibold">£{service.price}</span>
+                  <span className="font-semibold">£{booking?.service_price || '—'}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="text-gray-500">Extra Curls (Rubber Curl)</span>
@@ -1001,22 +1037,18 @@ export function BookingConfirmation() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center text-xl">✂️</div>
                 <div>
-                  <p className="text-xs font-semibold text-gray-800">{service.name}</p>
-                  <p className="text-[10px] text-gray-400">{service.duration} · Long Hair</p>
+                  <p className="text-xs font-semibold text-gray-800">{booking?.service_name || '—'}</p>
                 </div>
               </div>
               <div className="space-y-1.5 text-xs text-gray-600 mb-3">
-                <div className="flex items-center gap-2"><img src={provider.image} alt="" className="w-4 h-4 rounded-full object-cover" /> {provider.name} <ShieldCheck size={10} className="text-pink-500" /></div>
-                <div className="flex items-center gap-2"><Calendar size={11} className="text-gray-400" /> Wed, 22 May 2024 at 10:00 PM</div>
-                <div className="flex items-center gap-2"><MapPin size={11} className="text-gray-400" /> At My Salon · London</div>
-                <div className="flex items-center gap-2"><Clock size={11} className="text-gray-400" /> 3–6 Hours</div>
+                <div className="flex items-center gap-2"><img src={booking?.providers?.image_url} alt="" className="w-4 h-4 rounded-full object-cover" /> {booking?.providers?.name || '—'} <ShieldCheck size={10} className="text-pink-500" /></div>
+                <div className="flex items-center gap-2"><Calendar size={11} className="text-gray-400" /> {booking ? `${booking.booking_date} at ${booking.booking_time}` : '—'}</div>
+                <div className="flex items-center gap-2"><MapPin size={11} className="text-gray-400" /> {booking?.location_type || 'At My Salon'}</div>
               </div>
               <div className="border-t border-gray-100 pt-3 text-xs space-y-1">
-                <div className="flex justify-between"><span className="text-gray-500">Service Price</span><span className="font-semibold">£{service.price}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Extra Curls</span><span className="font-semibold">+ £20</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Platform Fee</span><span className="font-semibold">£2</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Service Price</span><span className="font-semibold">£{booking?.service_price || '—'}</span></div>
                 <div className="flex justify-between font-bold text-sm mt-2 pt-2 border-t border-gray-100">
-                  <span>Total Paid</span><span className="text-pink-500">£82.00</span>
+                  <span>Total Paid</span><span className="text-pink-500">£{booking?.service_price || '—'}</span>
                 </div>
               </div>
             </div>

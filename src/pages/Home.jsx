@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, MapPin, Calendar, Star, ArrowRight, ShieldCheck, Sparkles, Lock, ChevronRight } from 'lucide-react'
-import { serviceCategories, products, providers, shopCategories } from '../data/mockData'
+import { serviceCategories, shopCategories } from '../data/mockData'
+import { fetchProviders, fetchProducts } from '../lib/db'
 import { useApp } from '../context/AppContext'
 
 function Stars({ val = 5, size = 12 }) {
@@ -18,8 +19,15 @@ export default function Home() {
   const [service, setService] = useState('')
   const [location, setLocation] = useState('')
   const [date, setDate] = useState('')
+  const [providers, setProviders] = useState([])
+  const [products, setProducts] = useState([])
   const { addToCart } = useApp()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    fetchProviders({ featured: true, limit: 3 }).then(setProviders).catch(() => {})
+    fetchProducts({ featured: true, limit: 4 }).then(setProducts).catch(() => {})
+  }, [])
 
   const search = (e) => {
     e.preventDefault()
@@ -190,30 +198,28 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {providers.slice(0, 3).map((p) => (
+            {providers.map((p) => (
               <Link key={p.id} to={`/providers/${p.slug}`}
                 className="bg-white rounded-2xl overflow-hidden shadow-card card-hover border border-gray-100">
                 <div className="relative h-44">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                  {p.verified && (
-                    <span className="absolute top-3 left-3 bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                      <ShieldCheck size={10} /> Verified
-                    </span>
-                  )}
+                  <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
+                  <span className="absolute top-3 left-3 bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    <ShieldCheck size={10} /> Verified
+                  </span>
                   <button className="absolute top-3 right-3 w-7 h-7 bg-white/80 rounded-full flex items-center justify-center">
                     <span className="text-gray-400 text-sm">♡</span>
                   </button>
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 text-sm mb-0.5">{p.name}</h3>
-                  <p className="text-xs text-gray-500 mb-2">{p.category} · {p.city}</p>
+                  <p className="text-xs text-gray-500 mb-2">{p.speciality} · {p.location}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       <Stars val={p.rating} size={11} />
                       <span className="text-xs font-semibold text-gray-700">{p.rating}</span>
-                      <span className="text-xs text-gray-400">({p.reviews})</span>
+                      <span className="text-xs text-gray-400">({p.review_count})</span>
                     </div>
-                    <span className="text-sm font-bold text-pink-500">From £{p.startingPrice}</span>
+                    <span className="text-sm font-bold text-pink-500">From £{p.price_from}</span>
                   </div>
                   <button className="w-full mt-3 bg-pink-500 text-white text-xs font-semibold py-2 rounded-full hover:bg-pink-600 transition-colors">
                     View Profile
@@ -304,27 +310,27 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {products.slice(0, 6).map((p) => (
+            {products.map((p) => (
               <Link key={p.id} to={`/product/${p.id}`}
                 className="bg-white rounded-xl overflow-hidden shadow-card card-hover border border-gray-100">
                 <div className="relative aspect-square bg-gray-50">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                  {p.badge && (
+                  <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
+                  {p.is_featured && (
                     <span className="absolute top-2 left-2 bg-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                      {p.badge}
+                      FEATURED
                     </span>
                   )}
                 </div>
                 <div className="p-2.5">
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{p.brand}</p>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{p.category}</p>
                   <p className="text-xs font-medium text-gray-800 line-clamp-2 mb-1">{p.name}</p>
                   <div className="flex items-center gap-1 mb-1.5">
                     <Stars val={p.rating} size={9} />
-                    <span className="text-[9px] text-gray-400">({p.reviews})</span>
+                    <span className="text-[9px] text-gray-400">({p.review_count})</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <span className="text-sm font-bold text-gray-900">£{p.price.toFixed(2)}</span>
-                    {p.originalPrice && <span className="text-[10px] text-gray-400 line-through">£{p.originalPrice.toFixed(2)}</span>}
+                    <span className="text-sm font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
+                    {p.compare_price && <span className="text-[10px] text-gray-400 line-through">£{Number(p.compare_price).toFixed(2)}</span>}
                   </div>
                   <button onClick={e => { e.preventDefault(); addToCart(p) }}
                     className="w-full mt-2 bg-pink-500 text-white text-[10px] font-semibold py-1.5 rounded-full hover:bg-pink-600 transition-colors">

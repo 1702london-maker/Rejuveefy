@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Calendar, Heart, ShoppingBag, Settings, Star, Gift,
   ChevronRight, Clock, MapPin, ShieldCheck, Phone, Mail, Copy, Share2,
   Plus, CheckCircle, TrendingUp, Users, Zap, ArrowRight, X, BarChart2
 } from 'lucide-react'
-import { bookings, referrals, clientReviews } from '../data/mockData'
+import { fetchUserBookings, fetchUserReferrals, fetchUserReviews } from '../lib/db'
 import { useApp } from '../context/AppContext'
 
 const navItems = [
@@ -69,6 +69,10 @@ function Sidebar() {
 // ── MAIN DASHBOARD ────────────────────────────────────────────────────────────
 export function DashboardHome() {
   const { user } = useApp()
+  const [bookings, setBookings] = useState([])
+  useEffect(() => {
+    if (user?.id) fetchUserBookings(user.id).then(setBookings).catch(() => {})
+  }, [user?.id])
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-6">
@@ -117,23 +121,26 @@ export function DashboardHome() {
                 <h2 className="text-base font-semibold text-gray-900">Upcoming Appointments</h2>
                 <Link to="/bookings" className="text-xs text-pink-500 font-semibold flex items-center gap-1">View All <ArrowRight size={12} /></Link>
               </div>
-              {bookings.filter(b => b.status === 'upcoming').map((b) => (
+              {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 3).map((b) => (
                 <div key={b.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl mb-2 last:mb-0 card-hover">
-                  <img src={b.providerImg} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                  <img src={b.providers?.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 bg-pink-100" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{b.service}</p>
-                    <p className="text-xs text-gray-500">{b.provider}</p>
+                    <p className="text-sm font-semibold text-gray-900">{b.service_name}</p>
+                    <p className="text-xs text-gray-500">{b.providers?.name}</p>
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Calendar size={10} /> {b.date}</span>
-                      <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {b.time}</span>
+                      <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Calendar size={10} /> {new Date(b.booking_date).toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short'})}</span>
+                      <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {b.booking_time}</span>
                     </div>
                   </div>
                   <div className="shrink-0 text-right">
                     <span className="text-[10px] font-bold px-2 py-1 bg-blue-50 text-blue-500 rounded-full">{b.status}</span>
-                    <p className="text-sm font-bold text-gray-900 mt-1">£{b.price}</p>
+                    {b.service_price && <p className="text-sm font-bold text-gray-900 mt-1">£{b.service_price}</p>}
                   </div>
                 </div>
               ))}
+              {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">No upcoming appointments. <Link to="/book" className="text-pink-500 font-semibold">Book now</Link></p>
+              )}
             </div>
 
             {/* Refer */}
@@ -158,10 +165,21 @@ export function DashboardHome() {
 
 // ── MY BOOKINGS ───────────────────────────────────────────────────────────────
 export default function MyBookings() {
+  const { user } = useApp()
   const [activeTab, setActiveTab] = useState('All')
+  const [bookings, setBookings] = useState([])
   const tabs = ['All', 'Upcoming', 'Completed', 'Cancelled']
 
-  const filtered = activeTab === 'All' ? bookings : bookings.filter(b => b.status.toLowerCase() === activeTab.toLowerCase())
+  useEffect(() => {
+    if (user?.id) fetchUserBookings(user.id).then(setBookings).catch(() => {})
+  }, [user?.id])
+
+  const filtered = activeTab === 'All' ? bookings : bookings.filter(b => {
+    if (activeTab === 'Upcoming') return b.status === 'pending' || b.status === 'confirmed'
+    if (activeTab === 'Completed') return b.status === 'completed'
+    if (activeTab === 'Cancelled') return b.status === 'cancelled'
+    return true
+  })
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -180,7 +198,7 @@ export default function MyBookings() {
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[
                 { label: 'Total Bookings', value: bookings.length },
-                { label: 'Upcoming', value: bookings.filter(b => b.status === 'upcoming').length },
+                { label: 'Upcoming', value: bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length },
                 { label: 'Completed', value: bookings.filter(b => b.status === 'completed').length },
               ].map((s) => (
                 <div key={s.label} className="bg-white border border-gray-100 rounded-xl shadow-card p-4 text-center">
@@ -205,49 +223,46 @@ export default function MyBookings() {
               {filtered.map((b) => (
                 <div key={b.id} className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden card-hover">
                   <div className="flex gap-4 p-4">
-                    <img src={b.providerImg} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                    <div className="w-16 h-16 rounded-xl object-cover shrink-0 bg-pink-100 overflow-hidden">
+                      {b.providers?.image_url && <img src={b.providers.image_url} alt="" className="w-full h-full object-cover" />}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-sm font-semibold text-gray-900">{b.service}</p>
+                          <p className="text-sm font-semibold text-gray-900">{b.service_name}</p>
                           <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                            <ShieldCheck size={10} className="text-pink-400" /> {b.provider}
+                            <ShieldCheck size={10} className="text-pink-400" /> {b.providers?.name}
                           </p>
                         </div>
                         <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0
-                          ${b.status === 'upcoming' ? 'bg-blue-50 text-blue-500' :
+                          ${b.status === 'confirmed' || b.status === 'pending' ? 'bg-blue-50 text-blue-500' :
                             b.status === 'completed' ? 'bg-green-50 text-green-500' :
                             'bg-gray-100 text-gray-500'}`}>
                           {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-3 mt-2">
-                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Calendar size={10} /> {b.date}</span>
-                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {b.time}</span>
-                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><MapPin size={10} /> {b.location}</span>
+                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Calendar size={10} /> {new Date(b.booking_date).toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short',year:'numeric'})}</span>
+                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {b.booking_time}</span>
+                        {b.providers?.location && <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><MapPin size={10} /> {b.providers.location}</span>}
                       </div>
                     </div>
                   </div>
                   <div className="border-t border-gray-50 px-4 py-3 flex items-center justify-between">
-                    <p className="text-sm font-bold text-gray-900">£{b.price}</p>
+                    <p className="text-sm font-bold text-gray-900">{b.service_price ? `£${b.service_price}` : ''}</p>
                     <div className="flex gap-2">
-                      {b.status === 'completed' && !b.reviewed && (
+                      {b.status === 'completed' && (
                         <Link to="/reviews" className="text-xs bg-amber-50 text-amber-500 font-semibold px-3 py-1.5 rounded-full hover:bg-amber-100 transition-colors">
                           Leave Review
                         </Link>
                       )}
-                      {b.status === 'upcoming' && (
-                        <>
-                          <button className="text-xs border border-gray-200 text-gray-500 font-semibold px-3 py-1.5 rounded-full hover:border-pink-300 hover:text-pink-500 transition-colors">
-                            Reschedule
-                          </button>
-                          <button className="text-xs text-red-400 font-semibold px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors">
-                            Cancel
-                          </button>
-                        </>
+                      {(b.status === 'pending' || b.status === 'confirmed') && (
+                        <button className="text-xs text-red-400 font-semibold px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors">
+                          Cancel
+                        </button>
                       )}
-                      {b.status === 'completed' && (
-                        <Link to={`/providers/${b.providerSlug}/book`}
+                      {b.status === 'completed' && b.providers?.slug && (
+                        <Link to={`/providers/${b.providers.slug}/book`}
                           className="text-xs bg-pink-500 text-white font-semibold px-3 py-1.5 rounded-full hover:bg-pink-600 transition-colors">
                           Book Again
                         </Link>
@@ -278,7 +293,11 @@ export default function MyBookings() {
 export function ReferAndEarn() {
   const { user, showToast } = useApp()
   const [copied, setCopied] = useState(false)
-  const refCode = 'JESSICA2024'
+  const [referrals, setReferrals] = useState([])
+  useEffect(() => {
+    if (user?.id) fetchUserReferrals(user.id).then(setReferrals).catch(() => {})
+  }, [user?.id])
+  const refCode = user?.id ? user.id.slice(0,8).toUpperCase() : 'REJUV2024'
   const refLink = `https://rejuveefy.com/join?ref=${refCode}`
 
   const copy = () => {
@@ -351,25 +370,26 @@ export function ReferAndEarn() {
                 <h2 className="text-sm font-semibold text-gray-900">Referral History</h2>
                 <div className="text-right">
                   <p className="text-xs font-bold text-pink-500">{referrals.length} referrals</p>
-                  <p className="text-[10px] text-gray-400">£{referrals.filter(r => r.status === 'rewarded').length * 10} earned</p>
+                  <p className="text-[10px] text-gray-400">£{referrals.filter(r => r.reward_paid).length * 10} earned</p>
                 </div>
               </div>
               <div className="space-y-3">
+                {referrals.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No referrals yet. Share your code to start earning!</p>}
                 {referrals.map((r) => (
                   <div key={r.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl">
                     <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
-                      <span className="text-pink-500 font-bold">{r.name[0]}</span>
+                      <span className="text-pink-500 font-bold">{(r.referred_email || 'F')[0].toUpperCase()}</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800">{r.name}</p>
-                      <p className="text-xs text-gray-400">{r.date}</p>
+                      <p className="text-sm font-semibold text-gray-800">{r.referred_email || 'Friend'}</p>
+                      <p className="text-xs text-gray-400">{new Date(r.created_at).toLocaleDateString('en-GB')}</p>
                     </div>
                     <div className="text-right">
                       <p className={`text-xs font-bold px-2 py-1 rounded-full
-                        ${r.status === 'rewarded' ? 'bg-green-50 text-green-500' :
-                          r.status === 'pending' ? 'bg-amber-50 text-amber-500' :
-                          'bg-gray-100 text-gray-400'}`}>
-                        {r.status === 'rewarded' ? '+ £10' : r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                        ${r.status === 'converted' ? 'bg-green-50 text-green-500' :
+                          r.status === 'signed_up' ? 'bg-blue-50 text-blue-500' :
+                          'bg-amber-50 text-amber-500'}`}>
+                        {r.status === 'converted' ? `+ £${r.reward_amount}` : r.status.charAt(0).toUpperCase() + r.status.slice(1)}
                       </p>
                     </div>
                   </div>
@@ -382,7 +402,7 @@ export function ReferAndEarn() {
               <h2 className="text-sm font-semibold text-gray-900 mb-4">Your Rewards Summary</h2>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Total Earned', value: '£40', icon: TrendingUp, color: 'bg-green-50 text-green-500' },
+                  { label: 'Total Earned', value: `£${referrals.filter(r => r.reward_paid).length * 10}`, icon: TrendingUp, color: 'bg-green-50 text-green-500' },
                   { label: 'Points Balance', value: user.points, icon: Zap, color: 'bg-pink-50 text-pink-500' },
                   { label: 'Friends Referred', value: referrals.length, icon: Users, color: 'bg-blue-50 text-blue-500' },
                 ].map((s) => (
@@ -405,9 +425,18 @@ export function ReferAndEarn() {
 
 // ── REVIEWS & RATINGS ─────────────────────────────────────────────────────────
 export function ReviewsRatings() {
+  const { user } = useApp()
   const [showForm, setShowForm] = useState(false)
   const [rating, setRating] = useState(5)
   const [reviewText, setReviewText] = useState('')
+  const [userReviews, setUserReviews] = useState([])
+  const [userBookings, setUserBookings] = useState([])
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserReviews(user.id).then(setUserReviews).catch(() => {})
+      fetchUserBookings(user.id).then(setUserBookings).catch(() => {})
+    }
+  }, [user?.id])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -433,7 +462,7 @@ export function ReviewsRatings() {
                       <Star key={i} size={16} className={i <= 4 ? 'fill-amber-400 text-amber-400' : 'fill-amber-200 text-amber-200'} />
                     ))}
                   </div>
-                  <p className="text-xs text-gray-400">{clientReviews.length} reviews given</p>
+                  <p className="text-xs text-gray-400">{userReviews.length} reviews given</p>
                 </div>
                 <div className="flex-1 space-y-1.5">
                   {[5,4,3,2,1].map(n => (
@@ -459,8 +488,8 @@ export function ReviewsRatings() {
                 <div className="mb-4">
                   <label className="text-xs font-semibold text-gray-600 mb-1 block">Select Booking</label>
                   <select className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-pink-400">
-                    {bookings.filter(b => b.status === 'completed').map(b => (
-                      <option key={b.id}>{b.service} — {b.provider} ({b.date})</option>
+                    {userBookings.filter(b => b.status === 'completed').map(b => (
+                      <option key={b.id}>{b.service_name} — {b.providers?.name}</option>
                     ))}
                   </select>
                 </div>
@@ -497,19 +526,22 @@ export function ReviewsRatings() {
 
             {/* Review list */}
             <div className="space-y-3">
-              {clientReviews.map((r) => (
+              {userReviews.length === 0 && <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 text-center"><p className="text-sm text-gray-400">No reviews yet. Complete a booking to leave your first review!</p></div>}
+              {userReviews.map((r) => (
                 <div key={r.id} className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
                   <div className="flex items-start gap-4 mb-3">
-                    <img src={r.providerImg} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                    <div className="w-12 h-12 rounded-xl object-cover shrink-0 bg-pink-100 flex items-center justify-center overflow-hidden">
+                      {r.providers?.image_url ? <img src={r.providers.image_url} alt="" className="w-full h-full object-cover" /> : <span className="text-pink-500 font-bold">R</span>}
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-sm font-semibold text-gray-900">{r.service}</p>
+                          <p className="text-sm font-semibold text-gray-900">{r.providers?.name || r.products?.name || 'Service'}</p>
                           <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                            <ShieldCheck size={10} className="text-pink-400" /> {r.provider}
+                            <ShieldCheck size={10} className="text-pink-400" /> Verified Booking
                           </p>
                         </div>
-                        <span className="text-xs text-gray-400">{r.date}</span>
+                        <span className="text-xs text-gray-400">{new Date(r.created_at).toLocaleDateString('en-GB')}</span>
                       </div>
                     </div>
                   </div>
@@ -518,11 +550,11 @@ export function ReviewsRatings() {
                       <Star key={i} size={14} className={i <= r.rating ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'} />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{r.text}</p>
-                  {r.providerResponse && (
+                  <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>
+                  {r.reply && (
                     <div className="mt-3 bg-pink-50 rounded-xl p-3 border-l-2 border-pink-500">
                       <p className="text-[10px] font-bold text-pink-500 mb-1">Provider Response</p>
-                      <p className="text-xs text-gray-600">{r.providerResponse}</p>
+                      <p className="text-xs text-gray-600">{r.reply}</p>
                     </div>
                   )}
                 </div>

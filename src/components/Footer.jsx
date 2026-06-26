@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Instagram, Twitter, Facebook, Youtube, ChevronDown } from 'lucide-react'
+import { subscribeNewsletter } from '../lib/db'
 
 const cols = [
   {
@@ -60,9 +61,13 @@ export default function Footer() {
   const [done, setDone] = useState(false)
   const [acc, setAcc] = useState(null)
 
-  const sub = (e) => {
+  const sub = async (e) => {
     e.preventDefault()
-    if (email && consent) { setDone(true); setEmail('') }
+    if (email && consent) {
+      try { await subscribeNewsletter(email) } catch {}
+      setDone(true)
+      setEmail('')
+    }
   }
 
   return (

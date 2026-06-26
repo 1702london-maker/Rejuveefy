@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { submitAffiliateApplication } from '../lib/db'
 import {
   DollarSign, Users, BarChart2, Gift, CheckCircle, ArrowRight,
   Star, Copy, Share2, TrendingUp, Award, Zap, Globe, ChevronDown
@@ -53,9 +54,20 @@ export default function Affiliate() {
   const [form, setForm] = useState({ name: '', email: '', platform: '', audience: '', niche: '' })
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
+    try {
+      await submitAffiliateApplication({
+        full_name: form.name,
+        email: form.email,
+        platform: form.platform,
+        followers: form.audience,
+        niche: form.niche,
+      })
+      setSubmitted(true)
+    } catch {
+      alert('Something went wrong. Please try again.')
+    }
   }
 
   return (

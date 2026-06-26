@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronUp, Mail, Phone, MapPin, Clock, Send, Briefcase, Users, Zap, Heart, ArrowRight, Package, Search, CheckCircle, RotateCcw, Truck } from 'lucide-react'
-import { faqData, jobOpenings } from '../data/mockData'
+import { faqData } from '../data/mockData'
+import { fetchJobs, submitContactMessage, subscribeNewsletter } from '../lib/db'
 
 // ── ABOUT US ──────────────────────────────────────────────────────────────────
 export function AboutUs() {
@@ -142,8 +143,20 @@ export function AboutUs() {
 export function ContactUs() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [sent, setSent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
-  const submit = (e) => { e.preventDefault(); setSent(true) }
+  const submit = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      await submitContactMessage({ name: form.name, email: form.email, subject: form.subject, message: form.message })
+      setSent(true)
+    } catch {
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -206,9 +219,9 @@ export function ContactUs() {
                       placeholder="Tell us how we can help you..."
                       className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-pink-400 resize-none" />
                   </div>
-                  <button type="submit"
-                    className="w-full bg-pink-500 text-white py-3.5 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
-                    <Send size={15} /> Send Message
+                  <button type="submit" disabled={submitting}
+                    className="w-full bg-pink-500 text-white py-3.5 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
+                    <Send size={15} /> {submitting ? 'Sending...' : 'Send Message'}
                   </button>
                 </form>
               </div>
@@ -572,9 +585,14 @@ export function TrackOrder() {
 // ── CAREERS ───────────────────────────────────────────────────────────────────
 export function Careers() {
   const [filterDept, setFilterDept] = useState('All')
-  const depts = ['All', 'Engineering', 'Product', 'Design', 'Marketing', 'Operations']
+  const [jobs, setJobs] = useState([])
+  const depts = ['All', ...new Set(jobs.map(j => j.department).filter(Boolean))]
 
-  const filtered = filterDept === 'All' ? jobOpenings : jobOpenings.filter(j => j.department === filterDept)
+  useEffect(() => {
+    fetchJobs().then(setJobs).catch(() => {})
+  }, [])
+
+  const filtered = filterDept === 'All' ? jobs : jobs.filter(j => j.department === filterDept)
 
   return (
     <div className="min-h-screen bg-white">
@@ -641,15 +659,13 @@ export function Careers() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-base font-bold text-gray-900">{job.title}</h3>
-                      {job.urgent && <span className="text-[10px] font-bold bg-red-50 text-red-500 px-2 py-0.5 rounded-full">Urgent</span>}
                     </div>
                     <div className="flex flex-wrap gap-2 text-xs text-gray-500">
                       <span className="flex items-center gap-1"><Briefcase size={11} /> {job.department}</span>
                       <span className="flex items-center gap-1"><MapPin size={11} /> {job.location}</span>
                       <span className="flex items-center gap-1"><Clock size={11} /> {job.type}</span>
-                      <span className="flex items-center gap-1"><Zap size={11} /> {job.salary}</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">{job.desc}</p>
+                    <p className="text-xs text-gray-500 mt-2">{job.description}</p>
                   </div>
                   <div className="shrink-0">
                     <span className={`text-[11px] font-semibold px-3 py-1.5 rounded-full
@@ -662,7 +678,7 @@ export function Careers() {
                   </div>
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
-                  <p className="text-xs text-gray-400">Posted {job.posted}</p>
+                  <p className="text-xs text-gray-400">Posted {new Date(job.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</p>
                   <a href={`mailto:careers@rejuveefy.com?subject=Application: ${job.title}`}
                     className="bg-pink-500 text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-pink-600 transition-colors">
                     Apply Now

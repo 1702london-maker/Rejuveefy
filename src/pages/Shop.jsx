@@ -1,8 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { Search, Star, Heart, ShoppingBag, ChevronDown, SlidersHorizontal, ArrowRight, ShieldCheck, Truck, RotateCcw, CreditCard, ChevronLeft, ChevronRight, Plus, Minus, Check } from 'lucide-react'
-import { products, shopCategories } from '../data/mockData'
+import { shopCategories } from '../data/mockData'
+import { fetchProducts, fetchProduct, subscribeNewsletter } from '../lib/db'
 import { useApp } from '../context/AppContext'
+
+function NewsletterForm() {
+  const [email, setEmail] = useState('')
+  const [done, setDone] = useState(false)
+  const handle = async (e) => {
+    e.preventDefault()
+    try { await subscribeNewsletter(email) } catch {}
+    setDone(true)
+  }
+  if (done) return <p className="text-green-600 text-sm font-semibold">You're subscribed!</p>
+  return (
+    <form onSubmit={handle} className="flex gap-2">
+      <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="Enter your email"
+        className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 transition-colors" />
+      <button className="bg-pink-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-600 transition-colors whitespace-nowrap">Subscribe</button>
+    </form>
+  )
+}
 
 function Stars({ val = 5, size = 12 }) {
   return (
@@ -26,10 +45,13 @@ export default function Shop() {
   const [sp] = useSearchParams()
   const { addToCart, toggleWishlist, inWishlist } = useApp()
   const [promoIdx, setPromoIdx] = useState(0)
+  const [products, setProducts] = useState([])
 
-  const filtered = category
-    ? products.filter(p => p.category === category)
-    : products
+  useEffect(() => {
+    fetchProducts({ category: category || null, limit: 50 }).then(setProducts).catch(() => {})
+  }, [category])
+
+  const filtered = products
 
   return (
     <div className="min-h-screen bg-white">
@@ -112,9 +134,9 @@ export default function Shop() {
           {products.map((p) => (
             <div key={p.id} className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden card-hover group">
               <div className="relative aspect-square bg-gray-50">
-                <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                {p.badge && (
-                  <span className="absolute top-2 left-2 bg-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">{p.badge}</span>
+                <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
+                {p.is_featured && (
+                  <span className="absolute top-2 left-2 bg-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">FEATURED</span>
                 )}
                 <button onClick={() => toggleWishlist(p)}
                   className={`absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-sm transition-colors
@@ -123,12 +145,12 @@ export default function Shop() {
                 </button>
               </div>
               <div className="p-3">
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{p.brand}</p>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{p.category}</p>
                 <p className="text-xs font-medium text-gray-800 line-clamp-2 mb-1.5 mt-0.5">{p.name}</p>
                 <Stars val={p.rating} size={10} />
                 <div className="flex items-baseline gap-1.5 mt-1.5 mb-2">
-                  <span className="text-sm font-bold text-gray-900">£{p.price.toFixed(2)}</span>
-                  {p.originalPrice && <span className="text-[10px] text-gray-400 line-through">£{p.originalPrice.toFixed(2)}</span>}
+                  <span className="text-sm font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
+                  {p.compare_price && <span className="text-[10px] text-gray-400 line-through">£{Number(p.compare_price).toFixed(2)}</span>}
                 </div>
                 <button onClick={() => addToCart(p)}
                   className="w-full flex items-center justify-center gap-1.5 bg-pink-500 text-white text-[10px] font-semibold py-1.5 rounded-full hover:bg-pink-600 transition-colors">
@@ -166,11 +188,7 @@ export default function Shop() {
           <div>
             <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">Join the Rejuveefy Community</h2>
             <p className="text-sm text-gray-500 mb-4">Get exclusive offers, new product updates and beauty tips directly to your inbox.</p>
-            <div className="flex gap-2">
-              <input type="email" placeholder="Enter your email"
-                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 transition-colors" />
-              <button className="bg-pink-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-600 transition-colors whitespace-nowrap">Subscribe</button>
-            </div>
+            <NewsletterForm />
           </div>
           <div>
             <h3 className="font-semibold text-gray-800 mb-2">Download Our App</h3>
@@ -211,9 +229,13 @@ export function ShopCategory() {
   const { addToCart, toggleWishlist, inWishlist } = useApp()
   const [sortBy, setSortBy] = useState('Best Seller')
   const [view, setView] = useState('grid')
+  const [items, setItems] = useState([])
 
-  const cat = shopCategories.find(c => c.id === category) || { label: 'Hair Care' }
-  const items = products.filter(p => p.category === category || !category)
+  useEffect(() => {
+    fetchProducts({ category: category || null, limit: 50 }).then(setItems).catch(() => {})
+  }, [category])
+
+  const cat = shopCategories.find(c => c.id === category) || { label: 'Products' }
 
   return (
     <div className="min-h-screen bg-white">
@@ -285,13 +307,13 @@ export function ShopCategory() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {(items.length ? items : products).map((p) => (
+              {items.map((p) => (
                 <div key={p.id} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-card card-hover">
                   <div className="relative aspect-square bg-gray-50">
                     <Link to={`/product/${p.id}`}>
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                      <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
                     </Link>
-                    {p.badge && <span className="absolute top-2 left-2 bg-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">{p.badge}</span>}
+                    {p.is_featured && <span className="absolute top-2 left-2 bg-pink-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">FEATURED</span>}
                     <button onClick={() => toggleWishlist(p)}
                       className={`absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-sm
                         ${inWishlist(p.id) ? 'text-pink-500' : 'text-gray-300 hover:text-pink-400'}`}>
@@ -299,15 +321,15 @@ export function ShopCategory() {
                     </button>
                   </div>
                   <div className="p-3">
-                    <p className="text-[9px] font-bold text-gray-400 uppercase">{p.brand}</p>
+                    <p className="text-[9px] font-bold text-gray-400 uppercase">{p.category}</p>
                     <Link to={`/product/${p.id}`} className="text-xs font-medium text-gray-800 line-clamp-2 block mt-0.5 hover:text-pink-500">{p.name}</Link>
                     <div className="flex items-center gap-1 my-1">
                       <Stars val={p.rating} size={10} />
-                      <span className="text-[9px] text-gray-400">({p.reviews})</span>
+                      <span className="text-[9px] text-gray-400">({p.review_count})</span>
                     </div>
                     <div className="flex items-baseline gap-1 mb-2">
-                      <span className="text-sm font-bold text-gray-900">£{p.price.toFixed(2)}</span>
-                      {p.originalPrice && <span className="text-[10px] text-gray-400 line-through">£{p.originalPrice.toFixed(2)}</span>}
+                      <span className="text-sm font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
+                      {p.compare_price && <span className="text-[10px] text-gray-400 line-through">£{Number(p.compare_price).toFixed(2)}</span>}
                     </div>
                     <button onClick={() => addToCart(p)}
                       className="w-full flex items-center justify-center gap-1 bg-pink-500 text-white text-[10px] font-semibold py-1.5 rounded-full hover:bg-pink-600 transition-colors">
@@ -340,14 +362,24 @@ export function ShopCategory() {
 // ── PRODUCT DETAIL PAGE ───────────────────────────────────────────────────────
 export function ProductDetail() {
   const { id } = useParams()
-  const product = products.find(p => p.id === parseInt(id)) || products[0]
   const { addToCart, toggleWishlist, inWishlist } = useApp()
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [qty, setQty] = useState(1)
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0])
   const [activeImg, setActiveImg] = useState(0)
   const [tab, setTab] = useState('Overview')
 
-  const tabs = ['Overview', 'Ingredients', 'How to Use', `Reviews (${product.reviews})`, 'Q&A']
+  useEffect(() => {
+    fetchProduct(id)
+      .then(setProduct)
+      .catch(() => setProduct(null))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" /></div>
+  if (!product) return <div className="min-h-screen flex items-center justify-center"><p className="text-gray-500">Product not found.</p></div>
+
+  const tabs = ['Overview', 'Description', `Reviews (${product.review_count})`, 'Q&A']
 
   return (
     <div className="min-h-screen bg-white">
@@ -363,17 +395,16 @@ export function ProductDetail() {
           {/* Images */}
           <div>
             <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-3 relative">
-              <img src={product.images?.[activeImg] || product.image} alt={product.name} className="w-full h-full object-cover" />
-              {/* Sale badge */}
-              {product.originalPrice && (
+              <img src={(product.gallery_urls || [])[activeImg] || product.image_url} alt={product.name} className="w-full h-full object-cover" />
+              {product.compare_price && (
                 <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
-                  -{Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                  -{Math.round((1 - product.price / product.compare_price) * 100)}% OFF
                 </span>
               )}
             </div>
             {/* Thumbnails */}
             <div className="flex gap-2">
-              {(product.images || [product.image]).map((img, i) => (
+              {([product.image_url, ...(product.gallery_urls || [])]).filter(Boolean).map((img, i) => (
                 <button key={i} onClick={() => setActiveImg(i)}
                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-colors ${activeImg === i ? 'border-pink-500' : 'border-gray-200'}`}>
                   <img src={img} alt="" className="w-full h-full object-cover" />
@@ -384,43 +415,27 @@ export function ProductDetail() {
 
           {/* Info */}
           <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{product.brand}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{product.category}</p>
             <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
 
             {/* Rating */}
             <div className="flex items-center gap-2 mb-3">
               <Stars val={product.rating} size={14} />
               <span className="text-sm font-bold text-gray-700">{product.rating}</span>
-              <span className="text-sm text-gray-400">({product.reviews.toLocaleString()} reviews)</span>
+              <span className="text-sm text-gray-400">({(product.review_count || 0).toLocaleString()} reviews)</span>
             </div>
 
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-4">
-              <span className="font-display text-3xl font-bold text-gray-900">£{product.price.toFixed(2)}</span>
-              {product.originalPrice && (
+              <span className="font-display text-3xl font-bold text-gray-900">£{Number(product.price).toFixed(2)}</span>
+              {product.compare_price && (
                 <>
-                  <span className="text-lg text-gray-400 line-through">£{product.originalPrice.toFixed(2)}</span>
-                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded">{Math.round((1-product.price/product.originalPrice)*100)}% OFF</span>
+                  <span className="text-lg text-gray-400 line-through">£{Number(product.compare_price).toFixed(2)}</span>
+                  <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded">{Math.round((1-product.price/product.compare_price)*100)}% OFF</span>
                 </>
               )}
             </div>
-            <p className="text-xs text-gray-500 mb-4">{product.desc}</p>
-
-            {/* Size selector */}
-            {product.sizes && (
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-gray-800 mb-2">Size</p>
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((s) => (
-                    <button key={s} onClick={() => setSelectedSize(s)}
-                      className={`px-4 py-2 rounded-xl border text-sm font-medium transition-colors
-                        ${selectedSize === s ? 'border-pink-500 bg-pink-50 text-pink-500' : 'border-gray-200 text-gray-600 hover:border-pink-300'}`}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <p className="text-xs text-gray-500 mb-4">{product.description}</p>
 
             {/* Qty + CTA */}
             <div className="flex gap-3 mb-5">
