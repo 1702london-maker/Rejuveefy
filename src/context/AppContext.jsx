@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const AppContext = createContext(null)
 
@@ -6,11 +7,30 @@ export function AppProvider({ children }) {
   const [cart, setCart] = useState([])
   const [wishlist, setWishlist] = useState([])
   const [toast, setToast] = useState(null)
-  const [user] = useState({ name: 'Jessica', avatar: null, points: 750 })
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  // Listen for auth state changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setAuthLoading(false)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3000)
+  }
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    showToast('Signed out successfully', 'info')
   }
 
   const addToCart = (product, qty = 1) => {
@@ -50,8 +70,21 @@ export function AppProvider({ children }) {
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
 
+  // Derived user display info
+  const userDisplay = user ? {
+    name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+    email: user.email,
+    avatar: user.user_metadata?.avatar_url || null,
+    points: 750,
+  } : null
+
   return (
-    <AppContext.Provider value={{ cart, cartCount, cartTotal, addToCart, removeFromCart, updateQty, clearCart, wishlist, toggleWishlist, removeFromWishlist, inWishlist, toast, showToast, user }}>
+    <AppContext.Provider value={{
+      cart, cartCount, cartTotal, addToCart, removeFromCart, updateQty, clearCart,
+      wishlist, toggleWishlist, removeFromWishlist, inWishlist,
+      toast, showToast,
+      user, userDisplay, authLoading, signOut,
+    }}>
       {children}
     </AppContext.Provider>
   )

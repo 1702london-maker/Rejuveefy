@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, ShieldCheck, ArrowLeft, CheckCircle, Mail, Lock, User, Phone } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 function AuthLayout({ children, image }) {
   return (
@@ -48,8 +49,9 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1000))
+    const { error: err } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
     setLoading(false)
+    if (err) { setError(err.message); return }
     navigate('/')
   }
 
@@ -152,6 +154,7 @@ export function Register() {
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [agreed, setAgreed] = useState(false)
+  const [error, setError] = useState('')
 
   const upd = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
@@ -159,9 +162,16 @@ export function Register() {
 
   const submit = async (e) => {
     e.preventDefault()
+    if (form.password !== form.confirm) return
+    setError('')
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1200))
+    const { error: err } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+      options: { data: { full_name: form.name, phone: form.phone } }
+    })
     setLoading(false)
+    if (err) { setError(err.message); return }
     navigate('/')
   }
 
@@ -178,6 +188,10 @@ export function Register() {
 
         <h1 className="font-display text-2xl font-bold text-gray-900 mb-1.5">Create Your Account</h1>
         <p className="text-sm text-gray-500 mb-6">Join 10,000+ beauty lovers on Rejuveefy. It's free!</p>
+
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold px-3 py-2.5 rounded-xl">{error}</div>
+        )}
 
         <form onSubmit={submit} className="space-y-4">
           <div>
@@ -292,12 +306,17 @@ export function ForgotPassword() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const submit = async (e) => {
     e.preventDefault()
+    setError('')
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1000))
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    })
     setLoading(false)
+    if (err) { setError(err.message); return }
     setSent(true)
   }
 
