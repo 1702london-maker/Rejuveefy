@@ -77,12 +77,13 @@ Be specific, accurate, and helpful. Focus on what you can see in the image.`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        max_tokens: 1000,
+        max_tokens: 1200,
+        response_format: { type: 'json_object' },
         messages: [
           {
             role: 'user',
             content: [
-              { type: 'text', text: prompt },
+              { type: 'text', text: prompt + '\n\nRespond with valid JSON only. No markdown, no code blocks, no extra text.' },
               {
                 type: 'image_url',
                 image_url: {
@@ -104,11 +105,16 @@ Be specific, accurate, and helpful. Focus on what you can see in the image.`
     const data = await response.json()
     const content = data.choices[0].message.content
 
-    // Extract JSON from the response
-    const jsonMatch = content.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return res.status(500).json({ error: 'Could not parse AI response' })
+    let result
+    try {
+      result = JSON.parse(content)
+    } catch {
+      // Fallback: try to extract JSON block if model added extra text
+      const jsonMatch = content.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) return res.status(500).json({ error: 'Could not parse AI response. Please try again.' })
+      result = JSON.parse(jsonMatch[0])
+    }
 
-    const result = JSON.parse(jsonMatch[0])
     return res.status(200).json(result)
 
   } catch (err) {
