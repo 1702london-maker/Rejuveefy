@@ -15,6 +15,7 @@ import AIHairAnalysis, { AISkinAnalysis } from './pages/AIAnalyzer'
 import MyBookings, { DashboardHome, ReferAndEarn, ReviewsRatings } from './pages/Dashboard'
 import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers } from './pages/InfoPages'
 import Login, { Register, ForgotPassword } from './pages/Auth'
+import Wishlist from './pages/Wishlist'
 import Affiliate from './pages/Affiliate'
 import AffiliatePortal from './pages/AffiliatePortal'
 import ProvidersPortal from './pages/ProvidersPortal'
@@ -86,6 +87,9 @@ export default function App() {
           <Route path="/returns-refunds" element={<ReturnsRefunds />} />
           <Route path="/track-order" element={<TrackOrder />} />
           <Route path="/careers" element={<Careers />} />
+
+          {/* Wishlist */}
+          <Route path="/wishlist" element={<Wishlist />} />
 
           {/* Affiliate */}
           <Route path="/affiliate" element={<Affiliate />} />

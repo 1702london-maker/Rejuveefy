@@ -40,13 +40,18 @@ export function AppProvider({ children }) {
     })
   }
 
+  const removeFromWishlist = (id) => {
+    setWishlist(prev => prev.filter(i => i.id !== id))
+    showToast('Removed from wishlist', 'info')
+  }
+
   const inWishlist = (id) => wishlist.some(i => i.id === id)
 
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
 
   return (
-    <AppContext.Provider value={{ cart, cartCount, cartTotal, addToCart, removeFromCart, updateQty, clearCart, wishlist, toggleWishlist, inWishlist, toast, showToast, user }}>
+    <AppContext.Provider value={{ cart, cartCount, cartTotal, addToCart, removeFromCart, updateQty, clearCart, wishlist, toggleWishlist, removeFromWishlist, inWishlist, toast, showToast, user }}>
       {children}
     </AppContext.Provider>
   )
