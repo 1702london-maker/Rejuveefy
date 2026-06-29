@@ -2,6 +2,24 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { Upload, Camera, Sparkles, BarChart2, ShieldCheck, ArrowRight, RotateCcw, Zap, Droplets, Sun, Wind, AlertCircle, X } from 'lucide-react'
 
+// ── Image compression — resizes to max 1024px and converts to JPEG at 85% ────
+function compressImage(dataUrl, maxPx = 1024, quality = 0.85) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.src = dataUrl
+  })
+}
+
 // ── Shared helpers ─────────────────────────────────────────────────────────────
 
 function ScoreBar({ label, value }) {
@@ -431,17 +449,18 @@ export default function AIHairAnalysis() {
     setPhase('analyzing')
     setError('')
     try {
+      const compressed = await compressImage(imageBase64, 1024, 0.85)
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64, type: 'hair' }),
+        body: JSON.stringify({ imageBase64: compressed, type: 'hair' }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Analysis failed')
+      if (!res.ok) throw new Error(data.error || `Server error ${res.status}`)
       setResult(data)
       setPhase('results')
     } catch (err) {
-      setError(err.message)
+      setError(err.message || 'Analysis failed. Please try again.')
       setPhase('landing')
     }
   }
@@ -539,17 +558,18 @@ export function AISkinAnalysis() {
     setPhase('analyzing')
     setError('')
     try {
+      const compressed = await compressImage(imageBase64, 1024, 0.85)
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64, type: 'skin' }),
+        body: JSON.stringify({ imageBase64: compressed, type: 'skin' }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Analysis failed')
+      if (!res.ok) throw new Error(data.error || `Server error ${res.status}`)
       setResult(data)
       setPhase('results')
     } catch (err) {
-      setError(err.message)
+      setError(err.message || 'Analysis failed. Please try again.')
       setPhase('landing')
     }
   }

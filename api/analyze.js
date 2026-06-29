@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const isHair = type === 'hair'
 
   const prompt = isHair
-    ? `You are Reja, an expert hair analysis specialist for Rejuveefy, a UK beauty marketplace. Study this hair image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
+    ? `You are an expert an expert hair analysis specialist for Rejuveefy, a UK beauty marketplace. Study this hair image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
 
 Return this exact JSON structure with all fields populated:
 {
@@ -46,7 +46,7 @@ Return this exact JSON structure with all fields populated:
   ]
 }
 Base every score and observation on what you actually see in the image. Be honest and specific.`
-    : `You are Reja, an expert skin analysis specialist for Rejuveefy, a UK beauty marketplace. Study this face/skin image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
+    : `You are an expert an expert skin analysis specialist for Rejuveefy, a UK beauty marketplace. Study this face/skin image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
 
 Return this exact JSON structure with all fields populated:
 {
@@ -100,7 +100,7 @@ Base every score and observation on what you actually see in the image. Be hones
                 type: 'image_url',
                 image_url: {
                   url: imageBase64.startsWith('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`,
-                  detail: 'high',
+                  detail: 'auto',
                 },
               },
             ],
@@ -111,7 +111,8 @@ Base every score and observation on what you actually see in the image. Be hones
 
     if (!response.ok) {
       const err = await response.json()
-      return res.status(500).json({ error: err.error?.message || 'AI service error' })
+      console.error('OpenAI error:', JSON.stringify(err))
+      return res.status(500).json({ error: err.error?.message || `OpenAI error ${response.status}` })
     }
 
     const data = await response.json()
