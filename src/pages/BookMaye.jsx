@@ -714,13 +714,48 @@ function Step7({ location, service, cfg, hairChoice, hairProducts, date, time, d
     if (!agreed) { setErr('Please accept the cancellation policy to confirm.'); return }
     if (!payMethod) { setErr('Please choose a payment method.'); return }
     setErr(''); setLoading(true)
-    if (payMethod === 'bank') {
-      const msg = encodeURIComponent(
-        `Hi Maye! I'd like to book an appointment.\n\nLocation: ${locLabel}\nService: ${svc?.label}${cfg.type ? ` — ${cfg.type.split('(')[0].trim()}` : ''}${cfg.size ? ` (${cfg.size})` : ''}${cfg.length ? `, ${cfg.length.split('—')[0].trim()}` : ''}\nDate: ${date} at ${time}\n\nName: ${details.name}\nEmail: ${details.email}\nPhone: ${details.phone}${details.notes ? `\nNotes: ${details.notes}` : ''}\n\nTotal: £${total}\n50% Deposit: £${deposit}\n\nPlease send your bank details so I can confirm my slot. Thank you!`
-      )
-      setTimeout(() => { window.open(`${WHATSAPP}?text=${msg}`, '_blank'); setLoading(false); setSubmitted(true) }, 500)
-    } else {
-      setTimeout(() => { setLoading(false); setSubmitted(true) }, 700)
+
+    try {
+      const res = await fetch('/api/book-maye', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location, service,
+          serviceType: cfg.type || null,
+          size: cfg.size || null,
+          length: cfg.length || null,
+          duration: getServiceDuration(svc, cfg) || null,
+          hairChoice,
+          hairProducts,
+          date, time,
+          clientName: details.name,
+          clientEmail: details.email,
+          clientPhone: details.phone,
+          notes: details.notes || null,
+          priceSubtotal: price,
+          londonSurcharge: isLondon ? LONDON_SURCHARGE : 0,
+          hairTotal,
+          total,
+          deposit,
+          paymentMethod: payMethod,
+        }),
+      })
+
+      if (!res.ok) throw new Error('API error')
+
+      // If bank transfer, also open WhatsApp
+      if (payMethod === 'bank') {
+        const msg = encodeURIComponent(
+          `Hi Maye! I just booked through rejuveefy.com.\n\nLocation: ${locLabel}\nService: ${svc?.label}${cfg.type ? ` — ${cfg.type.split('(')[0].trim()}` : ''}${cfg.size ? ` (${cfg.size})` : ''}${cfg.length ? `, ${cfg.length.split('—')[0].trim()}` : ''}\nDate: ${date} at ${time}\n\nName: ${details.name}\nPhone: ${details.phone}\n\nTotal: £${total} · Deposit: £${deposit}\n\nPlease send your bank details so I can pay my deposit. Thank you!`
+        )
+        window.open(`${WHATSAPP}?text=${msg}`, '_blank')
+      }
+
+      setSubmitted(true)
+    } catch {
+      setErr('Something went wrong. Please try again or contact us directly.')
+    } finally {
+      setLoading(false)
     }
   }
 
