@@ -3,13 +3,19 @@ export const config = {
   api: { bodyParser: { sizeLimit: '4mb' } }
 }
 
-const HAIR_PROMPT = `Analyse this hair photo. Return ONLY a JSON object — no markdown, no extra text.
-Schema: {"overallScore":0,"summary":"","condition":"","hairType":"","scores":{"moisture":0,"strength":0,"scalp":0,"shine":0,"density":0,"growth":0},"insights":["","","",""],"recommendations":[{"product":"","reason":"","match":0},{"product":"","reason":"","match":0},{"product":"","reason":"","match":0}],"concerns":["",""]}
-Rules: overallScore 0-100. condition = Excellent|Good|Fair|Needs Care. hairType = specific curl pattern e.g. 4C Coily. All scores 0-100. insights = 4 specific observations from the image. recommendations = 3 real product types with specific reasons. concerns = 2 specific issues you see.`
+const HAIR_PROMPT = `You are a UK Black hair specialist. Study this hair photo carefully. Return ONLY a JSON object — absolutely no markdown or extra text.
 
-const SKIN_PROMPT = `Analyse this skin/face photo. Return ONLY a JSON object — no markdown, no extra text.
-Schema: {"overallScore":0,"summary":"","condition":"","skinType":"","scores":{"hydration":0,"evenness":0,"texture":0,"radiance":0,"pores":0,"firmness":0},"insights":["","","",""],"recommendations":[{"product":"","reason":"","match":0},{"product":"","reason":"","match":0},{"product":"","reason":"","match":0}],"concerns":["",""]}
-Rules: overallScore 0-100. condition = Excellent|Good|Fair|Needs Care. skinType = Oily|Dry|Combination|Normal|Sensitive. All scores 0-100. insights = 4 specific observations. recommendations = 3 real product types with specific reasons. concerns = 2 specific issues you see.`
+Required JSON (replace placeholder values with your real observations):
+{"overallScore":72,"summary":"Your hair shows [what you see] with [main characteristic]. The key focus should be [most important action].","condition":"Good","hairType":"4B Coily","faceShape":"Oval","porosity":"Normal","density":"Medium","scores":{"moisture":65,"strength":70,"scalp":75,"shine":60,"density":80,"growth":68},"insights":["Specific observation 1 from image","Specific observation 2 from image","Specific observation 3 from image"],"concerns":["Specific concern 1 you can see","Specific concern 2 you can see"],"bestStyles":["Knotless Box Braids","Faux Locs","Bantu Knots"],"wigPicks":[{"style":"Lace Front Wig","length":"16 inch","curl":"4B Match","why":"Why this suits their face shape and hair"},{"style":"Full Lace Wig","length":"20 inch","curl":"Body Wave","why":"Why this complements their features"}],"recommendations":[{"product":"Deep Moisture Hair Mask","reason":"Specific reason from what you see","match":92},{"product":"Scalp Treatment Oil","reason":"Specific reason","match":85},{"product":"Protein Reconstructor","reason":"Specific reason","match":78}]}
+
+Rules: condition=Excellent|Good|Fair|Needs Care. faceShape=Oval|Round|Square|Heart|Diamond|Oblong. porosity=Low|Normal|High. density=Thin|Medium|Thick. bestStyles = 3 hairstyles that suit this face shape. wigPicks = 2 specific wig recommendations. All scores 0-100. Match 60-99.`
+
+const SKIN_PROMPT = `You are a UK skin specialist. Study this face/skin photo carefully. Return ONLY a JSON object — absolutely no markdown or extra text.
+
+Required JSON (replace placeholder values with your real observations):
+{"overallScore":75,"summary":"Your skin appears [what you see] with [main characteristic]. The priority is [most important action].","condition":"Good","skinType":"Combination","undertone":"Warm","faceShape":"Oval","scores":{"hydration":70,"evenness":65,"texture":75,"radiance":68,"pores":72,"firmness":80},"insights":["Specific observation 1 from image","Specific observation 2 from image","Specific observation 3 from image"],"concerns":["Specific concern 1 you can see","Specific concern 2 you can see"],"morningRoutine":["Gentle Cleanser","Vitamin C Serum","Lightweight Moisturiser","SPF 50"],"eveningRoutine":["Oil Cleanser","Niacinamide Serum","Retinol (2x week)","Night Cream"],"recommendations":[{"product":"Hyaluronic Acid Serum","reason":"Specific reason from what you see","match":92},{"product":"Niacinamide Toner","reason":"Specific reason","match":85},{"product":"SPF 50 Moisturiser","reason":"Specific reason","match":80}]}
+
+Rules: condition=Excellent|Good|Fair|Needs Care. skinType=Oily|Dry|Combination|Normal|Sensitive. undertone=Warm|Cool|Neutral. faceShape=Oval|Round|Square|Heart|Diamond|Oblong. All scores 0-100. Match 60-99.`
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -29,7 +35,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        max_tokens: 700,
+        max_tokens: 750,
         response_format: { type: 'json_object' },
         messages: [
           {
@@ -46,7 +52,7 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const err = await response.json()
       console.error('OpenAI error:', JSON.stringify(err))
-      return res.status(500).json({ error: err.error?.message || `OpenAI error ${response.status}` })
+      return res.status(500).json({ error: err.error?.message || `AI error ${response.status}` })
     }
 
     const data = await response.json()
@@ -64,7 +70,7 @@ export default async function handler(req, res) {
     return res.status(200).json(result)
 
   } catch (err) {
-    console.error('Analyze error:', err)
+    console.error('Analyze error:', err.message)
     return res.status(500).json({ error: 'Analysis failed. Please try again.' })
   }
 }
