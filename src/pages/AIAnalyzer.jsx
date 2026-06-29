@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Upload, Camera, Sparkles, BarChart2, ShieldCheck, ArrowRight, RotateCcw, Zap, Droplets, Sun, Wind, AlertCircle } from 'lucide-react'
+import { Upload, Camera, Sparkles, BarChart2, ShieldCheck, ArrowRight, RotateCcw, Zap, Droplets, Sun, Wind, AlertCircle, X } from 'lucide-react'
 
 // ── Shared helpers ─────────────────────────────────────────────────────────────
 
@@ -176,10 +176,91 @@ function AnalysisResults({ result, type, previewUrl, onReset }) {
   )
 }
 
+function CameraModal({ onCapture, onClose, facing }) {
+  const videoRef = useRef(null)
+  const streamRef = useRef(null)
+  const [error, setError] = useState('')
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    const constraints = {
+      video: {
+        facingMode: facing === 'user' ? 'user' : 'environment',
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      }
+    }
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(stream => {
+        streamRef.current = stream
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          videoRef.current.onloadedmetadata = () => setReady(true)
+        }
+      })
+      .catch(() => setError('Camera access denied. Please allow camera permission and try again.'))
+
+    return () => {
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop())
+    }
+  }, [facing])
+
+  const capture = () => {
+    const video = videoRef.current
+    if (!video) return
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas.getContext('2d').drawImage(video, 0, 0)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92)
+    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop())
+    onCapture(dataUrl)
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col">
+      <div className="flex items-center justify-between px-4 py-3 bg-black/80">
+        <span className="text-white text-sm font-semibold">Take Photo</span>
+        <button onClick={onClose} className="text-white p-2"><X size={22} /></button>
+      </div>
+      <div className="flex-1 relative overflow-hidden">
+        {error ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+            <AlertCircle size={40} className="text-red-400 mb-3" />
+            <p className="text-white text-sm">{error}</p>
+            <button onClick={onClose} className="mt-4 bg-pink-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold">Go Back</button>
+          </div>
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
+      {!error && (
+        <div className="flex items-center justify-center py-6 bg-black/80">
+          <button
+            onClick={capture}
+            disabled={!ready}
+            className="w-16 h-16 rounded-full bg-white border-4 border-pink-500 flex items-center justify-center hover:bg-pink-50 transition-colors disabled:opacity-40"
+          >
+            <Camera size={26} className="text-pink-500" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function UploadZone({ onAnalyze, type }) {
-  const id = `file-upload-${type}`
+  const uploadId = `file-upload-${type}`
   const [preview, setPreview] = useState(null)
   const [dragOver, setDragOver] = useState(false)
+  const [showCamera, setShowCamera] = useState(false)
+  const uploadRef = useRef(null)
 
   const handleFile = (f) => {
     if (!f || !f.type.startsWith('image/')) return
@@ -194,81 +275,114 @@ function UploadZone({ onAnalyze, type }) {
     handleFile(e.dataTransfer.files[0])
   }
 
+  const handleCapture = (dataUrl) => {
+    setShowCamera(false)
+    setPreview(dataUrl)
+  }
+
+  // facing: 'environment' for hair (back camera), 'user' for skin (selfie)
+  const cameraFacing = type === 'skin' ? 'user' : 'environment'
+
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 mb-5">
-      <h2 className="text-base font-semibold text-gray-900 mb-2">
-        Upload Your {type === 'hair' ? 'Hair Photo' : 'Selfie'}
-      </h2>
-      <p className="text-sm text-gray-500 mb-6">
-        {type === 'hair'
-          ? 'A clear photo of your hair in good lighting gives the most accurate results.'
-          : 'A well-lit selfie with your face clearly visible gives the most accurate results.'}
-      </p>
-
-      {/* Hidden input — triggered by label htmlFor */}
-      <input
-        id={id}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }}
-        onChange={e => handleFile(e.target.files[0])}
-      />
-
-      {preview ? (
-        <div className="mb-5">
-          <div className="relative rounded-2xl overflow-hidden mb-3">
-            <img src={preview} alt="Preview" className="w-full max-h-64 object-cover rounded-2xl" />
-            <label htmlFor={id}
-              className="absolute top-3 right-3 bg-white/90 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white shadow-sm cursor-pointer">
-              Change Photo
-            </label>
-          </div>
-          <button onClick={() => onAnalyze(preview)}
-            className="w-full bg-pink-500 text-white font-bold py-3.5 rounded-full hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
-            <Sparkles size={16} /> Analyse with AI
-          </button>
-        </div>
-      ) : (
-        <label
-          htmlFor={id}
-          onDrop={handleDrop}
-          onDragOver={e => { e.preventDefault(); setDragOver(true) }}
-          onDragLeave={() => setDragOver(false)}
-          className={`flex flex-col items-center border-2 border-dashed rounded-2xl p-10 text-center transition-all cursor-pointer
-            ${dragOver ? 'border-pink-500 bg-pink-50' : 'border-pink-200 hover:border-pink-400 hover:bg-pink-50'}`}
-        >
-          <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mb-4">
-            <Upload size={24} className="text-pink-500" />
-          </div>
-          <p className="text-sm font-semibold text-gray-800 mb-1">Tap or drop your photo here</p>
-          <p className="text-xs text-gray-400 mb-4">JPG, PNG or WEBP · Max 10MB</p>
-          <div className="flex justify-center gap-3 pointer-events-none">
-            <span className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold">
-              <Upload size={15} /> Upload Photo
-            </span>
-            <span className="flex items-center gap-2 border border-gray-200 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-semibold">
-              <Camera size={15} /> Take Photo
-            </span>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-3">Your privacy is protected · Images are never stored</p>
-        </label>
+    <>
+      {showCamera && (
+        <CameraModal
+          onCapture={handleCapture}
+          onClose={() => setShowCamera(false)}
+          facing={cameraFacing}
+        />
       )}
 
-      <div className="mt-5 grid grid-cols-3 gap-3">
-        {[
-          { icon: '💡', title: 'Good Lighting', sub: 'Natural light works best' },
-          { icon: '🔍', title: 'Clear Focus', sub: type === 'hair' ? 'Hair should be sharp' : 'Face should be sharp' },
-          { icon: '📐', title: 'Proper Angle', sub: type === 'hair' ? 'Show hair & scalp' : 'Face forward, chin up' },
-        ].map(t => (
-          <div key={t.title} className="text-center p-3 bg-gray-50 rounded-xl">
-            <div className="text-xl mb-1">{t.icon}</div>
-            <p className="text-xs font-semibold text-gray-700">{t.title}</p>
-            <p className="text-[10px] text-gray-400">{t.sub}</p>
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 mb-5">
+        <h2 className="text-base font-semibold text-gray-900 mb-2">
+          Upload Your {type === 'hair' ? 'Hair Photo' : 'Selfie'}
+        </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          {type === 'hair'
+            ? 'A clear photo of your hair in good lighting gives the most accurate results.'
+            : 'A well-lit selfie with your face clearly visible gives the most accurate results.'}
+        </p>
+
+        {/* File upload input — no capture attribute so it opens the file picker */}
+        <input
+          ref={uploadRef}
+          id={uploadId}
+          type="file"
+          accept="image/*"
+          style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }}
+          onChange={e => handleFile(e.target.files[0])}
+        />
+
+        {preview ? (
+          <div className="mb-5">
+            <div className="relative rounded-2xl overflow-hidden mb-3">
+              <img src={preview} alt="Preview" className="w-full max-h-64 object-cover rounded-2xl" />
+              <div className="absolute top-3 right-3 flex gap-2">
+                <button
+                  onClick={() => uploadRef.current?.click()}
+                  className="bg-white/90 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white shadow-sm"
+                >
+                  Change
+                </button>
+                <button
+                  onClick={() => setShowCamera(true)}
+                  className="bg-white/90 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white shadow-sm flex items-center gap-1"
+                >
+                  <Camera size={11} /> Retake
+                </button>
+              </div>
+            </div>
+            <button onClick={() => onAnalyze(preview)}
+              className="w-full bg-pink-500 text-white font-bold py-3.5 rounded-full hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
+              <Sparkles size={16} /> Analyse Now
+            </button>
           </div>
-        ))}
+        ) : (
+          <div
+            onDrop={handleDrop}
+            onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={() => setDragOver(false)}
+            className={`flex flex-col items-center border-2 border-dashed rounded-2xl p-10 text-center transition-all
+              ${dragOver ? 'border-pink-500 bg-pink-50' : 'border-pink-200 bg-white'}`}
+          >
+            <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mb-4">
+              <Upload size={24} className="text-pink-500" />
+            </div>
+            <p className="text-sm font-semibold text-gray-800 mb-1">Drop your photo here or choose an option below</p>
+            <p className="text-xs text-gray-400 mb-6">JPG, PNG or WEBP · Max 10MB</p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => uploadRef.current?.click()}
+                className="flex items-center gap-2 bg-pink-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-pink-600 transition-colors"
+              >
+                <Upload size={15} /> Upload Photo
+              </button>
+              <button
+                onClick={() => setShowCamera(true)}
+                className="flex items-center gap-2 border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-pink-400 hover:text-pink-500 transition-colors"
+              >
+                <Camera size={15} /> Take Photo
+              </button>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-4">Your privacy is protected · Images are never stored</p>
+          </div>
+        )}
+
+        <div className="mt-5 grid grid-cols-3 gap-3">
+          {[
+            { icon: '💡', title: 'Good Lighting', sub: 'Natural light works best' },
+            { icon: '🔍', title: 'Clear Focus', sub: type === 'hair' ? 'Hair should be sharp' : 'Face should be sharp' },
+            { icon: '📐', title: 'Proper Angle', sub: type === 'hair' ? 'Show hair & scalp' : 'Face forward, chin up' },
+          ].map(t => (
+            <div key={t.title} className="text-center p-3 bg-gray-50 rounded-xl">
+              <div className="text-xl mb-1">{t.icon}</div>
+              <p className="text-xs font-semibold text-gray-700">{t.title}</p>
+              <p className="text-[10px] text-gray-400">{t.sub}</p>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
