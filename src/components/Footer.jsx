@@ -117,7 +117,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link to="/">
-              <img src="/logo.png" alt="Rejuveefy" className="h-8 w-auto object-contain mb-3" />
+              <img src="/logo.png" alt="Rejuveefy" className="h-20 w-auto object-contain mb-3" />
             </Link>
             <p className="text-xs text-gray-500 leading-relaxed mb-4">
               Rejuveefy is a modern beauty-tech marketplace connecting you with verified professionals and premium beauty products across the UK.

@@ -97,7 +97,7 @@ export default function Header() {
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 flex items-center h-14 gap-4">
           {/* Logo */}
           <Link to="/" className="shrink-0 mr-2">
-            <img src="/logo.png" alt="Rejuveefy" className="h-8 w-auto object-contain" />
+            <img src="/logo.png" alt="Rejuveefy" className="h-12 w-auto object-contain" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.08))' }} />
           </Link>
 
           {/* Desktop nav */}
@@ -216,7 +216,7 @@ export default function Header() {
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                <img src="/logo.png" alt="Rejuveefy" className="h-7 w-auto object-contain" />
+                <img src="/logo.png" alt="Rejuveefy" className="h-10 w-auto object-contain" />
                 <button onClick={() => setMobile(false)}><X size={20} className="text-gray-500" /></button>
               </div>
               <div className="p-3 space-y-0.5">
