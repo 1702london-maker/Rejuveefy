@@ -336,10 +336,10 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
           <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <span className="inline-flex items-center gap-2 bg-pink-500/20 text-pink-400 text-xs font-bold px-4 py-1.5 rounded-full mb-5">
-              <Sparkles size={13} /> Powered by AI
+              <Sparkles size={13} /> Meet Your Beauty Advisor
             </span>
             <h2 className="font-display font-bold text-4xl lg:text-5xl text-white leading-tight mb-5">
-              Meet <span className="text-pink-400">Reja</span> —<br />Your AI Beauty Advisor
+              Meet <span className="text-pink-400">Dora</span> —<br />Your AI Beauty Advisor
             </h2>
             <p className="text-gray-400 text-lg mb-8 leading-relaxed">
               Upload a photo and get a personalised hair health report, product recommendations, and a routine crafted for your unique hair type.
@@ -355,7 +355,7 @@ export default function Home() {
               ))}
             </div>
             <Link to="/ai-beauty/hair" className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-pink-900/30">
-              Try Reja Free <ArrowRight size={16} />
+              Try Dora Free <ArrowRight size={16} />
             </Link>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
@@ -366,7 +366,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent" />
             </div>
             <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4">
-              <p className="text-white text-xs font-bold mb-2">✨ Reja Analysis Complete</p>
+              <p className="text-white text-xs font-bold mb-2">✨ Dora Analysis Complete</p>
               <div className="flex gap-2 flex-wrap">
                 {['4C Hair Type','Low Porosity','Needs Moisture'].map(t => (
                   <span key={t} className="bg-pink-500/80 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">{t}</span>

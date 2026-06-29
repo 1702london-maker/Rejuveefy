@@ -344,7 +344,7 @@ export default function AIHairAnalysis() {
           </p>
           <div className="flex items-center gap-3 mb-2">
             <div className="inline-flex items-center gap-2 bg-pink-100 text-pink-600 text-xs font-semibold px-3 py-1.5 rounded-full">
-              <Zap size={13} /> Powered by Rejuveefy AI
+              <Zap size={13} /> Advanced Beauty Analysis
             </div>
           </div>
           <h1 className="font-display text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-3">
