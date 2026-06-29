@@ -50,9 +50,9 @@ const howItWorks = [
 ]
 
 const testimonials = [
-  { name: 'Amara O.', role: 'Regular Client', text: 'Found the most amazing braider through Rejuveefy. My knotless braids lasted 8 weeks and the experience was 10/10.', rating: 5, avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face' },
-  { name: 'Destiny K.', role: 'Loyal Customer', text: 'The AI hair analyser recommended the perfect routine for my 4C hair. My hair has never been healthier!', rating: 5, avatar: 'https://images.unsplash.com/photo-1523264653568-d3d4032d1476?w=80&h=80&fit=crop&crop=face' },
-  { name: 'Fatima B.', role: 'VIP Member', text: 'Booked a last-minute wig install and the provider arrived on time, fully prepared. Absolutely seamless.', rating: 5, avatar: 'https://images.unsplash.com/photo-1499557354967-2b2d8910bcca?w=80&h=80&fit=crop&crop=face' },
+  { name: 'Amara O.', role: 'Regular Client', text: 'Found the most amazing braider through Rejuveefy. My knotless braids lasted 8 weeks and the experience was 10/10.', rating: 5, avatar: '/assets/hero-beauty.png' },
+  { name: 'Destiny K.', role: 'Loyal Customer', text: 'The AI hair analyser recommended the perfect routine for my 4C hair. My hair has never been healthier!', rating: 5, avatar: '/assets/spa-interior.png' },
+  { name: 'Fatima B.', role: 'VIP Member', text: 'Booked a last-minute wig install and the provider arrived on time, fully prepared. Absolutely seamless.', rating: 5, avatar: '/assets/wellness-lifestyle.png' },
 ]
 
 export default function Home() {
@@ -132,8 +132,8 @@ export default function Home() {
             {/* Social proof */}
             <motion.div variants={fadeUp} custom={5} className="flex items-center gap-4 pt-1">
               <div className="flex -space-x-2">
-                {['photo-1531746020798-e6953c6e8e04','photo-1523264653568-d3d4032d1476','photo-1499557354967-2b2d8910bcca','photo-1489424731084-a5d8b219a5bb'].map((id,i) => (
-                  <img key={i} src={`https://images.unsplash.com/${id}?w=36&h=36&fit=crop&crop=face`} className="w-9 h-9 rounded-full border-2 border-white object-cover" alt="" />
+                {['/assets/hero-beauty.png','/assets/spa-interior.png','/assets/wellness-lifestyle.png','/assets/hair-product.png'].map((src,i) => (
+                  <img key={i} src={src} className="w-9 h-9 rounded-full border-2 border-white object-cover" alt="" />
                 ))}
               </div>
               <div>
@@ -157,7 +157,7 @@ export default function Home() {
               <img
                 src="/assets/hero-beauty.png"
                 alt="Beautiful natural hair"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
             </div>
@@ -193,8 +193,8 @@ export default function Home() {
               className="absolute left-4 -bottom-5 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-gray-50"
             >
               <div className="flex -space-x-1.5">
-                {['photo-1531746020798-e6953c6e8e04','photo-1523264653568-d3d4032d1476'].map((id,i) => (
-                  <img key={i} src={`https://images.unsplash.com/${id}?w=28&h=28&fit=crop&crop=face`} className="w-7 h-7 rounded-full border-2 border-white" alt="" />
+                {['/assets/hero-beauty.png','/assets/spa-interior.png'].map((src,i) => (
+                  <img key={i} src={src} className="w-7 h-7 rounded-full border-2 border-white object-cover" alt="" />
                 ))}
               </div>
               <div>
@@ -261,7 +261,7 @@ export default function Home() {
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100 group">
                   <Link to={`/providers/${p.id}`}>
                     <div className="relative h-52 overflow-hidden">
-                      <img src={p.avatar || `https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop`}
+                      <img src={p.avatar || p.image || '/assets/hero-beauty.png'}
                         alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       {p.verified && (
                         <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-green-600 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
@@ -292,16 +292,16 @@ export default function Home() {
             <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { name: 'Amara Johnson', spec: 'Braids & Natural Hair', rating: 4.9, reviews: 238, location: 'London, UK', price: 45, img: 'photo-1531746020798-e6953c6e8e04' },
-                { name: 'Kezia Williams', spec: 'Locs Specialist', rating: 4.8, reviews: 184, location: 'Manchester, UK', price: 55, img: 'photo-1523264653568-d3d4032d1476' },
-                { name: 'Temi Ade', spec: 'Wig Installation', rating: 5.0, reviews: 312, location: 'Birmingham, UK', price: 80, img: 'photo-1499557354967-2b2d8910bcca' },
-                { name: 'Naomi Clarke', spec: 'Hair Stylist & MUA', rating: 4.9, reviews: 97, location: 'Leeds, UK', price: 60, img: 'photo-1489424731084-a5d8b219a5bb' },
+                { name: 'Amara Johnson', spec: 'Braids & Natural Hair', rating: 4.9, reviews: 238, location: 'London, UK', price: 45, img: '/assets/hero-beauty.png' },
+                { name: 'Kezia Williams', spec: 'Locs Specialist', rating: 4.8, reviews: 184, location: 'Manchester, UK', price: 55, img: '/assets/spa-interior.png' },
+                { name: 'Temi Ade', spec: 'Wig Installation', rating: 5.0, reviews: 312, location: 'Birmingham, UK', price: 80, img: '/assets/wellness-lifestyle.png' },
+                { name: 'Naomi Clarke', spec: 'Hair Stylist & MUA', rating: 4.9, reviews: 97, location: 'Leeds, UK', price: 60, img: '/assets/gift-set.png' },
               ].map((p, i) => (
                 <motion.div key={i} variants={cardItem} whileHover={{ y: -6, transition: { duration: 0.25 } }}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100 group">
                   <Link to="/providers">
                     <div className="relative h-52 overflow-hidden">
-                      <img src={`https://images.unsplash.com/${p.img}?w=400&h=300&fit=crop&crop=face`}
+                      <img src={p.img}
                         alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-green-600 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
                         <CheckCircle size={11} /> Verified
@@ -361,7 +361,7 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
             className="relative hidden lg:block">
             <div className="rounded-3xl overflow-hidden h-[420px] relative">
-              <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=600&h=500&fit=crop&crop=center"
+              <img src="/assets/laboratory.png"
                 alt="AI Beauty Analysis" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent" />
             </div>
@@ -393,16 +393,16 @@ export default function Home() {
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {(products.length > 0 ? products : [
-              { id:1, name: 'Jamaican Black Castor Oil', brand: 'Tropic Isle', price: 12.99, rating: 4.8, img: 'photo-1571781926291-c477ebfd024b', category: 'Hair Care' },
-              { id:2, name: 'Curl Defining Cream', brand: 'Shea Moisture', price: 9.49, rating: 4.9, img: 'photo-1596755389378-c31d21fd1273', category: 'Styling' },
-              { id:3, name: 'Deep Conditioning Mask', brand: 'Cantu', price: 7.99, rating: 4.7, img: 'photo-1556228578-8c89e6adf883', category: 'Treatment' },
-              { id:4, name: 'Edge Control Gel', brand: 'Got2B', price: 5.99, rating: 4.6, img: 'photo-1571019613454-1cb2f99b2d8b', category: 'Styling' },
+              { id:1, name: 'Jamaican Black Castor Oil', brand: 'Tropic Isle', price: 12.99, rating: 4.8, img: '/assets/hair-product.png', category: 'Hair Care' },
+              { id:2, name: 'Curl Defining Cream', brand: 'Shea Moisture', price: 9.49, rating: 4.9, img: '/assets/skincare-product.png', category: 'Styling' },
+              { id:3, name: 'Deep Conditioning Mask', brand: 'Cantu', price: 7.99, rating: 4.7, img: '/assets/product-texture.png', category: 'Treatment' },
+              { id:4, name: 'Edge Control Gel', brand: 'Got2B', price: 5.99, rating: 4.6, img: '/assets/botanical.png', category: 'Styling' },
             ]).map((p, i) => (
               <motion.div key={p.id || i} variants={cardItem} whileHover={{ y: -5 }}
                 className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all group">
                 <div className="relative h-52 bg-gray-50 overflow-hidden">
                   <img
-                    src={p.image_url || `https://images.unsplash.com/${p.img}?w=300&h=280&fit=crop`}
+                    src={p.image_url || p.img}
                     alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <button
                     onClick={() => toggleWishlist(p)}
