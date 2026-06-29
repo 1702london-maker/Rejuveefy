@@ -10,6 +10,7 @@ import FloatingWidgets from './components/FloatingWidgets'
 // Pages
 import Home from './pages/Home'
 import Book from './pages/Book'
+import BookMaye from './pages/BookMaye'
 import Providers, { ProviderProfile, BookingFlow, BookingConfirmation } from './pages/Providers'
 import Shop, { ShopCategory, ProductDetail } from './pages/Shop'
 import Cart, { Checkout, OrderSuccess } from './pages/Cart'
@@ -71,6 +72,7 @@ export default function App() {
           {/* Core */}
           <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
           <Route path="/book" element={<PageWrapper><Book /></PageWrapper>} />
+          <Route path="/book/maye" element={<PageWrapper><BookMaye /></PageWrapper>} />
 
           {/* Providers */}
           <Route path="/providers" element={<PageWrapper><Providers /></PageWrapper>} />
