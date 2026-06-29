@@ -49,6 +49,7 @@ export default function FloatingWidgets() {
   const [unread, setUnread] = useState(0)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
+  const sendMessageRef = useRef(null)
 
   useEffect(() => {
     if (chatOpen) {
@@ -56,6 +57,22 @@ export default function FloatingWidgets() {
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }, [chatOpen])
+
+  // Listen for AI Analyser results — opens Dora with context pre-loaded
+  useEffect(() => {
+    const handleOpenDora = (e) => {
+      setChatOpen(true)
+      setMinimised(false)
+      const message = e.detail?.message
+      if (message) {
+        setTimeout(() => {
+          sendMessageRef.current(message)
+        }, 300)
+      }
+    }
+    window.addEventListener('openDora', handleOpenDora)
+    return () => window.removeEventListener('openDora', handleOpenDora)
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -91,6 +108,9 @@ export default function FloatingWidgets() {
       setLoading(false)
     }
   }
+
+  // Keep ref current so the openDora event listener always calls the latest version
+  useEffect(() => { sendMessageRef.current = sendMessage })
 
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
