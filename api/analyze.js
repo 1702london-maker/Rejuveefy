@@ -1,84 +1,24 @@
 export const config = {
-  maxDuration: 30,
-  api: { bodyParser: { sizeLimit: '10mb' } }
+  maxDuration: 10,
+  api: { bodyParser: { sizeLimit: '4mb' } }
 }
+
+const HAIR_PROMPT = `Analyse this hair photo. Return ONLY a JSON object — no markdown, no extra text.
+Schema: {"overallScore":0,"summary":"","condition":"","hairType":"","scores":{"moisture":0,"strength":0,"scalp":0,"shine":0,"density":0,"growth":0},"insights":["","","",""],"recommendations":[{"product":"","reason":"","match":0},{"product":"","reason":"","match":0},{"product":"","reason":"","match":0}],"concerns":["",""]}
+Rules: overallScore 0-100. condition = Excellent|Good|Fair|Needs Care. hairType = specific curl pattern e.g. 4C Coily. All scores 0-100. insights = 4 specific observations from the image. recommendations = 3 real product types with specific reasons. concerns = 2 specific issues you see.`
+
+const SKIN_PROMPT = `Analyse this skin/face photo. Return ONLY a JSON object — no markdown, no extra text.
+Schema: {"overallScore":0,"summary":"","condition":"","skinType":"","scores":{"hydration":0,"evenness":0,"texture":0,"radiance":0,"pores":0,"firmness":0},"insights":["","","",""],"recommendations":[{"product":"","reason":"","match":0},{"product":"","reason":"","match":0},{"product":"","reason":"","match":0}],"concerns":["",""]}
+Rules: overallScore 0-100. condition = Excellent|Good|Fair|Needs Care. skinType = Oily|Dry|Combination|Normal|Sensitive. All scores 0-100. insights = 4 specific observations. recommendations = 3 real product types with specific reasons. concerns = 2 specific issues you see.`
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const { imageBase64, type } = req.body
-
   if (!imageBase64) return res.status(400).json({ error: 'No image provided' })
 
-  const isHair = type === 'hair'
-
-  const prompt = isHair
-    ? `You are an expert an expert hair analysis specialist for Rejuveefy, a UK beauty marketplace. Study this hair image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
-
-Return this exact JSON structure with all fields populated:
-{
-  "overallScore": <integer 0-100 reflecting genuine hair health>,
-  "summary": "<2-3 sentences describing what you see: the hair type, current condition, and the single most important thing to address>",
-  "condition": "<one of: Excellent, Good, Fair, Needs Care>",
-  "hairType": "<specific curl pattern e.g. 4C Coily, 4B Coily, 3C Curly, 3A Curly, 2C Wavy, 1B Straight — be precise>",
-  "scores": {
-    "moisture": <0-100>,
-    "strength": <0-100>,
-    "scalp": <0-100>,
-    "shine": <0-100>,
-    "density": <0-100>,
-    "growth": <0-100>
-  },
-  "insights": [
-    "<observation 1: specific thing visible in the image>",
-    "<observation 2: specific thing visible in the image>",
-    "<observation 3: specific thing visible in the image>",
-    "<observation 4: specific thing visible in the image>"
-  ],
-  "recommendations": [
-    { "product": "<real product type e.g. Deep Moisture Hair Mask>", "reason": "<specific reason based on what you saw>", "match": <70-98> },
-    { "product": "<real product type e.g. Scalp Treatment Oil>", "reason": "<specific reason based on what you saw>", "match": <65-95> },
-    { "product": "<real product type e.g. Protein Reconstructor>", "reason": "<specific reason based on what you saw>", "match": <60-90> }
-  ],
-  "concerns": [
-    "<concern 1: specific issue visible>",
-    "<concern 2: specific issue visible>"
-  ]
-}
-Base every score and observation on what you actually see in the image. Be honest and specific.`
-    : `You are an expert an expert skin analysis specialist for Rejuveefy, a UK beauty marketplace. Study this face/skin image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
-
-Return this exact JSON structure with all fields populated:
-{
-  "overallScore": <integer 0-100 reflecting genuine skin health>,
-  "summary": "<2-3 sentences describing what you see: the skin type, current condition, and the single most important thing to address>",
-  "condition": "<one of: Excellent, Good, Fair, Needs Care>",
-  "skinType": "<one of: Oily, Dry, Combination, Normal, Sensitive, or a combination e.g. Combination-Oily>",
-  "scores": {
-    "hydration": <0-100>,
-    "evenness": <0-100>,
-    "texture": <0-100>,
-    "radiance": <0-100>,
-    "pores": <0-100>,
-    "firmness": <0-100>
-  },
-  "insights": [
-    "<observation 1: specific thing visible in the image>",
-    "<observation 2: specific thing visible in the image>",
-    "<observation 3: specific thing visible in the image>",
-    "<observation 4: specific thing visible in the image>"
-  ],
-  "recommendations": [
-    { "product": "<real product type e.g. Hyaluronic Acid Serum>", "reason": "<specific reason based on what you saw>", "match": <70-98> },
-    { "product": "<real product type e.g. Niacinamide Toner>", "reason": "<specific reason based on what you saw>", "match": <65-95> },
-    { "product": "<real product type e.g. SPF 50 Moisturiser>", "reason": "<specific reason based on what you saw>", "match": <60-90> }
-  ],
-  "concerns": [
-    "<concern 1: specific issue visible>",
-    "<concern 2: specific issue visible>"
-  ]
-}
-Base every score and observation on what you actually see in the image. Be honest and specific.`
+  const prompt = type === 'hair' ? HAIR_PROMPT : SKIN_PROMPT
+  const imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -88,21 +28,15 @@ Base every score and observation on what you actually see in the image. Be hones
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
-        max_tokens: 2000,
+        model: 'gpt-4o-mini',
+        max_tokens: 700,
         response_format: { type: 'json_object' },
         messages: [
           {
             role: 'user',
             content: [
-              { type: 'text', text: prompt + '\n\nRespond with valid JSON only. No markdown, no code blocks, no extra text.' },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageBase64.startsWith('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`,
-                  detail: 'auto',
-                },
-              },
+              { type: 'text', text: prompt },
+              { type: 'image_url', image_url: { url: imageUrl, detail: 'low' } },
             ],
           },
         ],
@@ -122,16 +56,15 @@ Base every score and observation on what you actually see in the image. Be hones
     try {
       result = JSON.parse(content)
     } catch {
-      // Fallback: try to extract JSON block if model added extra text
-      const jsonMatch = content.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) return res.status(500).json({ error: 'Could not parse AI response. Please try again.' })
-      result = JSON.parse(jsonMatch[0])
+      const match = content.match(/\{[\s\S]*\}/)
+      if (!match) return res.status(500).json({ error: 'Could not parse response. Please try again.' })
+      result = JSON.parse(match[0])
     }
 
     return res.status(200).json(result)
 
   } catch (err) {
-    console.error('OpenAI API error:', err)
+    console.error('Analyze error:', err)
     return res.status(500).json({ error: 'Analysis failed. Please try again.' })
   }
 }
