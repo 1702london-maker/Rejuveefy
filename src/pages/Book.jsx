@@ -102,6 +102,49 @@ export default function Book() {
         </div>
       </div>
 
+      {/* ── Book Maye featured card ── */}
+      <div className="max-w-[1280px] mx-auto px-4 lg:px-6 pt-8 pb-2">
+        <Link to="/book/maye"
+          className="group relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8 hover:shadow-2xl transition-all duration-300 border border-white/5">
+          {/* Glow */}
+          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          {/* Avatar */}
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-amber-900 to-amber-700 flex items-center justify-center text-4xl sm:text-5xl border-2 border-white/10 shadow-xl">
+              👩🏾
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full" />
+            </div>
+          </div>
+          {/* Text */}
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-2">
+              <span className="text-[10px] font-black bg-pink-500 text-white px-3 py-1 rounded-full tracking-wide uppercase">Founder</span>
+              <span className="text-[10px] font-bold bg-white/10 text-white/80 px-3 py-1 rounded-full">10+ Years Experience</span>
+              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full">Available Now</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white mb-1">Book Maye — Hair & Makeup Artist</h2>
+            <p className="text-sm text-white/60 leading-relaxed max-w-lg">
+              Braiding · Cornrows · Dreadlocks · Bridal · Makeup · Wig Styling. The founder of Rejuveefy takes personal bookings across Southampton, Portsmouth & London.
+            </p>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3">
+              {['Southampton', 'Portsmouth', 'London'].map(l => (
+                <span key={l} className="text-[11px] text-white/50 flex items-center gap-1">
+                  <span className="w-1 h-1 bg-pink-400 rounded-full" /> {l}
+                </span>
+              ))}
+            </div>
+          </div>
+          {/* CTA */}
+          <div className="shrink-0">
+            <span className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-400 text-white font-black text-sm px-6 py-3.5 rounded-xl transition-all group-hover:scale-105 shadow-lg">
+              Book Now <ArrowRight size={15} />
+            </span>
+          </div>
+        </Link>
+      </div>
+
       {/* Popular categories */}
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-6">
         <div className="flex items-center justify-between mb-4">

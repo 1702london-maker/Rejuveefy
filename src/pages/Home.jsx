@@ -206,6 +206,52 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── BOOK MAYE BANNER ───────────────────────────────────────── */}
+      <section className="bg-white py-8 sm:py-10 border-b border-gray-100">
+        <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
+          <Link to="/book/maye"
+            className="group relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 flex flex-col sm:flex-row items-center gap-6 p-6 sm:p-8 lg:p-10 hover:shadow-2xl transition-all duration-300 border border-white/5">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br from-amber-900 to-amber-700 flex items-center justify-center text-5xl lg:text-6xl border-2 border-white/10 shadow-2xl">
+                👩🏾
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full border-2 border-gray-900 flex items-center justify-center shadow-lg">
+                <div className="w-2.5 h-2.5 bg-white rounded-full" />
+              </div>
+            </div>
+            {/* Copy */}
+            <div className="flex-1 text-center sm:text-left">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
+                <span className="text-[10px] font-black bg-pink-500 text-white px-3 py-1.5 rounded-full tracking-widest uppercase">✨ Founder's Studio</span>
+                <span className="text-[10px] font-bold bg-white/10 text-white/80 px-3 py-1.5 rounded-full">10+ Years</span>
+                <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full">● Available Now</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-2">
+                Book Maye<br className="hidden sm:block" />
+                <span className="text-pink-400"> Hair & Makeup Artist</span>
+              </h2>
+              <p className="text-sm sm:text-base text-white/60 leading-relaxed max-w-xl mb-4">
+                The founder of Rejuveefy takes personal bookings. Braids, cornrows, dreadlocks, bridal hair, wig styling, and makeup — across Southampton, Portsmouth & London.
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                {['Braiding','Cornrows','Dreadlocks','Makeup','Wig Styling','Bridal'].map(t => (
+                  <span key={t} className="text-[11px] bg-white/8 border border-white/10 text-white/60 px-3 py-1 rounded-full">{t}</span>
+                ))}
+              </div>
+            </div>
+            {/* CTA */}
+            <div className="shrink-0 flex flex-col items-center gap-2">
+              <span className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-400 text-white font-black text-sm sm:text-base px-8 py-4 rounded-2xl transition-all group-hover:scale-105 shadow-xl">
+                Book Now →
+              </span>
+              <span className="text-[10px] text-white/30">50% deposit · Instant confirmation</span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* ── STATS BAR ──────────────────────────────────────────────── */}
       <section className="bg-gray-900 py-10">
         <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-8">

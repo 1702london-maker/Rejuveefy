@@ -9,6 +9,7 @@ const nav = [
   {
     label: 'Book', path: '/book',
     sub: [
+      { label: '✨ Book Maye — Founder', path: '/book/maye' },
       { label: 'Braids', path: '/book/braids' },
       { label: 'Twists', path: '/book/twists' },
       { label: 'Locks', path: '/book/locks' },
