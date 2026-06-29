@@ -37,8 +37,8 @@ const quickLinks = [
 ]
 
 const stats = [
-  { value: '12K+', label: 'Happy Clients' },
-  { value: '850+', label: 'Expert Providers' },
+  { value: '100+', label: 'Happy Clients' },
+  { value: '5', label: 'Expert Providers' },
   { value: '4.9', label: 'Average Rating' },
   { value: '98%', label: 'Satisfaction Rate' },
 ]
@@ -141,7 +141,7 @@ export default function Home() {
                   <Stars val={5} size={13} />
                   <span className="text-sm font-bold text-gray-800">4.9</span>
                 </div>
-                <p className="text-xs text-gray-500">Trusted by 12,000+ clients</p>
+                <p className="text-xs text-gray-500">Trusted by 100+ clients</p>
               </div>
             </motion.div>
           </motion.div>
@@ -155,7 +155,7 @@ export default function Home() {
           >
             <div className="relative rounded-3xl overflow-hidden h-[600px] shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=700&h=800&fit=crop&crop=center"
+                src="/assets/hero-beauty.png"
                 alt="Beautiful natural hair"
                 className="w-full h-full object-cover"
               />
@@ -198,7 +198,7 @@ export default function Home() {
                 ))}
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-800">850+ Experts</p>
+                <p className="text-xs font-bold text-gray-800">5 Experts</p>
                 <Stars val={5} size={11} />
               </div>
             </motion.div>
@@ -487,7 +487,7 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left">
           <div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-white mb-3">Are You a Beauty Professional?</h2>
-            <p className="text-pink-100 text-lg">Join 850+ providers earning more with Rejuveefy. Free to join, no commission on your first 10 bookings.</p>
+            <p className="text-pink-100 text-lg">Join our growing community of providers earning more with Rejuveefy. Free to join, no commission on your first 10 bookings.</p>
           </div>
           <div className="flex gap-3 shrink-0">
             <Link to="/providers-portal" className="bg-white text-pink-500 font-bold px-8 py-4 rounded-xl hover:bg-pink-50 transition-colors shadow-lg">

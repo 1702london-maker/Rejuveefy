@@ -9,16 +9,15 @@ const nav = [
   {
     label: 'Book', path: '/book',
     sub: [
-      { label: 'Book a Service', path: '/book' },
       { label: 'Braids', path: '/book/braids' },
       { label: 'Twists', path: '/book/twists' },
       { label: 'Locks', path: '/book/locks' },
       { label: 'Wig Installation', path: '/book/wig-install' },
       { label: 'Frontal & Closure', path: '/book/frontal' },
       { label: 'Hair Styling', path: '/book/hair-styling' },
-      { label: 'Hair Treatments', path: '/book/hair-treatments' },
       { label: 'Makeup', path: '/book/makeup' },
       { label: 'Barbers', path: '/book/barbers' },
+      { label: 'Training', path: '/training' },
     ],
   },
   {
@@ -49,6 +48,7 @@ const nav = [
       { label: 'Affiliate Portal', path: '/affiliate-portal' },
     ],
   },
+  { label: 'Training', path: '/training' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ]
@@ -97,7 +97,7 @@ export default function Header() {
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 flex items-center h-14 gap-4">
           {/* Logo */}
           <Link to="/" className="shrink-0 mr-2">
-            <span className="font-display font-bold text-xl text-pink-500 tracking-tight">Rejuveefy</span>
+            <img src="/logo.png" alt="Rejuveefy" className="h-8 w-auto object-contain" />
           </Link>
 
           {/* Desktop nav */}
@@ -216,7 +216,7 @@ export default function Header() {
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                <span className="font-display font-bold text-lg text-pink-500">Menu</span>
+                <img src="/logo.png" alt="Rejuveefy" className="h-7 w-auto object-contain" />
                 <button onClick={() => setMobile(false)}><X size={20} className="text-gray-500" /></button>
               </div>
               <div className="p-3 space-y-0.5">

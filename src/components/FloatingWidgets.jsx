@@ -4,6 +4,18 @@ import { MessageCircle, X, Send, RotateCcw, Minimize2, PhoneCall } from 'lucide-
 const WHATSAPP_NUMBER = '447700900000' // ← replace with real number
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%20Rejuveefy%2C%20I%20need%20help%20with%20my%20account.`
 
+function stripMarkdown(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/^[\s]*[-–—]\s/gm, '')
+    .replace(/^[\s]*\d+\.\s/gm, '')
+    .replace(/#{1,6}\s?/g, '')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 const QUICK_REPLIES = [
   'How do I book a service?',
   'What hair treatments do you offer?',
@@ -69,7 +81,7 @@ export default function FloatingWidgets() {
         }),
       })
       const data = await res.json()
-      const reply = { role: 'assistant', content: data.message || 'Sorry, something went wrong. Please try again.' }
+      const reply = { role: 'assistant', content: stripMarkdown(data.message || 'Sorry, something went wrong. Please try again.') }
       setMessages(prev => [...prev, reply])
       if (data.transferToHuman) setTransferring(true)
       if (!chatOpen) setUnread(u => u + 1)

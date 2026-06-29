@@ -7,16 +7,14 @@ const cols = [
   {
     title: 'Services',
     links: [
-      { l: 'Book a Service', p: '/book' },
       { l: 'Braids', p: '/book/braids' },
       { l: 'Twists', p: '/book/twists' },
       { l: 'Locks', p: '/book/locks' },
       { l: 'Wig Installation', p: '/book/wig-install' },
       { l: 'Frontal & Closure', p: '/book/frontal' },
-      { l: 'Hair Treatments', p: '/book/hair-treatments' },
       { l: 'Makeup', p: '/book/makeup' },
       { l: 'Barbers', p: '/book/barbers' },
-      { l: 'More Services', p: '/book' },
+      { l: 'Training', p: '/training' },
     ],
   },
   {
@@ -24,7 +22,6 @@ const cols = [
     links: [
       { l: 'Hair Care', p: '/shop/hair-care' },
       { l: 'Hair Bundles', p: '/shop/hair-bundles' },
-      { l: 'Hair Treatments', p: '/shop/hair-treatments' },
       { l: 'Hair Accessories', p: '/shop/accessories' },
       { l: 'Lashes', p: '/shop/lashes' },
       { l: 'New Arrivals', p: '/shop?sort=new' },
@@ -36,24 +33,67 @@ const cols = [
     links: [
       { l: 'About Us', p: '/about' },
       { l: 'Contact Us', p: '/contact' },
-      { l: 'Booking Help', p: '/booking-help' },
+      { l: 'FAQ', p: '/faq' },
       { l: 'Returns & Refunds', p: '/returns' },
       { l: 'Track Order', p: '/track-order' },
       { l: 'Careers', p: '/careers' },
-      { l: 'Terms & Conditions', p: '/terms' },
-      { l: 'Privacy Policy', p: '/privacy' },
       { l: 'Become a Provider', p: '/become-provider' },
     ],
   },
 ]
 
-const payIcons = [
-  { label: 'Visa', bg: 'bg-blue-700' },
-  { label: 'MC', bg: 'bg-red-600' },
-  { label: 'PayPal', bg: 'bg-blue-500' },
-  { label: 'APay', bg: 'bg-gray-900' },
-  { label: 'GPay', bg: 'bg-white border border-gray-300' },
-]
+// Real payment provider SVG logos
+function VisaLogo() {
+  return (
+    <svg viewBox="0 0 50 16" className="h-5 w-auto" aria-label="Visa">
+      <rect width="50" height="16" rx="3" fill="#1A1F71"/>
+      <text x="7" y="12" fontFamily="Arial" fontWeight="bold" fontSize="11" fill="white">VISA</text>
+    </svg>
+  )
+}
+function MastercardLogo() {
+  return (
+    <svg viewBox="0 0 38 24" className="h-5 w-auto" aria-label="Mastercard">
+      <rect width="38" height="24" rx="3" fill="#252525"/>
+      <circle cx="14" cy="12" r="8" fill="#EB001B"/>
+      <circle cx="24" cy="12" r="8" fill="#F79E1B"/>
+      <path d="M19 5.8a8 8 0 0 1 0 12.4A8 8 0 0 1 19 5.8z" fill="#FF5F00"/>
+    </svg>
+  )
+}
+function PayPalLogo() {
+  return (
+    <svg viewBox="0 0 60 16" className="h-5 w-auto" aria-label="PayPal">
+      <rect width="60" height="16" rx="3" fill="#003087"/>
+      <text x="6" y="12" fontFamily="Arial" fontWeight="bold" fontSize="10" fill="#009CDE">Pay</text>
+      <text x="22" y="12" fontFamily="Arial" fontWeight="bold" fontSize="10" fill="white">Pal</text>
+    </svg>
+  )
+}
+function KlarnaLogo() {
+  return (
+    <svg viewBox="0 0 52 16" className="h-5 w-auto" aria-label="Klarna">
+      <rect width="52" height="16" rx="3" fill="#FFB3C7"/>
+      <text x="7" y="12" fontFamily="Arial" fontWeight="bold" fontSize="10" fill="#17120F">klarna</text>
+    </svg>
+  )
+}
+function ApplePayLogo() {
+  return (
+    <svg viewBox="0 0 50 20" className="h-5 w-auto" aria-label="Apple Pay">
+      <rect width="50" height="20" rx="3" fill="#000"/>
+      <text x="5" y="14" fontFamily="Arial" fontWeight="600" fontSize="9" fill="white">Apple Pay</text>
+    </svg>
+  )
+}
+function GooglePayLogo() {
+  return (
+    <svg viewBox="0 0 54 20" className="h-5 w-auto" aria-label="Google Pay">
+      <rect width="54" height="20" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+      <text x="5" y="14" fontFamily="Arial" fontWeight="500" fontSize="9" fill="#3c4043">Google Pay</text>
+    </svg>
+  )
+}
 
 export default function Footer() {
   const [email, setEmail] = useState('')
@@ -76,7 +116,9 @@ export default function Footer() {
         <div className="grid lg:grid-cols-[220px_1fr_1fr_1fr_220px] gap-8">
           {/* Brand */}
           <div>
-            <span className="font-display font-bold text-xl text-pink-500 mb-3 block">Rejuveefy</span>
+            <Link to="/">
+              <img src="/logo.png" alt="Rejuveefy" className="h-8 w-auto object-contain mb-3" />
+            </Link>
             <p className="text-xs text-gray-500 leading-relaxed mb-4">
               Rejuveefy is a modern beauty-tech marketplace connecting you with verified professionals and premium beauty products across the UK.
             </p>
@@ -158,15 +200,28 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-gray-100">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-400">© 2026 Rejuveefy Ltd. All rights reserved.</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {['Privacy Policy', 'Terms & Conditions', 'Cookie Policy', 'Accessibility'].map((t) => (
-              <Link key={t} to="#" className="text-xs text-gray-400 hover:text-pink-500 transition-colors">{t}</Link>
-            ))}
+          {/* Left: copyright */}
+          <p className="text-xs text-gray-400 shrink-0">© 2026 Rejuveefy Ltd. All rights reserved.</p>
+
+          {/* Centre: payment logos */}
+          <div className="flex gap-2 items-center">
+            <VisaLogo />
+            <MastercardLogo />
+            <PayPalLogo />
+            <KlarnaLogo />
+            <ApplePayLogo />
+            <GooglePayLogo />
           </div>
-          <div className="flex gap-1.5 items-center">
-            {payIcons.map((p) => (
-              <span key={p.label} className={`${p.bg} text-white text-[9px] font-bold px-2 py-1 rounded`}>{p.label}</span>
+
+          {/* Right: legal links */}
+          <div className="flex flex-wrap justify-end gap-4 shrink-0">
+            {[
+              { l: 'Privacy Policy', p: '/privacy' },
+              { l: 'Terms & Conditions', p: '/terms' },
+              { l: 'Cookie Policy', p: '/cookie-policy' },
+              { l: 'Accessibility', p: '/accessibility' },
+            ].map((t) => (
+              <Link key={t.l} to={t.p} className="text-xs text-gray-400 hover:text-pink-500 transition-colors">{t.l}</Link>
             ))}
           </div>
         </div>

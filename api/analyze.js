@@ -13,12 +13,14 @@ export default async function handler(req, res) {
   const isHair = type === 'hair'
 
   const prompt = isHair
-    ? `You are an expert hair analysis AI for Rejuveefy, a UK beauty platform. Analyse this hair image and return a JSON object with exactly this structure:
+    ? `You are Reja, an expert hair analysis specialist for Rejuveefy, a UK beauty marketplace. Study this hair image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
+
+Return this exact JSON structure with all fields populated:
 {
-  "overallScore": <number 0-100>,
-  "summary": "<2 sentence overall assessment>",
-  "condition": "<Excellent|Good|Fair|Needs Care>",
-  "hairType": "<e.g. 4C Coily, 3B Curly, 2A Wavy, 1B Straight>",
+  "overallScore": <integer 0-100 reflecting genuine hair health>,
+  "summary": "<2-3 sentences describing what you see: the hair type, current condition, and the single most important thing to address>",
+  "condition": "<one of: Excellent, Good, Fair, Needs Care>",
+  "hairType": "<specific curl pattern e.g. 4C Coily, 4B Coily, 3C Curly, 3A Curly, 2C Wavy, 1B Straight — be precise>",
   "scores": {
     "moisture": <0-100>,
     "strength": <0-100>,
@@ -28,24 +30,30 @@ export default async function handler(req, res) {
     "growth": <0-100>
   },
   "insights": [
-    "<specific observation 1>",
-    "<specific observation 2>",
-    "<specific observation 3>"
+    "<observation 1: specific thing visible in the image>",
+    "<observation 2: specific thing visible in the image>",
+    "<observation 3: specific thing visible in the image>",
+    "<observation 4: specific thing visible in the image>"
   ],
   "recommendations": [
-    { "product": "<product name>", "reason": "<why this helps>", "match": <60-99> },
-    { "product": "<product name>", "reason": "<why this helps>", "match": <60-99> },
-    { "product": "<product name>", "reason": "<why this helps>", "match": <60-99> }
+    { "product": "<real product type e.g. Deep Moisture Hair Mask>", "reason": "<specific reason based on what you saw>", "match": <70-98> },
+    { "product": "<real product type e.g. Scalp Treatment Oil>", "reason": "<specific reason based on what you saw>", "match": <65-95> },
+    { "product": "<real product type e.g. Protein Reconstructor>", "reason": "<specific reason based on what you saw>", "match": <60-90> }
   ],
-  "concerns": ["<concern 1>", "<concern 2>"]
+  "concerns": [
+    "<concern 1: specific issue visible>",
+    "<concern 2: specific issue visible>"
+  ]
 }
-Be specific, accurate, and helpful. Focus on what you can see in the image.`
-    : `You are an expert skin analysis AI for Rejuveefy, a UK beauty platform. Analyse this skin/face image and return a JSON object with exactly this structure:
+Base every score and observation on what you actually see in the image. Be honest and specific.`
+    : `You are Reja, an expert skin analysis specialist for Rejuveefy, a UK beauty marketplace. Study this face/skin image carefully and return a complete JSON analysis. Every field is required — do not leave anything empty or skip any field.
+
+Return this exact JSON structure with all fields populated:
 {
-  "overallScore": <number 0-100>,
-  "summary": "<2 sentence overall assessment>",
-  "condition": "<Excellent|Good|Fair|Needs Care>",
-  "skinType": "<e.g. Oily, Dry, Combination, Normal, Sensitive>",
+  "overallScore": <integer 0-100 reflecting genuine skin health>,
+  "summary": "<2-3 sentences describing what you see: the skin type, current condition, and the single most important thing to address>",
+  "condition": "<one of: Excellent, Good, Fair, Needs Care>",
+  "skinType": "<one of: Oily, Dry, Combination, Normal, Sensitive, or a combination e.g. Combination-Oily>",
   "scores": {
     "hydration": <0-100>,
     "evenness": <0-100>,
@@ -55,18 +63,22 @@ Be specific, accurate, and helpful. Focus on what you can see in the image.`
     "firmness": <0-100>
   },
   "insights": [
-    "<specific observation 1>",
-    "<specific observation 2>",
-    "<specific observation 3>"
+    "<observation 1: specific thing visible in the image>",
+    "<observation 2: specific thing visible in the image>",
+    "<observation 3: specific thing visible in the image>",
+    "<observation 4: specific thing visible in the image>"
   ],
   "recommendations": [
-    { "product": "<product name>", "reason": "<why this helps>", "match": <60-99> },
-    { "product": "<product name>", "reason": "<why this helps>", "match": <60-99> },
-    { "product": "<product name>", "reason": "<why this helps>", "match": <60-99> }
+    { "product": "<real product type e.g. Hyaluronic Acid Serum>", "reason": "<specific reason based on what you saw>", "match": <70-98> },
+    { "product": "<real product type e.g. Niacinamide Toner>", "reason": "<specific reason based on what you saw>", "match": <65-95> },
+    { "product": "<real product type e.g. SPF 50 Moisturiser>", "reason": "<specific reason based on what you saw>", "match": <60-90> }
   ],
-  "concerns": ["<concern 1>", "<concern 2>"]
+  "concerns": [
+    "<concern 1: specific issue visible>",
+    "<concern 2: specific issue visible>"
+  ]
 }
-Be specific, accurate, and helpful. Focus on what you can see in the image.`
+Base every score and observation on what you actually see in the image. Be honest and specific.`
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -77,7 +89,7 @@ Be specific, accurate, and helpful. Focus on what you can see in the image.`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
-        max_tokens: 1200,
+        max_tokens: 2000,
         response_format: { type: 'json_object' },
         messages: [
           {

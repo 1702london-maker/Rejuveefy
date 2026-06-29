@@ -21,6 +21,7 @@ import Wishlist from './pages/Wishlist'
 import Affiliate from './pages/Affiliate'
 import AffiliatePortal from './pages/AffiliatePortal'
 import ProvidersPortal from './pages/ProvidersPortal'
+import Training from './pages/Training'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -113,6 +114,9 @@ export default function App() {
           {/* Affiliate */}
           <Route path="/affiliate" element={<PageWrapper><Affiliate /></PageWrapper>} />
           <Route path="/affiliate-portal" element={<PageWrapper><AffiliatePortal /></PageWrapper>} />
+
+          {/* Training */}
+          <Route path="/training" element={<PageWrapper><Training /></PageWrapper>} />
 
           {/* Providers Portal */}
           <Route path="/providers-portal" element={<PageWrapper><ProvidersPortal /></PageWrapper>} />
