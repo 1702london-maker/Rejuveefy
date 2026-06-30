@@ -144,6 +144,37 @@ const SERVICES = [
     getDuration: (cfg) => { const m = (cfg.type||'').match(/·\s*(.+?)\)/); return m ? m[1].trim() : '—' },
   },
   {
+    id: 'hair-treatment', label: 'Hair Treatment', icon: 'T',
+    desc: 'Deep conditioning, washing, strengthening, straightening, curling and trimming. For all hair types.',
+    needsHair: false,
+    config: [
+      { key: 'type', label: 'Treatment Type', type: 'select', options: [
+        'Treating & Washing — £45 · 1h',
+        'Treatment, Washing & Strengthening or Styling — £65 · 1h 30m',
+        'Washing & Straightening — £30–£100 · 1h',
+        'Washing only — £15',
+        'Straightening or Curling — £20–£80 · 30–45m',
+        'Hair Trimming — £20 · 30m',
+      ]},
+    ],
+    getPrice: (cfg) => { const m = (cfg.type||'').match(/£(\d+)/); return m ? parseInt(m[1]) : 0 },
+    getDuration: (cfg) => { const m = (cfg.type||'').match(/·\s*(.+)$/); return m ? m[1].trim() : '—' },
+  },
+  {
+    id: 'wig-treatment', label: 'Wig Treatment', icon: 'W',
+    desc: 'Professional wig treatment, conditioning and styling. Bring your wig or book with a Rejuveefy wig.',
+    needsHair: false,
+    config: [
+      { key: 'type', label: 'Service', type: 'select', options: [
+        'Wig Treatment & Styling — £80 · 4 days',
+        'Wig Treatment only — £50 · 3 days',
+        'Wig Styling only — £30–£60 · 2h',
+      ]},
+    ],
+    getPrice: (cfg) => { const m = (cfg.type||'').match(/£(\d+)/); return m ? parseInt(m[1]) : 0 },
+    getDuration: (cfg) => { const m = (cfg.type||'').match(/·\s*(.+)$/); return m ? m[1].trim() : '—' },
+  },
+  {
     id: 'makeup', label: 'Makeup', icon: 'M',
     desc: 'Everyday, glamour, bridal, special occasion, editorial, cultural and traditional makeup. For all skin tones.',
     needsHair: false,
