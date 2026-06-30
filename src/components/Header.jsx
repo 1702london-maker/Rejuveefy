@@ -233,7 +233,7 @@ export default function Header() {
                     </Link>
                     {item.sub && (
                       <div className="pl-3">
-                        {item.sub.slice(1).map((s) => (
+                        {item.sub.map((s) => (
                           <Link key={s.path} to={s.path} onClick={() => setMobile(false)}
                             className="block px-3 py-2 text-xs text-gray-500 hover:text-pink-500 hover:bg-pink-50 rounded-lg transition-colors">
                             {s.label}
