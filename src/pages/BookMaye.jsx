@@ -861,12 +861,12 @@ function Step7({ location, service, cfg, hairChoice, hairProducts, date, time, d
             {payMethod==='bank' && <Check size={16} className="text-pink-500 shrink-0" />}
           </button>
 
-          <button type="button" onClick={() => setPayMethod('stripe')}
+          <button type="button" onClick={() => setPayMethod('card')}
             className={`w-full flex items-center gap-4 p-4 border text-left transition-all
-              ${payMethod==='stripe' ? 'border-pink-500 bg-pink-50' : 'border-gray-200 bg-white hover:border-pink-300'}`}>
+              ${payMethod==='card' ? 'border-pink-500 bg-pink-50' : 'border-gray-200 bg-white hover:border-pink-300'}`}>
             <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0 text-sm font-bold text-blue-600">S</div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-gray-800">Pay by Card — Stripe</p>
+              <p className="text-sm font-bold text-gray-800">Pay by Card</p>
               <p className="text-xs text-gray-500 font-medium mt-0.5">Secure card payment. Coming soon.</p>
             </div>
             <span className="text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-1 shrink-0">Coming Soon</span>
@@ -893,9 +893,9 @@ function Step7({ location, service, cfg, hairChoice, hairProducts, date, time, d
         </div>
       )}
 
-      <button type="submit" disabled={loading || payMethod === 'stripe'}
+      <button type="submit" disabled={loading || payMethod === 'card'}
         className="w-full bg-pink-500 text-white font-bold text-xs tracking-[2.5px] uppercase py-5 hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-        {loading ? 'Sending...' : payMethod === 'bank' ? 'Open WhatsApp & Pay Deposit' : payMethod === 'stripe' ? 'Card payment coming soon' : 'Confirm Appointment'}
+        {loading ? 'Sending...' : payMethod === 'bank' ? 'Open WhatsApp & Pay Deposit' : payMethod === 'card' ? 'Card payment coming soon' : 'Confirm Appointment'}
       </button>
 
       <div className="mt-4">

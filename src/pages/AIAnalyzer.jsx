@@ -913,7 +913,7 @@ function PageShell({ activeTab, children }) {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div>
               <div className="inline-flex items-center gap-2 bg-black text-white text-[10px] font-bold px-3 py-1.5 rounded-full mb-3">
-                🖤 Specialised for Afro & Textured Hair
+                Specialised for Afro and textured hair
               </div>
               <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 leading-tight">
                 {activeTab === 'hair' ? <>AI Hair <em className="text-pink-500 not-italic">Analysis</em></> : <>AI Skin <em className="text-pink-500 not-italic">Analysis</em></>}
@@ -933,11 +933,11 @@ function PageShell({ activeTab, children }) {
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 flex">
           <Link to="/ai-beauty/hair"
             className={`py-3 px-1 mr-6 text-sm font-bold border-b-2 transition-colors ${activeTab === 'hair' ? 'text-pink-500 border-pink-500' : 'text-gray-400 border-transparent hover:text-gray-700'}`}>
-            💇‍♀️ Hair Analysis
+            Hair Analysis
           </Link>
           <Link to="/ai-beauty/skin"
             className={`py-3 px-1 text-sm font-bold border-b-2 transition-colors ${activeTab === 'skin' ? 'text-pink-500 border-pink-500' : 'text-gray-400 border-transparent hover:text-gray-700'}`}>
-            🧖‍♀️ Skin Analysis
+            Skin Analysis
           </Link>
         </div>
       </div>
