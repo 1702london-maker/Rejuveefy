@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, ShieldCheck, ArrowLeft, CheckCircle, Mail, Lock, User, Phone } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { submitProviderApplication } from '../lib/db'
 
 function AuthLayout({ children, image }) {
   return (
@@ -14,13 +13,13 @@ function AuthLayout({ children, image }) {
           <Link to="/" className="text-white font-display text-3xl font-bold mb-8">Rejuveefy</Link>
           <div className="space-y-4 w-full max-w-xs">
             {[
-              { icon: '✨', text: 'Book verified Rejuveefy services' },
-              { icon: '🛍️', text: 'Shop curated beauty products' },
-              { icon: '🤖', text: 'Get personalised AI beauty analysis' },
-              { icon: '📅', text: 'Manage bookings from your account' },
+              { text: 'Book verified Rejuveefy services' },
+              { text: 'Shop curated beauty products' },
+              { text: 'Manage your client account' },
+              { text: 'Apply for provider or affiliate access' },
             ].map(f => (
               <div key={f.text} className="flex items-center gap-3 text-white">
-                <span className="text-xl">{f.icon}</span>
+                <ShieldCheck size={16} className="text-white/80 shrink-0" />
                 <span className="text-sm">{f.text}</span>
               </div>
             ))}
@@ -39,10 +38,15 @@ function AuthLayout({ children, image }) {
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 
 async function signInWithProvider(provider, accountType = 'client') {
+  const target = accountType === 'provider'
+    ? '/providers-portal'
+    : accountType === 'affiliate'
+      ? '/affiliate'
+      : '/dashboard'
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${window.location.origin}/dashboard`,
+      redirectTo: `${window.location.origin}${target}`,
       queryParams: { account_type: accountType },
     },
   })
@@ -64,7 +68,7 @@ export default function Login() {
     const { error: err } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
     setLoading(false)
     if (err) { setError(err.message); return }
-    navigate('/')
+    navigate('/dashboard')
   }
   const socialSignIn = async (provider) => {
     setError('')
@@ -99,7 +103,7 @@ export default function Login() {
             <label className="text-xs font-semibold text-gray-600 mb-1 block">Email Address</label>
             <div className="relative">
               <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="email" value={form.email} onChange={e => upd('email', e.target.value)} required placeholder="jessica@example.com"
+              <input type="email" value={form.email} onChange={e => upd('email', e.target.value)} required placeholder="you@example.com"
                 className="w-full border border-gray-200 rounded-xl pl-10 pr-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
             </div>
           </div>
@@ -111,7 +115,7 @@ export default function Login() {
             </div>
             <div className="relative">
               <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type={showPw ? 'text' : 'password'} value={form.password} onChange={e => upd('password', e.target.value)} required placeholder="••••••••"
+              <input type={showPw ? 'text' : 'password'} value={form.password} onChange={e => upd('password', e.target.value)} required placeholder="Enter your password"
                 className="w-full border border-gray-200 rounded-xl pl-10 pr-11 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
               <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -158,9 +162,7 @@ export default function Login() {
           <Link to="/register" className="text-pink-500 font-semibold hover:underline">Create one free</Link>
         </p>
 
-        <p className="text-center text-[10px] text-gray-400 mt-4 flex items-center justify-center gap-1">
-          <ShieldCheck size={11} className="text-pink-400" /> Secured by SSL encryption
-        </p>
+        <p className="text-center text-[10px] text-gray-400 mt-4">Email verification is handled by Supabase.</p>
       </div>
     </AuthLayout>
   )
@@ -191,24 +193,9 @@ export function Register() {
       password: form.password,
       options: { data: { full_name: form.name, phone: form.phone, account_type: form.accountType } }
     })
-    if (err) { setError(err.message); return }
-    if (form.accountType === 'provider') {
-      try {
-        await submitProviderApplication({
-          full_name: form.name,
-          email: form.email,
-          phone: form.phone,
-          services: [],
-          status: 'pending',
-        })
-      } catch (applicationError) {
-        setError(applicationError.message || 'Account created, but provider application could not be saved.')
-        setLoading(false)
-        return
-      }
-    }
+    if (err) { setError(err.message); setLoading(false); return }
     setLoading(false)
-    navigate(form.accountType === 'provider' ? '/providers-portal' : '/')
+    navigate(form.accountType === 'provider' ? '/providers-portal' : form.accountType === 'affiliate' ? '/affiliate' : '/dashboard')
   }
 
   const socialSignUp = async (provider) => {
@@ -232,7 +219,7 @@ export function Register() {
         </div>
 
         <h1 className="font-display text-2xl font-bold text-gray-900 mb-1.5">Create Your Account</h1>
-        <p className="text-sm text-gray-500 mb-6">Create a client, provider or affiliate-ready Rejuveefy account.</p>
+        <p className="text-sm text-gray-500 mb-6">Create your account. Provider and affiliate access is reviewed after signup.</p>
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold px-3 py-2.5 rounded-xl">{error}</div>
@@ -243,7 +230,7 @@ export function Register() {
             <label className="text-xs font-semibold text-gray-600 mb-1 block">Full Name</label>
             <div className="relative">
               <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input value={form.name} onChange={e => upd('name', e.target.value)} required placeholder="Jessica Williams"
+              <input value={form.name} onChange={e => upd('name', e.target.value)} required placeholder="Your full name"
                 className="w-full border border-gray-200 rounded-xl pl-10 pr-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
             </div>
           </div>
@@ -262,7 +249,7 @@ export function Register() {
             <label className="text-xs font-semibold text-gray-600 mb-1 block">Email Address</label>
             <div className="relative">
               <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="email" value={form.email} onChange={e => upd('email', e.target.value)} required placeholder="jessica@example.com"
+              <input type="email" value={form.email} onChange={e => upd('email', e.target.value)} required placeholder="you@example.com"
                 className="w-full border border-gray-200 rounded-xl pl-10 pr-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
             </div>
           </div>
@@ -339,13 +326,19 @@ export function Register() {
           <div className="relative flex justify-center"><span className="bg-white px-4 text-xs text-gray-400">or sign up with</span></div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-5">
-          {[{ label: 'Google', provider: 'google' }, { label: 'Facebook', provider: 'facebook' }].map(s => (
-            <button type="button" key={s.label} onClick={() => socialSignUp(s.provider)} className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
-              {s.label}
-            </button>
-          ))}
-        </div>
+        {form.accountType === 'client' ? (
+          <div className="grid grid-cols-2 gap-2 mb-5">
+            {[{ label: 'Google', provider: 'google' }, { label: 'Facebook', provider: 'facebook' }].map(s => (
+              <button type="button" key={s.label} onClick={() => socialSignUp(s.provider)} className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
+                {s.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400 text-center mb-5">
+            Use email signup for provider or affiliate applications so the review record can match your account.
+          </p>
+        )}
 
         <p className="text-center text-sm text-gray-500">
           Already have an account?{' '}
@@ -395,7 +388,7 @@ export function ForgotPassword() {
                 <label className="text-xs font-semibold text-gray-600 mb-1 block">Email Address</label>
                 <div className="relative">
                   <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="jessica@example.com"
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com"
                     className="w-full border border-gray-200 rounded-xl pl-10 pr-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
                 </div>
               </div>
