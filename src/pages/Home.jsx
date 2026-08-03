@@ -75,11 +75,23 @@ export default function Home() {
     else navigate('/book')
   }
 
+  const handleNewsletter = async (e) => {
+    e.preventDefault()
+    if (!newsletterEmail) return
+    try {
+      await subscribeNewsletter(newsletterEmail)
+      setNewsletterDone(true)
+      setNewsletterEmail('')
+    } catch {
+      setNewsletterDone(false)
+    }
+  }
+
   return (
     <div className="bg-white">
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF0F5] via-white to-[#FFF8FB] min-h-[92vh] flex items-center">`r`n
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF0F5] via-white to-[#FFF8FB] min-h-[92vh] flex items-center">
         <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 w-full grid lg:grid-cols-2 gap-12 items-center py-20 lg:py-0">
 
           {/* Left */}
