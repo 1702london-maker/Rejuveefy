@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Search, Star, ArrowRight, ShieldCheck, Sparkles, ChevronRight, MapPin, Heart, ShoppingBag, Play, CheckCircle } from 'lucide-react'
+import { Search, Star, ArrowRight, ShieldCheck, Sparkles, ChevronRight, MapPin, Heart, ShoppingBag, CheckCircle, Scissors, Leaf, Crown, WandSparkles, Palette, HandHeart, Droplets, GraduationCap } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { fetchProviders, fetchProducts } from '../lib/db'
+import { fetchProviders, fetchProducts, subscribeNewsletter } from '../lib/db'
 import { useApp } from '../context/AppContext'
 
 const fadeUp = {
@@ -26,14 +26,14 @@ function Stars({ val = 5, size = 13 }) {
 }
 
 const quickLinks = [
-  { label: 'Braids', icon: '🧶', path: '/book/braids' },
-  { label: 'Locs', icon: '🌿', path: '/book/locks' },
-  { label: 'Wig Install', icon: '👑', path: '/book/wig-install' },
-  { label: 'Hair Styling', icon: '✂️', path: '/book/hair-styling' },
-  { label: 'Skin Care', icon: '✨', path: '/shop/skin-care' },
-  { label: 'Makeup', icon: '💄', path: '/book/makeup' },
-  { label: 'Treatments', icon: '💆', path: '/book/hair-treatments' },
-  { label: 'Barbers', icon: '🪒', path: '/book/barbers' },
+  { label: 'Braids', icon: Scissors, path: '/book/braids' },
+  { label: 'Locs', icon: Leaf, path: '/book/locks' },
+  { label: 'Wig Install', icon: Crown, path: '/book/wig-install' },
+  { label: 'Hair Styling', icon: WandSparkles, path: '/book/hair-styling' },
+  { label: 'Skin Care', icon: Droplets, path: '/shop/skin-care' },
+  { label: 'Makeup', icon: Palette, path: '/book/makeup' },
+  { label: 'Treatments', icon: HandHeart, path: '/book/hair-treatments' },
+  { label: 'Training', icon: GraduationCap, path: '/training' },
 ]
 
 const stats = [
@@ -44,9 +44,9 @@ const stats = [
 ]
 
 const howItWorks = [
-  { step: '01', title: 'Search & Discover', desc: 'Find verified hair and beauty experts near you by service, location, or availability.', icon: '🔍' },
-  { step: '02', title: 'Book Instantly', desc: 'Choose your date, time and service. Confirm your booking in under 60 seconds.', icon: '📅' },
-  { step: '03', title: 'Experience Beauty', desc: 'Sit back and enjoy a flawless service from a trusted, vetted professional.', icon: '✨' },
+  { step: '01', title: 'Search & Discover', desc: 'Find approved services, products and provider profiles as they become available.', icon: Search },
+  { step: '02', title: 'Book Securely', desc: 'Choose a service, sign in, and manage your booking from your Rejuveefy account.', icon: ShieldCheck },
+  { step: '03', title: 'Stay Connected', desc: 'Track appointments, referrals, provider applications and affiliate status from one place.', icon: Sparkles },
 ]
 
 const testimonials = [
@@ -57,6 +57,8 @@ const testimonials = [
 
 export default function Home() {
   const [query, setQuery] = useState('')
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterDone, setNewsletterDone] = useState(false)
   const [providers, setProviders] = useState([])
   const [products, setProducts] = useState([])
   const { addToCart, toggleWishlist, inWishlist } = useApp()
@@ -77,18 +79,14 @@ export default function Home() {
     <div className="bg-white">
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF0F5] via-white to-[#FFF8FB] min-h-[92vh] flex items-center">
-        {/* decorative blobs */}
-        <div className="absolute top-[-80px] right-[-80px] w-[520px] h-[520px] rounded-full bg-pink-100/60 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-[-60px] left-[-60px] w-[320px] h-[320px] rounded-full bg-rose-100/50 blur-2xl pointer-events-none" />
-
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF0F5] via-white to-[#FFF8FB] min-h-[92vh] flex items-center">`r`n
         <div className="relative max-w-[1280px] mx-auto px-6 lg:px-10 w-full grid lg:grid-cols-2 gap-12 items-center py-20 lg:py-0">
 
           {/* Left */}
           <motion.div variants={stagger} initial="hidden" animate="show" className="flex flex-col gap-6 z-10">
             <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-white border border-pink-200 text-pink-600 text-xs font-semibold px-4 py-1.5 rounded-full shadow-sm w-fit">
               <Sparkles size={13} />
-              UK's #1 Hair &amp; Beauty Marketplace
+              Beauty-tech marketplace for bookings, products and AI guidance
             </motion.div>
 
             <motion.h1 variants={fadeUp} custom={1} className="font-display font-bold text-[52px] lg:text-[64px] leading-[1.08] text-gray-900">
@@ -98,7 +96,7 @@ export default function Home() {
             </motion.h1>
 
             <motion.p variants={fadeUp} custom={2} className="text-gray-500 text-lg leading-relaxed max-w-[460px]">
-              Discover and instantly book verified hair stylists, beauty experts and natural hair specialists near you — or shop premium products delivered to your door.
+              Discover Rejuveefy services, book Maye, join the verified provider directory, apply as an affiliate, or shop curated beauty products.
             </motion.p>
 
             {/* Search bar */}
@@ -168,7 +166,7 @@ export default function Home() {
               transition={{ delay: 0.6, duration: 0.5 }}
               className="absolute -left-8 top-16 bg-white rounded-2xl shadow-xl px-4 py-3 flex items-center gap-3 border border-gray-50"
             >
-              <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center text-lg">✅</div>
+              <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center text-pink-500"><ShieldCheck size={18} /></div>
               <div>
                 <p className="text-xs font-bold text-gray-800">Background Verified</p>
                 <p className="text-[11px] text-gray-500">All providers checked</p>
@@ -181,9 +179,9 @@ export default function Home() {
               transition={{ delay: 0.75, duration: 0.5 }}
               className="absolute -right-6 bottom-24 bg-white rounded-2xl shadow-xl px-4 py-3 border border-gray-50"
             >
-              <p className="text-xs text-gray-500 mb-1">Next available</p>
-              <p className="text-sm font-bold text-gray-800">Tomorrow 10:00 AM</p>
-              <div className="mt-2 bg-pink-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg text-center">Book Now</div>
+              <p className="text-xs text-gray-500 mb-1">Founder booking</p>
+              <p className="text-sm font-bold text-gray-800">Book Maye directly</p>
+              <Link to="/book/maye" className="block mt-2 bg-pink-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg text-center">Book Now</Link>
             </motion.div>
 
             {/* Floating card 3 */}
@@ -198,8 +196,8 @@ export default function Home() {
                 ))}
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-800">5 Experts</p>
-                <Stars val={5} size={11} />
+                <p className="text-xs font-bold text-gray-800">Provider applications</p>
+                <p className="text-[11px] text-gray-500">Reviewed before approval</p>
               </div>
             </motion.div>
           </motion.div>
@@ -274,8 +272,8 @@ export default function Home() {
               <motion.div key={ql.label} variants={cardItem}>
                 <Link to={ql.path}
                   className="flex flex-col items-center gap-2.5 group p-3 rounded-2xl hover:bg-pink-50 transition-colors">
-                  <div className="w-14 h-14 bg-pink-50 group-hover:bg-pink-100 rounded-2xl flex items-center justify-center text-2xl transition-colors shadow-sm">
-                    {ql.icon}
+                  <div className="w-14 h-14 bg-pink-50 group-hover:bg-pink-100 rounded-2xl flex items-center justify-center text-pink-500 transition-colors shadow-sm">
+                    <ql.icon size={24} />
                   </div>
                   <span className="text-xs font-semibold text-gray-700 group-hover:text-pink-500 transition-colors text-center">{ql.label}</span>
                 </Link>
@@ -417,12 +415,7 @@ export default function Home() {
 
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            {(products.length > 0 ? products : [
-              { id:1, name: 'Jamaican Black Castor Oil', brand: 'Tropic Isle', price: 12.99, rating: 4.8, img: '/assets/hair-product.png', category: 'Hair Care' },
-              { id:2, name: 'Curl Defining Cream', brand: 'Shea Moisture', price: 9.49, rating: 4.9, img: '/assets/skincare-product.png', category: 'Styling' },
-              { id:3, name: 'Deep Conditioning Mask', brand: 'Cantu', price: 7.99, rating: 4.7, img: '/assets/product-texture.png', category: 'Treatment' },
-              { id:4, name: 'Edge Control Gel', brand: 'Got2B', price: 5.99, rating: 4.6, img: '/assets/botanical.png', category: 'Styling' },
-            ]).map((p, i) => (
+            {products.map((p, i) => (
               <motion.div key={p.id || i} variants={cardItem} whileHover={{ y: -5 }}
                 className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all group">
                 <div className="relative h-52 bg-gray-50 overflow-hidden">
@@ -440,7 +433,7 @@ export default function Home() {
                   <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2">{p.name}</h3>
                   <div className="flex items-center gap-1.5 mb-3">
                     <Stars val={p.rating || 4.8} size={11} />
-                    <span className="text-[11px] text-gray-500">({p.review_count || Math.floor(Math.random()*200+50)})</span>
+                    <span className="text-[11px] text-gray-500">({p.review_count || 0})</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
@@ -452,6 +445,15 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
+            {products.length === 0 && (
+              <div className="col-span-full bg-[#FAFAFA] border border-dashed border-pink-200 rounded-2xl p-8 text-center">
+                <ShoppingBag size={34} className="text-pink-400 mx-auto mb-3" />
+                <h3 className="font-display text-xl font-bold text-gray-900 mb-2">Products are being prepared</h3>
+                <p className="text-sm text-gray-500 max-w-xl mx-auto">
+                  Best sellers will appear here once active products are connected in Supabase.
+                </p>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -471,7 +473,9 @@ export default function Home() {
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-pink-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-md">
                   {h.step}
                 </div>
-                <div className="text-5xl mb-5 mt-2">{h.icon}</div>
+                <div className="w-14 h-14 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-5 mt-2">
+                  <h.icon size={24} />
+                </div>
                 <h3 className="font-bold text-xl text-gray-900 mb-3">{h.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{h.desc}</p>
               </motion.div>
@@ -512,7 +516,7 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left">
           <div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-white mb-3">Are You a Beauty Professional?</h2>
-            <p className="text-pink-100 text-lg">Join our growing community of providers earning more with Rejuveefy. Free to join, no commission on your first 10 bookings.</p>
+            <p className="text-pink-100 text-lg">Apply to join the verified Rejuveefy directory. Applications are reviewed before profiles go live.</p>
           </div>
           <div className="flex gap-3 shrink-0">
             <Link to="/providers-portal" className="bg-white text-pink-500 font-bold px-8 py-4 rounded-xl hover:bg-pink-50 transition-colors shadow-lg">
@@ -530,14 +534,15 @@ export default function Home() {
         <div className="max-w-[600px] mx-auto px-6 text-center">
           <p className="text-pink-400 text-sm font-semibold uppercase tracking-wider mb-3">Stay in the Loop</p>
           <h2 className="font-display font-bold text-3xl text-white mb-3">Get Beauty Tips & Offers</h2>
-          <p className="text-gray-400 mb-8">Join 8,000+ subscribers for weekly hair care tips, exclusive deals and new provider highlights.</p>
-          <form className="flex gap-2 max-w-[440px] mx-auto" onSubmit={e => e.preventDefault()}>
-            <input type="email" placeholder="Enter your email address"
+          <p className="text-gray-400 mb-8">Get hair care tips, product updates and Rejuveefy news.</p>
+          <form className="flex gap-2 max-w-[440px] mx-auto" onSubmit={handleNewsletter}>
+            <input type="email" value={newsletterEmail} onChange={e => setNewsletterEmail(e.target.value)} placeholder="Enter your email address"
               className="flex-1 bg-gray-800 border border-gray-700 text-white placeholder:text-gray-500 text-sm px-4 py-3.5 rounded-xl outline-none focus:border-pink-500 transition-colors" />
             <button type="submit" className="bg-pink-500 hover:bg-pink-600 text-white font-bold px-6 py-3.5 rounded-xl transition-colors shrink-0">
               Subscribe
             </button>
           </form>
+          {newsletterDone && <p className="text-pink-300 text-xs mt-4">You are subscribed.</p>}
           <p className="text-gray-600 text-xs mt-4">No spam. Unsubscribe anytime.</p>
         </div>
       </section>
