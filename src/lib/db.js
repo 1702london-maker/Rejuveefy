@@ -147,6 +147,12 @@ export async function submitAffiliateApplication(app) {
   return data
 }
 
+export async function submitProviderApplication(app) {
+  const { data, error } = await supabase.from('provider_applications').insert(app).select().single()
+  if (error) throw error
+  return data
+}
+
 // ── CONTACT ───────────────────────────────────────────────────────────────────
 export async function submitContactMessage(msg) {
   const { error } = await supabase.from('contact_messages').insert(msg)

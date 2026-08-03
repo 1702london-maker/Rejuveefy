@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, ShieldCheck, ArrowLeft, CheckCircle, Mail, Lock, User, Phone } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { submitProviderApplication } from '../lib/db'
 
 function AuthLayout({ children, image }) {
   return (
@@ -150,7 +151,9 @@ export default function Login() {
 // ── REGISTER ──────────────────────────────────────────────────────────────────
 export function Register() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' })
+  const { search } = useLocation()
+  const initialType = new URLSearchParams(search).get('type') === 'provider' ? 'provider' : 'client'
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '', accountType: initialType })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [agreed, setAgreed] = useState(false)
@@ -168,11 +171,26 @@ export function Register() {
     const { error: err } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
-      options: { data: { full_name: form.name, phone: form.phone } }
+      options: { data: { full_name: form.name, phone: form.phone, account_type: form.accountType } }
     })
-    setLoading(false)
     if (err) { setError(err.message); return }
-    navigate('/')
+    if (form.accountType === 'provider') {
+      try {
+        await submitProviderApplication({
+          full_name: form.name,
+          email: form.email,
+          phone: form.phone,
+          services: [],
+          status: 'pending',
+        })
+      } catch (applicationError) {
+        setError(applicationError.message || 'Account created, but provider application could not be saved.')
+        setLoading(false)
+        return
+      }
+    }
+    setLoading(false)
+    navigate(form.accountType === 'provider' ? '/providers-portal' : '/')
   }
 
   return (
@@ -201,6 +219,16 @@ export function Register() {
               <input value={form.name} onChange={e => upd('name', e.target.value)} required placeholder="Jessica Williams"
                 className="w-full border border-gray-200 rounded-xl pl-10 pr-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-gray-600 mb-1 block">Account Type</label>
+            <select value={form.accountType} onChange={e => upd('accountType', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors">
+              <option value="client">Client</option>
+              <option value="provider">Provider</option>
+              <option value="affiliate">Affiliate</option>
+            </select>
           </div>
 
           <div>
