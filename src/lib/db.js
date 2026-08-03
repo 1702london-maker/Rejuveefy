@@ -147,10 +147,28 @@ export async function submitAffiliateApplication(app) {
   return data
 }
 
+export async function fetchAffiliateApplication({ userId, email }) {
+  let q = supabase.from('affiliate_applications').select('*').order('created_at', { ascending: false }).limit(1)
+  if (userId) q = q.or(`user_id.eq.${userId},email.eq.${email}`)
+  else q = q.eq('email', email)
+  const { data, error } = await q
+  if (error) throw error
+  return data?.[0] || null
+}
+
 export async function submitProviderApplication(app) {
   const { data, error } = await supabase.from('provider_applications').insert(app).select().single()
   if (error) throw error
   return data
+}
+
+export async function fetchProviderApplication({ userId, email }) {
+  let q = supabase.from('provider_applications').select('*').order('created_at', { ascending: false }).limit(1)
+  if (userId) q = q.or(`user_id.eq.${userId},email.eq.${email}`)
+  else q = q.eq('email', email)
+  const { data, error } = await q
+  if (error) throw error
+  return data?.[0] || null
 }
 
 // ── CONTACT ───────────────────────────────────────────────────────────────────

@@ -35,7 +35,7 @@ const tiers = [
 ]
 
 const steps = [
-  { num: '01', title: 'Apply & Get Approved', desc: 'Fill out our short application. Most approvals happen within 24 hours.', icon: CheckCircle },
+  { num: '01', title: 'Apply & Get Approved', desc: 'Fill out the application and our team will review your fit for the programme.', icon: CheckCircle },
   { num: '02', title: 'Share Your Link', desc: 'Get your unique referral link and share it on social, blog, or email.', icon: Share2 },
   { num: '03', title: 'Track Conversions', desc: 'Watch bookings and purchases roll in through your real-time dashboard.', icon: BarChart2 },
   { num: '04', title: 'Earn Commissions', desc: 'Receive payouts directly to your bank or PayPal every month.', icon: DollarSign },
@@ -105,8 +105,8 @@ export default function Affiliate() {
       <section className="bg-gray-900 text-white py-8">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
-            { val: '£2M+', label: 'Paid to affiliates' },
-            { val: '3,200+', label: 'Active affiliates' },
+            { val: 'Open', label: 'Applications' },
+            { val: 'Verified', label: 'Partner review' },
             { val: '30-day', label: 'Cookie window' },
             { val: '22%', label: 'Max commission' },
           ].map(s => (
@@ -196,15 +196,15 @@ export default function Affiliate() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Programme readiness */}
       <section className="py-16 bg-pink-50">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
-          <h2 className="font-display text-2xl font-bold text-gray-900 mb-8 text-center">What Our Affiliates Say</h2>
+          <h2 className="font-display text-2xl font-bold text-gray-900 mb-8 text-center">Built for Clean Tracking</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { name: 'Tamara O.', handle: '@tamarabeautyuk', img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&h=60&fit=crop', text: 'I made £840 in my first month just by sharing my link in my newsletter. The dashboard is so easy to use.', stars: 5 },
-              { name: 'Jade M.', handle: '@jadehairdiaries', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&h=60&fit=crop', text: 'Rejuveefy converts incredibly well with my audience. The 30-day cookie window means I rarely miss a sale.', stars: 5 },
-              { name: 'Precious A.', handle: 'Beauty Blogger', img: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=60&h=60&fit=crop', text: 'Reached Elite tier in 3 months. The dedicated account manager is a game changer — they actually help you grow.', stars: 5 },
+              { name: 'Application review', handle: 'Step 1', img: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=60&h=60&fit=crop', text: 'Applicants are reviewed before referral links and commission tracking are activated.', stars: 5 },
+              { name: 'Referral setup', handle: 'Step 2', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&h=60&fit=crop', text: 'Approved affiliates will receive trackable links connected to their Rejuveefy account.', stars: 5 },
+              { name: 'Payout readiness', handle: 'Step 3', img: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=60&h=60&fit=crop', text: 'Commission reporting and payout history will appear inside the affiliate portal.', stars: 5 },
             ].map(t => (
               <div key={t.name} className="bg-white rounded-2xl p-6 shadow-card">
                 <div className="flex gap-0.5 mb-3">
@@ -257,7 +257,7 @@ export default function Affiliate() {
                 <CheckCircle size={32} className="text-green-500" />
               </div>
               <h3 className="font-display text-2xl font-bold mb-2">Application Submitted!</h3>
-              <p className="text-gray-500 mb-6">We'll review your application and email you within 24 hours. Keep an eye on your inbox.</p>
+              <p className="text-gray-500 mb-6">We'll review your application and email you once a decision has been made. Keep an eye on your inbox.</p>
               <Link to="/affiliate-portal" className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 transition-colors">
                 Go to Affiliate Portal →
               </Link>

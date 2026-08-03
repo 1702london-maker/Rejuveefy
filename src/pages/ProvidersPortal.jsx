@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Calendar,
@@ -10,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { fetchProviderApplication } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
 
@@ -28,6 +30,17 @@ function EmptyPanel({ icon: Icon, title, body, action }) {
 
 export default function ProvidersPortal() {
   const { user, userDisplay } = useApp()
+  const [application, setApplication] = useState(null)
+  const [loadingApplication, setLoadingApplication] = useState(false)
+
+  useEffect(() => {
+    if (!user?.email) return
+    setLoadingApplication(true)
+    fetchProviderApplication({ userId: user.id, email: user.email })
+      .then(setApplication)
+      .catch(() => setApplication(null))
+      .finally(() => setLoadingApplication(false))
+  }, [user?.id, user?.email])
 
   if (!user) {
     return (
@@ -82,7 +95,9 @@ export default function ProvidersPortal() {
           <div>
             <p className="font-display text-xl font-bold">Provider setup</p>
             <p className="text-pink-100 text-sm mt-1">
-              Your live dashboard will populate once the provider profile, services and booking tables are connected in Supabase.
+              {application
+                ? `Your provider application is ${application.status}.`
+                : 'Your live dashboard will populate once your provider application is submitted and approved.'}
             </p>
           </div>
           <Link to="/contact" className="bg-white text-pink-600 rounded-full px-5 py-2.5 text-sm font-bold hover:bg-pink-50 transition-colors">
@@ -94,8 +109,14 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={FileText}
             title="Application"
-            body="No approved provider profile is attached to this account yet. Once approved, this panel will show your verification status and profile completeness."
-            action={<Link to="/register?type=provider" className="inline-flex items-center gap-2 text-pink-600 text-sm font-semibold">Start or update application <CheckCircle size={15} /></Link>}
+            body={loadingApplication
+              ? 'Checking your latest provider application...'
+              : application
+                ? `Latest application: ${application.status}. Submitted ${new Date(application.created_at).toLocaleDateString('en-GB')}.`
+                : 'No provider application is attached to this account yet.'}
+            action={application
+              ? <span className="inline-flex items-center gap-2 text-pink-600 text-sm font-semibold"><CheckCircle size={15} /> Application received</span>
+              : <Link to="/register?type=provider" className="inline-flex items-center gap-2 text-pink-600 text-sm font-semibold">Start application <CheckCircle size={15} /></Link>}
           />
           <EmptyPanel
             icon={Calendar}

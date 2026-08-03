@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   BarChart2,
@@ -10,6 +11,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { fetchAffiliateApplication } from '../lib/db'
 
 function MetricCard({ icon: Icon, label }) {
   return (
@@ -28,6 +30,17 @@ function MetricCard({ icon: Icon, label }) {
 
 export default function AffiliatePortal() {
   const { user, userDisplay } = useApp()
+  const [application, setApplication] = useState(null)
+  const [loadingApplication, setLoadingApplication] = useState(false)
+
+  useEffect(() => {
+    if (!user?.email) return
+    setLoadingApplication(true)
+    fetchAffiliateApplication({ userId: user.id, email: user.email })
+      .then(setApplication)
+      .catch(() => setApplication(null))
+      .finally(() => setLoadingApplication(false))
+  }, [user?.id, user?.email])
 
   if (!user) {
     return (
@@ -73,8 +86,16 @@ export default function AffiliatePortal() {
         <div className="bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white">
           <div>
             <p className="text-pink-100 text-xs font-semibold uppercase tracking-wide mb-1">Affiliate setup</p>
-            <p className="font-display text-2xl font-bold">No approved affiliate account connected yet</p>
-            <p className="text-pink-100 text-sm mt-1">Once approved, this portal will show live referral links, clicks, conversions, commissions and payouts.</p>
+            <p className="font-display text-2xl font-bold">
+              {application ? `Application ${application.status}` : 'No approved affiliate account connected yet'}
+            </p>
+            <p className="text-pink-100 text-sm mt-1">
+              {loadingApplication
+                ? 'Checking your latest affiliate application...'
+                : application
+                  ? `Submitted ${new Date(application.created_at).toLocaleDateString('en-GB')}. Referral tools unlock after approval.`
+                  : 'Once approved, this portal will show live referral links, clicks, conversions, commissions and payouts.'}
+            </p>
           </div>
           <Link to="/affiliate#apply" className="bg-white text-pink-600 rounded-full px-5 py-2.5 text-sm font-bold hover:bg-pink-50 transition-colors">
             Complete Application
