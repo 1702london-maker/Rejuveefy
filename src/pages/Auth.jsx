@@ -37,6 +37,17 @@ function AuthLayout({ children, image }) {
 }
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
+
+async function signInWithProvider(provider, accountType = 'client') {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/dashboard`,
+      queryParams: { account_type: accountType },
+    },
+  })
+  if (error) throw error
+}
 export default function Login() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
@@ -54,6 +65,14 @@ export default function Login() {
     setLoading(false)
     if (err) { setError(err.message); return }
     navigate('/')
+  }
+  const socialSignIn = async (provider) => {
+    setError('')
+    try {
+      await signInWithProvider(provider)
+    } catch (err) {
+      setError(err.message || 'Social sign-in failed. Please try again.')
+    }
   }
 
   return (
@@ -123,14 +142,13 @@ export default function Login() {
         </div>
 
         {/* Social */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
+        <div className="grid grid-cols-2 gap-2 mb-5">
           {[
-            { label: 'Google', icon: '🇬' },
-            { label: 'Apple', icon: '🍎' },
-            { label: 'Facebook', icon: '📘' },
+            { label: 'Google', provider: 'google' },
+            { label: 'Facebook', provider: 'facebook' },
           ].map(s => (
-            <button key={s.label} className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
-              <span>{s.icon}</span> {s.label}
+            <button type="button" key={s.label} onClick={() => socialSignIn(s.provider)} className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
+              {s.label}
             </button>
           ))}
         </div>
@@ -191,6 +209,15 @@ export function Register() {
     }
     setLoading(false)
     navigate(form.accountType === 'provider' ? '/providers-portal' : '/')
+  }
+
+  const socialSignUp = async (provider) => {
+    setError('')
+    try {
+      await signInWithProvider(provider, form.accountType)
+    } catch (err) {
+      setError(err.message || 'Social sign-up failed. Please try again.')
+    }
   }
 
   return (
@@ -312,10 +339,10 @@ export function Register() {
           <div className="relative flex justify-center"><span className="bg-white px-4 text-xs text-gray-400">or sign up with</span></div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 mb-5">
-          {[{ label: 'Google', icon: '🇬' }, { label: 'Apple', icon: '🍎' }, { label: 'Facebook', icon: '📘' }].map(s => (
-            <button key={s.label} className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
-              <span>{s.icon}</span> {s.label}
+        <div className="grid grid-cols-2 gap-2 mb-5">
+          {[{ label: 'Google', provider: 'google' }, { label: 'Facebook', provider: 'facebook' }].map(s => (
+            <button type="button" key={s.label} onClick={() => socialSignUp(s.provider)} className="flex items-center justify-center gap-1.5 border border-gray-200 rounded-xl py-2.5 text-xs font-semibold text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
+              {s.label}
             </button>
           ))}
         </div>
