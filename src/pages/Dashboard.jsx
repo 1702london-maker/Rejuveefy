@@ -1,9 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, Calendar, Heart, ShoppingBag, Settings, Star, Gift,
-  ChevronRight, Clock, MapPin, ShieldCheck, Phone, Mail, Copy, Share2,
-  Plus, CheckCircle, TrendingUp, Users, Zap, ArrowRight, X, BarChart2
+  ArrowRight,
+  Calendar,
+  CheckCircle,
+  ChevronRight,
+  Clock,
+  Copy,
+  Gift,
+  Heart,
+  LayoutDashboard,
+  Mail,
+  Plus,
+  ShieldCheck,
+  Share2,
+  Star,
+  Users,
 } from 'lucide-react'
 import { fetchUserBookings, fetchUserReferrals, fetchUserReviews } from '../lib/db'
 import { useApp } from '../context/AppContext'
@@ -12,46 +24,61 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { icon: Calendar, label: 'My Bookings', href: '/bookings' },
   { icon: Heart, label: 'Wishlist', href: '/wishlist' },
-  { icon: ShoppingBag, label: 'My Orders', href: '/orders' },
   { icon: Star, label: 'Reviews', href: '/reviews' },
-  { icon: Gift, label: 'Refer & Earn', href: '/referrals' },
-  { icon: Settings, label: 'Account Settings', href: '/settings' },
+  { icon: Gift, label: 'Referrals', href: '/referrals' },
 ]
+
+const money = (value) => `GBP ${Number(value || 0).toFixed(2)}`
+
+function isUpcoming(booking) {
+  return booking.status === 'pending' || booking.status === 'confirmed'
+}
+
+function statusLabel(status = 'pending') {
+  return status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ')
+}
+
+function useUserData(userId) {
+  const [bookings, setBookings] = useState([])
+  const [referrals, setReferrals] = useState([])
+  const [reviews, setReviews] = useState([])
+
+  useEffect(() => {
+    if (!userId) {
+      setBookings([])
+      setReferrals([])
+      setReviews([])
+      return
+    }
+
+    fetchUserBookings(userId).then(setBookings).catch(() => setBookings([]))
+    fetchUserReferrals(userId).then(setReferrals).catch(() => setReferrals([]))
+    fetchUserReviews(userId).then(setReviews).catch(() => setReviews([]))
+  }, [userId])
+
+  return { bookings, referrals, reviews }
+}
 
 function Sidebar() {
   const { pathname } = useLocation()
   const { userDisplay } = useApp()
   const name = userDisplay?.name || 'User'
-  const points = userDisplay?.points || 0
 
   return (
     <aside className="hidden lg:block w-64 shrink-0">
       <div className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden sticky top-24">
-        {/* User profile */}
         <div className="p-5 bg-gradient-to-br from-pink-50 to-white border-b border-pink-100">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-pink-200 rounded-2xl flex items-center justify-center">
-              <span className="text-pink-600 font-bold text-lg">{name[0].toUpperCase()}</span>
+              <span className="text-pink-600 font-bold text-lg">{name[0]?.toUpperCase() || 'U'}</span>
             </div>
             <div>
               <p className="font-semibold text-gray-900 text-sm">{name}</p>
-              <p className="text-xs text-gray-400">Beauty Enthusiast</p>
-            </div>
-          </div>
-          {/* Points */}
-          <div className="mt-3 bg-pink-500 rounded-xl px-3 py-2 flex items-center justify-between">
-            <div>
-              <p className="text-[9px] text-pink-100 font-semibold uppercase tracking-wider">Beauty Points</p>
-              <p className="text-white font-bold text-lg leading-none">{points.toLocaleString()}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] text-pink-100">Next Reward</p>
-              <p className="text-xs text-white font-semibold">250 pts</p>
+              <p className="text-xs text-gray-400">Rejuveefy account</p>
             </div>
           </div>
         </div>
 
-        {/* Nav links */}
         <nav className="p-3">
           {navItems.map(({ icon: Icon, label, href }) => (
             <Link key={href} to={href}
@@ -68,96 +95,149 @@ function Sidebar() {
   )
 }
 
-// ── MAIN DASHBOARD ────────────────────────────────────────────────────────────
+function AuthRequired() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-20">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 text-center max-w-md">
+        <ShieldCheck size={34} className="text-pink-500 mx-auto mb-4" />
+        <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Sign in required</h1>
+        <p className="text-sm text-gray-500 mb-6">Create or sign in to your Rejuveefy account to see bookings, reviews, wishlist and referrals.</p>
+        <div className="flex gap-3 justify-center">
+          <Link to="/login" className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">Sign In</Link>
+          <Link to="/register" className="border border-pink-500 text-pink-500 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-50 transition-colors">Create Account</Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function BookingCard({ booking, compact = false }) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden card-hover">
+      <div className="flex gap-4 p-4">
+        <div className="w-14 h-14 rounded-xl shrink-0 bg-pink-100 overflow-hidden flex items-center justify-center">
+          {booking.providers?.image_url ? (
+            <img src={booking.providers.image_url} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <Calendar size={20} className="text-pink-500" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{booking.service_name || 'Beauty appointment'}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{booking.providers?.name || 'Provider to confirm'}</p>
+            </div>
+            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0
+              ${isUpcoming(booking) ? 'bg-blue-50 text-blue-500' :
+                booking.status === 'completed' ? 'bg-green-50 text-green-500' :
+                'bg-gray-100 text-gray-500'}`}>
+              {statusLabel(booking.status)}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-3 mt-2">
+            {booking.booking_date && (
+              <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+                <Calendar size={10} /> {new Date(booking.booking_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: compact ? undefined : 'numeric' })}
+              </span>
+            )}
+            {booking.booking_time && (
+              <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {booking.booking_time}</span>
+            )}
+          </div>
+        </div>
+      </div>
+      {!compact && (
+        <div className="border-t border-gray-50 px-4 py-3 flex items-center justify-between">
+          <p className="text-sm font-bold text-gray-900">{booking.service_price ? money(booking.service_price) : ''}</p>
+          <div className="flex gap-2">
+            {booking.status === 'completed' && (
+              <Link to="/reviews" className="text-xs bg-amber-50 text-amber-500 font-semibold px-3 py-1.5 rounded-full hover:bg-amber-100 transition-colors">
+                Review
+              </Link>
+            )}
+            {booking.providers?.slug && (
+              <Link to={`/providers/${booking.providers.slug}/book`}
+                className="text-xs bg-pink-500 text-white font-semibold px-3 py-1.5 rounded-full hover:bg-pink-600 transition-colors">
+                Book Again
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function DashboardHome() {
   const { user, userDisplay } = useApp()
+  const { bookings, referrals, reviews } = useUserData(user?.id)
   const name = userDisplay?.name || 'User'
-  const points = userDisplay?.points || 0
-  const [bookings, setBookings] = useState([])
-  useEffect(() => {
-    if (user?.id) fetchUserBookings(user.id).then(setBookings).catch(() => {})
-  }, [user?.id])
-  const upcomingCount = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length
+  const upcoming = bookings.filter(isUpcoming)
+
+  if (!user) return <AuthRequired />
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-6">
         <div className="flex lg:gap-6">
           <Sidebar />
           <div className="flex-1 min-w-0 space-y-5">
-            {/* Welcome */}
             <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl p-5 text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-pink-100 text-xs mb-1">Welcome back,</p>
-                  <h1 className="font-display text-2xl font-bold">Hello, {name}</h1><p className="text-pink-100 text-sm mt-1">{upcomingCount > 0 ? `You have ${upcomingCount} upcoming appointment${upcomingCount === 1 ? '' : 's'}.` : 'No upcoming appointments yet.'}</p>
-                </div>
-                <div className="hidden sm:block text-right">
-                  <div className="bg-white/20 rounded-xl px-4 py-2">
-                    <p className="text-xs text-pink-100">Beauty Points</p>
-                    <p className="font-bold text-2xl">{points}</p>
-                  </div>
-                </div>
-              </div>
+              <p className="text-pink-100 text-xs mb-1">Welcome back,</p>
+              <h1 className="font-display text-2xl font-bold">Hello, {name}</h1>
+              <p className="text-pink-100 text-sm mt-1">
+                {upcoming.length > 0 ? `You have ${upcoming.length} upcoming appointment${upcoming.length === 1 ? '' : 's'}.` : 'Your client account is ready.'}
+              </p>
             </div>
 
-            {/* Quick stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
-                { icon: Calendar, label: 'Total Bookings', value: bookings.length, sub: `${upcomingCount} upcoming`, color: 'bg-blue-50 text-blue-500' },
-                { icon: Star, label: 'Reviews Given', value: 0, sub: 'After completed bookings', color: 'bg-amber-50 text-amber-500' },
-                { icon: Gift, label: 'Points Earned', value: points, sub: 'Rewards sync pending', color: 'bg-pink-50 text-pink-500' },
-                { icon: ShoppingBag, label: 'Products Ordered', value: 0, sub: 'Orders table pending', color: 'bg-green-50 text-green-500' },
-              ].map((s) => (
-                <div key={s.label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
-                  <div className={`w-9 h-9 ${s.color} rounded-xl flex items-center justify-center mb-3`}>
-                    <s.icon size={16} />
+                { icon: Calendar, label: 'Bookings', value: bookings.length, sub: `${upcoming.length} upcoming`, color: 'bg-blue-50 text-blue-500' },
+                { icon: Star, label: 'Reviews', value: reviews.length, sub: 'From completed activity', color: 'bg-amber-50 text-amber-500' },
+                { icon: Gift, label: 'Referrals', value: referrals.length, sub: 'Tracked in Supabase', color: 'bg-pink-50 text-pink-500' },
+                { icon: Heart, label: 'Wishlist', value: 'Saved', sub: 'Managed on this device', color: 'bg-green-50 text-green-500' },
+              ].map(({ icon: Icon, label, value, sub, color }) => (
+                <div key={label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
+                  <div className={`w-9 h-9 ${color} rounded-xl flex items-center justify-center mb-3`}>
+                    <Icon size={16} />
                   </div>
-                  <p className="text-xl font-bold text-gray-900">{s.value}</p>
-                  <p className="text-xs font-semibold text-gray-600">{s.label}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{s.sub}</p>
+                  <p className="text-xl font-bold text-gray-900">{value}</p>
+                  <p className="text-xs font-semibold text-gray-600">{label}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{sub}</p>
                 </div>
               ))}
             </div>
 
-            {/* Upcoming appointments */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-semibold text-gray-900">Upcoming Appointments</h2>
                 <Link to="/bookings" className="text-xs text-pink-500 font-semibold flex items-center gap-1">View All <ArrowRight size={12} /></Link>
               </div>
-              {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 3).map((b) => (
-                <div key={b.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl mb-2 last:mb-0 card-hover">
-                  <img src={b.providers?.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0 bg-pink-100" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{b.service_name}</p>
-                    <p className="text-xs text-gray-500">{b.providers?.name}</p>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Calendar size={10} /> {new Date(b.booking_date).toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short'})}</span>
-                      <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {b.booking_time}</span>
-                    </div>
+              <div className="space-y-3">
+                {upcoming.slice(0, 3).map((booking) => <BookingCard key={booking.id} booking={booking} compact />)}
+                {upcoming.length === 0 && (
+                  <div className="text-center py-8">
+                    <Calendar size={34} className="mx-auto mb-3 text-gray-200" />
+                    <p className="text-sm text-gray-400 mb-4">No upcoming appointments yet.</p>
+                    <Link to="/book" className="inline-flex items-center gap-2 bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">
+                      Book a Service <Plus size={14} />
+                    </Link>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <span className="text-[10px] font-bold px-2 py-1 bg-blue-50 text-blue-500 rounded-full">{b.status}</span>
-                    {b.service_price && <p className="text-sm font-bold text-gray-900 mt-1">£{b.service_price}</p>}
-                  </div>
-                </div>
-              ))}
-              {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-4">No upcoming appointments. <Link to="/book" className="text-pink-500 font-semibold">Book now</Link></p>
-              )}
+                )}
+              </div>
             </div>
 
-            {/* Refer */}
             <div className="bg-pink-50 border border-pink-100 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4">
               <div className="w-14 h-14 bg-pink-500 rounded-2xl flex items-center justify-center shrink-0">
                 <Gift size={24} className="text-white" />
               </div>
               <div className="flex-1 text-center sm:text-left">
-                <h3 className="text-base font-bold text-gray-900 mb-1">Refer a Friend & Earn £10!</h3>
-                <p className="text-xs text-gray-500">Share your code and both of you get £10 off your next booking.</p>
+                <h3 className="text-base font-bold text-gray-900 mb-1">Referral flow is ready to track</h3>
+                <p className="text-xs text-gray-500">Share your code and view real referral activity once people register through your link.</p>
               </div>
               <Link to="/referrals" className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors whitespace-nowrap">
-                Refer Now
+                Open Referrals
               </Link>
             </div>
           </div>
@@ -167,21 +247,18 @@ export function DashboardHome() {
   )
 }
 
-// ── MY BOOKINGS ───────────────────────────────────────────────────────────────
 export default function MyBookings() {
   const { user } = useApp()
+  const { bookings } = useUserData(user?.id)
   const [activeTab, setActiveTab] = useState('All')
-  const [bookings, setBookings] = useState([])
   const tabs = ['All', 'Upcoming', 'Completed', 'Cancelled']
 
-  useEffect(() => {
-    if (user?.id) fetchUserBookings(user.id).then(setBookings).catch(() => {})
-  }, [user?.id])
+  if (!user) return <AuthRequired />
 
-  const filtered = activeTab === 'All' ? bookings : bookings.filter(b => {
-    if (activeTab === 'Upcoming') return b.status === 'pending' || b.status === 'confirmed'
-    if (activeTab === 'Completed') return b.status === 'completed'
-    if (activeTab === 'Cancelled') return b.status === 'cancelled'
+  const filtered = activeTab === 'All' ? bookings : bookings.filter(booking => {
+    if (activeTab === 'Upcoming') return isUpcoming(booking)
+    if (activeTab === 'Completed') return booking.status === 'completed'
+    if (activeTab === 'Cancelled') return booking.status === 'cancelled'
     return true
   })
 
@@ -198,88 +275,36 @@ export default function MyBookings() {
               </Link>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-3 gap-3 mb-5">
               {[
-                { label: 'Total Bookings', value: bookings.length },
-                { label: 'Upcoming', value: bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length },
-                { label: 'Completed', value: bookings.filter(b => b.status === 'completed').length },
-              ].map((s) => (
-                <div key={s.label} className="bg-white border border-gray-100 rounded-xl shadow-card p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-                  <p className="text-xs text-gray-500">{s.label}</p>
+                { label: 'Total', value: bookings.length },
+                { label: 'Upcoming', value: bookings.filter(isUpcoming).length },
+                { label: 'Completed', value: bookings.filter(booking => booking.status === 'completed').length },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-white border border-gray-100 rounded-xl shadow-card p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-xs text-gray-500">{stat.label}</p>
                 </div>
               ))}
             </div>
 
-            {/* Tabs */}
             <div className="flex gap-1 mb-4 bg-gray-100 rounded-xl p-1">
-              {tabs.map(t => (
-                <button key={t} onClick={() => setActiveTab(t)}
+              {tabs.map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab)}
                   className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors
-                    ${activeTab === t ? 'bg-white text-pink-500 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>
-                  {t}
+                    ${activeTab === tab ? 'bg-white text-pink-500 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>
+                  {tab}
                 </button>
               ))}
             </div>
 
             <div className="space-y-3">
-              {filtered.map((b) => (
-                <div key={b.id} className="bg-white border border-gray-100 rounded-2xl shadow-card overflow-hidden card-hover">
-                  <div className="flex gap-4 p-4">
-                    <div className="w-16 h-16 rounded-xl object-cover shrink-0 bg-pink-100 overflow-hidden">
-                      {b.providers?.image_url && <img src={b.providers.image_url} alt="" className="w-full h-full object-cover" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">{b.service_name}</p>
-                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                            <ShieldCheck size={10} className="text-pink-400" /> {b.providers?.name}
-                          </p>
-                        </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0
-                          ${b.status === 'confirmed' || b.status === 'pending' ? 'bg-blue-50 text-blue-500' :
-                            b.status === 'completed' ? 'bg-green-50 text-green-500' :
-                            'bg-gray-100 text-gray-500'}`}>
-                          {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-3 mt-2">
-                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Calendar size={10} /> {new Date(b.booking_date).toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short',year:'numeric'})}</span>
-                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><Clock size={10} /> {b.booking_time}</span>
-                        {b.providers?.location && <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><MapPin size={10} /> {b.providers.location}</span>}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border-t border-gray-50 px-4 py-3 flex items-center justify-between">
-                    <p className="text-sm font-bold text-gray-900">{b.service_price ? `£${b.service_price}` : ''}</p>
-                    <div className="flex gap-2">
-                      {b.status === 'completed' && (
-                        <Link to="/reviews" className="text-xs bg-amber-50 text-amber-500 font-semibold px-3 py-1.5 rounded-full hover:bg-amber-100 transition-colors">
-                          Leave Review
-                        </Link>
-                      )}
-                      {(b.status === 'pending' || b.status === 'confirmed') && (
-                        <button className="text-xs text-red-400 font-semibold px-3 py-1.5 rounded-full hover:bg-red-50 transition-colors">
-                          Cancel
-                        </button>
-                      )}
-                      {b.status === 'completed' && b.providers?.slug && (
-                        <Link to={`/providers/${b.providers.slug}/book`}
-                          className="text-xs bg-pink-500 text-white font-semibold px-3 py-1.5 rounded-full hover:bg-pink-600 transition-colors">
-                          Book Again
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {filtered.map((booking) => <BookingCard key={booking.id} booking={booking} />)}
               {filtered.length === 0 && (
-                <div className="text-center py-12 text-gray-400">
+                <div className="bg-white border border-gray-100 rounded-2xl shadow-card text-center py-12 text-gray-400">
                   <Calendar size={40} className="mx-auto mb-3 text-gray-200" />
                   <p className="text-sm font-semibold">No {activeTab.toLowerCase()} bookings</p>
-                  <p className="text-xs mt-1">Book a service to get started</p>
+                  <p className="text-xs mt-1">Book a service to get started.</p>
                   <Link to="/book" className="inline-block mt-4 bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">
                     Book Now
                   </Link>
@@ -293,21 +318,21 @@ export default function MyBookings() {
   )
 }
 
-// ── REFER & EARN ──────────────────────────────────────────────────────────────
 export function ReferAndEarn() {
   const { user, showToast } = useApp()
+  const { referrals } = useUserData(user?.id)
   const [copied, setCopied] = useState(false)
-  const [referrals, setReferrals] = useState([])
-  useEffect(() => {
-    if (user?.id) fetchUserReferrals(user.id).then(setReferrals).catch(() => {})
-  }, [user?.id])
-  const refCode = user?.id ? user.id.slice(0,8).toUpperCase() : 'REJUV2024'
-  const refLink = `https://rejuveefy.com/join?ref=${refCode}`
 
-  const copy = () => {
-    navigator.clipboard.writeText(refCode)
+  if (!user) return <AuthRequired />
+
+  const refCode = user.id.slice(0, 8).toUpperCase()
+  const refLink = `https://www.rejuveefy.com/register?ref=${refCode}`
+  const rewardCount = referrals.filter(referral => referral.reward_paid).length
+
+  const copy = async (value, label) => {
+    await navigator.clipboard.writeText(value)
     setCopied(true)
-    showToast('Referral code copied!')
+    showToast(`${label} copied`)
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -317,105 +342,62 @@ export function ReferAndEarn() {
         <div className="flex lg:gap-6">
           <Sidebar />
           <div className="flex-1 min-w-0 space-y-5">
-            {/* Hero */}
             <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl p-8 text-white text-center">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Gift size={32} />
               </div>
-              <h1 className="font-display text-2xl font-bold mb-2">Refer & Earn</h1>
-              <p className="text-pink-100 text-sm mb-1">Share your unique referral link with friends</p>
-              <p className="text-white text-sm font-semibold">Both you & your friend get <strong className="text-xl">£10</strong> off!</p>
+              <h1 className="font-display text-2xl font-bold mb-2">Referrals</h1>
+              <p className="text-pink-100 text-sm">Share your unique link. Rewards can be configured once the business rule is final.</p>
             </div>
 
-            {/* How it works */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-4">How It Works</h2>
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { n: '1', icon: Share2, title: 'Share Your Link', sub: 'Share your unique referral link or code with friends' },
-                  { n: '2', icon: Users, title: 'Friend Signs Up', sub: 'Your friend creates an account and makes their first booking' },
-                  { n: '3', icon: Gift, title: 'Both Earn £10', sub: 'You both receive £10 credit to use on your next booking' },
-                ].map((s) => (
-                  <div key={s.n} className="text-center">
-                    <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                      <s.icon size={20} className="text-pink-500" />
-                    </div>
-                    <p className="text-xs font-bold text-gray-800 mb-1">{s.title}</p>
-                    <p className="text-[10px] text-gray-400 leading-relaxed">{s.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Referral code */}
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">Your Referral Code</h2>
-              <div className="bg-pink-50 border border-dashed border-pink-300 rounded-xl p-4 flex items-center justify-between mb-3">
-                <span className="font-bold text-pink-500 text-lg tracking-widest">{refCode}</span>
-                <button onClick={copy}
-                  className={`flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">Your Referral Link</h2>
+              <div className="bg-pink-50 border border-dashed border-pink-300 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <span className="font-bold text-pink-500 text-sm break-all">{refLink}</span>
+                <button onClick={() => copy(refLink, 'Referral link')}
+                  className={`flex items-center justify-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors shrink-0
                     ${copied ? 'bg-green-500 text-white' : 'bg-pink-500 text-white hover:bg-pink-600'}`}>
                   {copied ? <CheckCircle size={12} /> : <Copy size={12} />}
-                  {copied ? 'Copied!' : 'Copy Code'}
+                  {copied ? 'Copied' : 'Copy Link'}
                 </button>
               </div>
-              <div className="flex gap-2">
-                {['WhatsApp', 'Instagram', 'Facebook', 'Email', 'Copy Link'].map((s) => (
-                  <button key={s} className="flex-1 py-2 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:border-pink-300 hover:text-pink-500 transition-colors">
-                    {s}
-                  </button>
-                ))}
-              </div>
+              <button onClick={() => copy(refCode, 'Referral code')} className="inline-flex items-center gap-2 text-xs text-gray-500 hover:text-pink-500">
+                <Share2 size={12} /> Code: {refCode}
+              </button>
             </div>
 
-            {/* Referral history */}
-            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-gray-900">Referral History</h2>
-                <div className="text-right">
-                  <p className="text-xs font-bold text-pink-500">{referrals.length} referrals</p>
-                  <p className="text-[10px] text-gray-400">£{referrals.filter(r => r.reward_paid).length * 10} earned</p>
-                </div>
-              </div>
-              <div className="space-y-3">
-                {referrals.length === 0 && <p className="text-sm text-gray-400 text-center py-4">No referrals yet. Share your code to start earning!</p>}
-                {referrals.map((r) => (
-                  <div key={r.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl">
-                    <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
-                      <span className="text-pink-500 font-bold">{(r.referred_email || 'F')[0].toUpperCase()}</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800">{r.referred_email || 'Friend'}</p>
-                      <p className="text-xs text-gray-400">{new Date(r.created_at).toLocaleDateString('en-GB')}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className={`text-xs font-bold px-2 py-1 rounded-full
-                        ${r.status === 'converted' ? 'bg-green-50 text-green-500' :
-                          r.status === 'signed_up' ? 'bg-blue-50 text-blue-500' :
-                          'bg-amber-50 text-amber-500'}`}>
-                        {r.status === 'converted' ? `+ £${r.reward_amount}` : r.status.charAt(0).toUpperCase() + r.status.slice(1)}
-                      </p>
-                    </div>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {[
+                { label: 'Tracked Referrals', value: referrals.length, icon: Users },
+                { label: 'Rewards Paid', value: rewardCount, icon: Gift },
+                { label: 'Reward Value', value: money(referrals.reduce((sum, referral) => sum + Number(referral.reward_paid ? referral.reward_amount || 0 : 0), 0)), icon: ShieldCheck },
+              ].map(({ label, value, icon: Icon }) => (
+                <div key={label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-5 text-center">
+                  <div className="w-10 h-10 bg-pink-50 text-pink-500 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <Icon size={18} />
                   </div>
-                ))}
-              </div>
+                  <p className="font-bold text-lg text-gray-900">{value}</p>
+                  <p className="text-[10px] text-gray-400">{label}</p>
+                </div>
+              ))}
             </div>
 
-            {/* Points summary */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-              <h2 className="text-sm font-semibold text-gray-900 mb-4">Your Rewards Summary</h2>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: 'Total Earned', value: `£${referrals.filter(r => r.reward_paid).length * 10}`, icon: TrendingUp, color: 'bg-green-50 text-green-500' },
-                  { label: 'Points Balance', value: user.points, icon: Zap, color: 'bg-pink-50 text-pink-500' },
-                  { label: 'Friends Referred', value: referrals.length, icon: Users, color: 'bg-blue-50 text-blue-500' },
-                ].map((s) => (
-                  <div key={s.label} className="text-center p-4 bg-gray-50 rounded-xl">
-                    <div className={`w-10 h-10 ${s.color} rounded-xl flex items-center justify-center mx-auto mb-2`}>
-                      <s.icon size={18} />
+              <h2 className="text-sm font-semibold text-gray-900 mb-4">Referral History</h2>
+              <div className="space-y-3">
+                {referrals.length === 0 && <p className="text-sm text-gray-400 text-center py-6">No referrals yet.</p>}
+                {referrals.map((referral) => (
+                  <div key={referral.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-xl">
+                    <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
+                      <Mail size={16} className="text-pink-500" />
                     </div>
-                    <p className="font-bold text-lg text-gray-900">{s.value}</p>
-                    <p className="text-[10px] text-gray-400">{s.label}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 truncate">{referral.referred_email || 'Referral pending'}</p>
+                      <p className="text-xs text-gray-400">{referral.created_at ? new Date(referral.created_at).toLocaleDateString('en-GB') : ''}</p>
+                    </div>
+                    <span className="text-xs font-bold px-2 py-1 rounded-full bg-gray-100 text-gray-500">
+                      {statusLabel(referral.status || 'pending')}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -427,20 +409,15 @@ export function ReferAndEarn() {
   )
 }
 
-// ── REVIEWS & RATINGS ─────────────────────────────────────────────────────────
 export function ReviewsRatings() {
   const { user } = useApp()
-  const [showForm, setShowForm] = useState(false)
-  const [rating, setRating] = useState(5)
-  const [reviewText, setReviewText] = useState('')
-  const [userReviews, setUserReviews] = useState([])
-  const [userBookings, setUserBookings] = useState([])
-  useEffect(() => {
-    if (user?.id) {
-      fetchUserReviews(user.id).then(setUserReviews).catch(() => {})
-      fetchUserBookings(user.id).then(setUserBookings).catch(() => {})
-    }
-  }, [user?.id])
+  const { bookings, reviews } = useUserData(user?.id)
+  const completedBookings = bookings.filter(booking => booking.status === 'completed')
+  const averageRating = reviews.length
+    ? (reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviews.length).toFixed(1)
+    : '0.0'
+
+  if (!user) return <AuthRequired />
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -449,118 +426,62 @@ export function ReviewsRatings() {
           <Sidebar />
           <div className="flex-1 min-w-0 space-y-5">
             <div className="flex items-center justify-between">
-              <h1 className="font-display text-xl font-bold text-gray-900">Reviews & Ratings</h1>
-              <button onClick={() => setShowForm(!showForm)}
+              <h1 className="font-display text-xl font-bold text-gray-900">Reviews</h1>
+              <Link to="/bookings"
                 className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">
-                <Plus size={14} /> Write a Review
-              </button>
+                <Calendar size={14} /> View Bookings
+              </Link>
             </div>
 
-            {/* Stats */}
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
               <div className="flex items-center gap-6">
                 <div className="text-center">
-                  <p className="font-display text-4xl font-bold text-gray-900">4.8</p>
+                  <p className="font-display text-4xl font-bold text-gray-900">{averageRating}</p>
                   <div className="flex gap-0.5 justify-center my-1">
-                    {[1,2,3,4,5].map(i => (
-                      <Star key={i} size={16} className={i <= 4 ? 'fill-amber-400 text-amber-400' : 'fill-amber-200 text-amber-200'} />
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <Star key={i} size={16} className={i <= Math.round(Number(averageRating)) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'} />
                     ))}
                   </div>
-                  <p className="text-xs text-gray-400">{userReviews.length} reviews given</p>
+                  <p className="text-xs text-gray-400">{reviews.length} reviews given</p>
                 </div>
-                <div className="flex-1 space-y-1.5">
-                  {[5,4,3,2,1].map(n => (
-                    <div key={n} className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500 w-3">{n}★</span>
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-amber-400 rounded-full" style={{ width: n===5?'80%':n===4?'15%':'5%' }} />
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex-1">
+                  <p className="text-sm text-gray-500">
+                    Reviews should be enabled only for completed bookings. You currently have {completedBookings.length} completed booking{completedBookings.length === 1 ? '' : 's'}.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Write review form */}
-            {showForm && (
-              <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-gray-900">Write a Review</h2>
-                  <button onClick={() => setShowForm(false)}><X size={16} className="text-gray-400" /></button>
-                </div>
-                {/* Select booking */}
-                <div className="mb-4">
-                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Select Booking</label>
-                  <select className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-pink-400">
-                    {userBookings.filter(b => b.status === 'completed').map(b => (
-                      <option key={b.id}>{b.service_name} — {b.providers?.name}</option>
-                    ))}
-                  </select>
-                </div>
-                {/* Rating */}
-                <div className="mb-4">
-                  <label className="text-xs font-semibold text-gray-600 mb-2 block">Your Rating</label>
-                  <div className="flex gap-2">
-                    {[1,2,3,4,5].map(n => (
-                      <button key={n} onClick={() => setRating(n)}>
-                        <Star size={28} className={n <= rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200 fill-gray-200'} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {/* Text */}
-                <div className="mb-4">
-                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Your Review</label>
-                  <textarea value={reviewText} onChange={e => setReviewText(e.target.value)} rows={4}
-                    placeholder="Share your experience with this provider..."
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-pink-400 resize-none" />
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => { setShowForm(false); setReviewText('') }}
-                    className="flex-1 bg-pink-500 text-white py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
-                    Submit Review
-                  </button>
-                  <button onClick={() => setShowForm(false)}
-                    className="border border-gray-200 text-gray-500 px-5 py-3 rounded-full text-sm font-semibold hover:border-pink-300 transition-colors">
-                    Cancel
-                  </button>
-                </div>
+            {completedBookings.length === 0 && (
+              <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 text-center">
+                <Star size={34} className="text-gray-200 mx-auto mb-3" />
+                <p className="text-sm text-gray-400">Complete a booking before leaving a review.</p>
               </div>
             )}
 
-            {/* Review list */}
             <div className="space-y-3">
-              {userReviews.length === 0 && <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 text-center"><p className="text-sm text-gray-400">No reviews yet. Complete a booking to leave your first review!</p></div>}
-              {userReviews.map((r) => (
-                <div key={r.id} className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-                  <div className="flex items-start gap-4 mb-3">
-                    <div className="w-12 h-12 rounded-xl object-cover shrink-0 bg-pink-100 flex items-center justify-center overflow-hidden">
-                      {r.providers?.image_url ? <img src={r.providers.image_url} alt="" className="w-full h-full object-cover" /> : <span className="text-pink-500 font-bold">R</span>}
+              {reviews.length === 0 && completedBookings.length > 0 && (
+                <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 text-center">
+                  <p className="text-sm text-gray-400">No reviews have been submitted yet.</p>
+                </div>
+              )}
+              {reviews.map((review) => (
+                <div key={review.id} className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{review.providers?.name || review.products?.name || 'Rejuveefy experience'}</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <ShieldCheck size={10} className="text-pink-400" /> Verified activity
+                      </p>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">{r.providers?.name || r.products?.name || 'Service'}</p>
-                          <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                            <ShieldCheck size={10} className="text-pink-400" /> Verified Booking
-                          </p>
-                        </div>
-                        <span className="text-xs text-gray-400">{new Date(r.created_at).toLocaleDateString('en-GB')}</span>
-                      </div>
-                    </div>
+                    <span className="text-xs text-gray-400">{review.created_at ? new Date(review.created_at).toLocaleDateString('en-GB') : ''}</span>
                   </div>
                   <div className="flex gap-0.5 mb-2">
-                    {[1,2,3,4,5].map(i => (
-                      <Star key={i} size={14} className={i <= r.rating ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'} />
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <Star key={i} size={14} className={i <= Number(review.rating || 0) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'} />
                     ))}
                   </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>
-                  {r.reply && (
-                    <div className="mt-3 bg-pink-50 rounded-xl p-3 border-l-2 border-pink-500">
-                      <p className="text-[10px] font-bold text-pink-500 mb-1">Provider Response</p>
-                      <p className="text-xs text-gray-600">{r.reply}</p>
-                    </div>
-                  )}
+                  <p className="text-sm text-gray-600 leading-relaxed">{review.comment}</p>
                 </div>
               ))}
             </div>
