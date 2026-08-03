@@ -82,7 +82,7 @@ export function AppProvider({ children }) {
     name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
     email: user.email,
     avatar: user.user_metadata?.avatar_url || null,
-    points: 750,
+    points: user.user_metadata?.points || 0,
   } : null
 
   return (

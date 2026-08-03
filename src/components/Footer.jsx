@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Instagram, Twitter, Facebook, Youtube, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { subscribeNewsletter } from '../lib/db'
 
 const cols = [
@@ -34,10 +34,10 @@ const cols = [
       { l: 'About Us', p: '/about' },
       { l: 'Contact Us', p: '/contact' },
       { l: 'FAQ', p: '/faq' },
-      { l: 'Returns & Refunds', p: '/returns' },
+      { l: 'Returns & Refunds', p: '/returns-refunds' },
       { l: 'Track Order', p: '/track-order' },
       { l: 'Careers', p: '/careers' },
-      { l: 'Become a Provider', p: '/become-provider' },
+      { l: 'Become a Provider', p: '/register?type=provider' },
     ],
   },
 ]
@@ -123,9 +123,9 @@ export default function Footer() {
               Rejuveefy is a modern beauty-tech marketplace connecting you with verified professionals and premium beauty products across the UK.
             </p>
             <div className="flex gap-2 mb-4">
-              {[Instagram, Twitter, Facebook, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-pink-100 hover:text-pink-500 transition-colors">
-                  <Icon size={15} />
+              {['IG', 'X', 'FB', 'YT'].map((label) => (
+                <a key={label} href="#" aria-label={label} className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-500 hover:bg-pink-100 hover:text-pink-500 transition-colors">
+                  {label}
                 </a>
               ))}
             </div>

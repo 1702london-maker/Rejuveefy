@@ -41,8 +41,8 @@ export default function Providers() {
             <span className="mx-1.5">›</span>
             <span>Providers</span>
           </p>
-          <h1 className="font-display text-2xl font-bold text-gray-900 mb-1">Find the Perfect Beauty Expert</h1>
-          <p className="text-sm text-gray-500 mb-4">Discover verified hair and beauty professionals near you</p>
+          <h1 className="font-display text-2xl font-bold text-gray-900 mb-1">Verified Provider Directory</h1>
+          <p className="text-sm text-gray-500 mb-4">Browse approved Rejuveefy hair and beauty professionals as they go live.</p>
 
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex items-center gap-2 flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5">
@@ -135,7 +135,7 @@ export default function Providers() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-500">
-                <strong className="text-gray-800">{filtered.length},700+ Providers</strong> found
+                <strong className="text-gray-800">{filtered.length} {filtered.length === 1 ? 'provider' : 'providers'}</strong> found
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400">Sort by:</span>
@@ -150,6 +150,23 @@ export default function Providers() {
             </div>
 
             <div className="space-y-4">
+              {filtered.length === 0 && (
+                <div className="bg-white border border-dashed border-pink-200 rounded-2xl p-8 text-center">
+                  <ShieldCheck size={34} className="text-pink-400 mx-auto mb-3" />
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Provider profiles are being verified</h2>
+                  <p className="text-sm text-gray-500 max-w-xl mx-auto mb-5">
+                    We are keeping this directory clean until approved provider profiles are connected from Supabase.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
+                      Book Maye
+                    </Link>
+                    <Link to="/register?type=provider" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+                      Apply as Provider
+                    </Link>
+                  </div>
+                </div>
+              )}
               {filtered.map((p) => (
                 <div key={p.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-card card-hover">
                   <div className="flex flex-col sm:flex-row">
@@ -221,7 +238,7 @@ export default function Providers() {
                 { icon: '✓', label: 'Verified Professionals', sub: 'All providers ID-checked' },
                 { icon: '⭐', label: 'Quality Assurance', sub: 'Regular rating reviews' },
                 { icon: '🛡️', label: 'Secure Booking', sub: 'Stripe-secured payments' },
-                { icon: '💜', label: 'Brand Reputation', sub: '10,000+ happy clients' },
+                { icon: '💜', label: 'Brand Reputation', sub: 'Real profiles only' },
               ].map((t) => (
                 <div key={t.label} className="text-center p-3">
                   <div className="text-xl mb-1">{t.icon}</div>

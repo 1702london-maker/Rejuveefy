@@ -37,10 +37,10 @@ const quickLinks = [
 ]
 
 const stats = [
-  { value: '100+', label: 'Happy Clients' },
-  { value: '5', label: 'Expert Providers' },
-  { value: '4.9', label: 'Average Rating' },
-  { value: '98%', label: 'Satisfaction Rate' },
+  { value: 'UK', label: 'Beauty Marketplace' },
+  { value: 'AI', label: 'Beauty Analysis' },
+  { value: '24/7', label: 'Online Booking' },
+  { value: 'Secure', label: 'Client Accounts' },
 ]
 
 const howItWorks = [
@@ -50,9 +50,9 @@ const howItWorks = [
 ]
 
 const testimonials = [
-  { name: 'Amara O.', role: 'Regular Client', text: 'Found the most amazing braider through Rejuveefy. My knotless braids lasted 8 weeks and the experience was 10/10.', rating: 5, avatar: '/assets/hero-beauty.png' },
-  { name: 'Destiny K.', role: 'Loyal Customer', text: 'The AI hair analyser recommended the perfect routine for my 4C hair. My hair has never been healthier!', rating: 5, avatar: '/assets/spa-interior.png' },
-  { name: 'Fatima B.', role: 'VIP Member', text: 'Booked a last-minute wig install and the provider arrived on time, fully prepared. Absolutely seamless.', rating: 5, avatar: '/assets/wellness-lifestyle.png' },
+  { name: 'Client account', role: 'Booking flow', text: 'Clients can create an account, choose services, and manage appointments from the dashboard.', rating: 5, avatar: '/assets/hero-beauty.png' },
+  { name: 'AI analyser', role: 'Beauty tech', text: 'The analyser supports personalised hair and beauty guidance from uploaded photos.', rating: 5, avatar: '/assets/spa-interior.png' },
+  { name: 'Provider setup', role: 'Portal flow', text: 'Providers can register now, with verified profiles and services ready to connect to Supabase.', rating: 5, avatar: '/assets/wellness-lifestyle.png' },
 ]
 
 export default function Home() {
@@ -141,7 +141,7 @@ export default function Home() {
                   <Stars val={5} size={13} />
                   <span className="text-sm font-bold text-gray-800">4.9</span>
                 </div>
-                <p className="text-xs text-gray-500">Trusted by 100+ clients</p>
+                <p className="text-xs text-gray-500">Designed for verified bookings</p>
               </div>
             </motion.div>
           </motion.div>
@@ -290,8 +290,8 @@ export default function Home() {
         <div className="max-w-[1280px] mx-auto px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-2">Top Rated</p>
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Featured Providers</h2>
+              <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-2">Verified Directory</p>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Approved Providers</h2>
             </div>
             <Link to="/providers" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-pink-500 hover:text-pink-600 transition-colors">
               View All <ChevronRight size={16} />
@@ -336,41 +336,20 @@ export default function Home() {
             </motion.div>
           ) : (
             <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
-              className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: 'Amara Johnson', spec: 'Braids & Natural Hair', rating: 4.9, reviews: 238, location: 'London, UK', price: 45, img: '/assets/hero-beauty.png' },
-                { name: 'Kezia Williams', spec: 'Locs Specialist', rating: 4.8, reviews: 184, location: 'Manchester, UK', price: 55, img: '/assets/spa-interior.png' },
-                { name: 'Temi Ade', spec: 'Wig Installation', rating: 5.0, reviews: 312, location: 'Birmingham, UK', price: 80, img: '/assets/wellness-lifestyle.png' },
-                { name: 'Naomi Clarke', spec: 'Hair Stylist & MUA', rating: 4.9, reviews: 97, location: 'Leeds, UK', price: 60, img: '/assets/gift-set.png' },
-              ].map((p, i) => (
-                <motion.div key={i} variants={cardItem} whileHover={{ y: -6, transition: { duration: 0.25 } }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100 group">
-                  <Link to="/providers">
-                    <div className="relative h-52 overflow-hidden">
-                      <img src={p.img}
-                        alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      <span className="absolute top-3 left-3 bg-white/90 backdrop-blur text-green-600 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <CheckCircle size={11} /> Verified
-                      </span>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-bold text-gray-900 mb-0.5">{p.name}</h3>
-                      <p className="text-xs text-gray-500 mb-2">{p.spec}</p>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Stars val={p.rating} size={12} />
-                        <span className="text-xs font-semibold text-gray-700">{p.rating}</span>
-                        <span className="text-xs text-gray-400">({p.reviews})</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                          <MapPin size={12} /> {p.location}
-                        </div>
-                        <span className="text-pink-500 text-xs font-bold">From £{p.price}</span>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
+              className="bg-white border border-dashed border-pink-200 rounded-2xl p-8 text-center">
+              <CheckCircle size={34} className="text-pink-400 mx-auto mb-3" />
+              <h3 className="font-display text-xl font-bold text-gray-900 mb-2">Provider profiles are being verified</h3>
+              <p className="text-sm text-gray-500 max-w-xl mx-auto mb-5">
+                The directory will show real approved professionals only. For now, clients can book Maye directly or providers can apply to join.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
+                  Book Maye
+                </Link>
+                <Link to="/register?type=provider" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+                  Apply as Provider
+                </Link>
+              </div>
             </motion.div>
           )}
         </div>

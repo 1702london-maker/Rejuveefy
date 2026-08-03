@@ -77,6 +77,7 @@ export function DashboardHome() {
   useEffect(() => {
     if (user?.id) fetchUserBookings(user.id).then(setBookings).catch(() => {})
   }, [user?.id])
+  const upcomingCount = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-6">
@@ -88,8 +89,7 @@ export function DashboardHome() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-pink-100 text-xs mb-1">Welcome back,</p>
-                  <h1 className="font-display text-2xl font-bold">Hello, {name}! 👋</h1>
-                  <p className="text-pink-100 text-sm mt-1">You have 1 upcoming appointment this week.</p>
+                  <h1 className="font-display text-2xl font-bold">Hello, {name}</h1><p className="text-pink-100 text-sm mt-1">{upcomingCount > 0 ? `You have ${upcomingCount} upcoming appointment${upcomingCount === 1 ? '' : 's'}.` : 'No upcoming appointments yet.'}</p>
                 </div>
                 <div className="hidden sm:block text-right">
                   <div className="bg-white/20 rounded-xl px-4 py-2">
@@ -103,10 +103,10 @@ export function DashboardHome() {
             {/* Quick stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {[
-                { icon: Calendar, label: 'Total Bookings', value: '12', sub: '+2 this month', color: 'bg-blue-50 text-blue-500' },
-                { icon: Star, label: 'Reviews Given', value: '8', sub: '4.8 avg rating', color: 'bg-amber-50 text-amber-500' },
-                { icon: Gift, label: 'Points Earned', value: points, sub: '2 rewards available', color: 'bg-pink-50 text-pink-500' },
-                { icon: ShoppingBag, label: 'Products Ordered', value: '5', sub: '1 on its way', color: 'bg-green-50 text-green-500' },
+                { icon: Calendar, label: 'Total Bookings', value: bookings.length, sub: `${upcomingCount} upcoming`, color: 'bg-blue-50 text-blue-500' },
+                { icon: Star, label: 'Reviews Given', value: 0, sub: 'After completed bookings', color: 'bg-amber-50 text-amber-500' },
+                { icon: Gift, label: 'Points Earned', value: points, sub: 'Rewards sync pending', color: 'bg-pink-50 text-pink-500' },
+                { icon: ShoppingBag, label: 'Products Ordered', value: 0, sub: 'Orders table pending', color: 'bg-green-50 text-green-500' },
               ].map((s) => (
                 <div key={s.label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
                   <div className={`w-9 h-9 ${s.color} rounded-xl flex items-center justify-center mb-3`}>

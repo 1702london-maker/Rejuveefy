@@ -13,10 +13,10 @@ function AuthLayout({ children, image }) {
           <Link to="/" className="text-white font-display text-3xl font-bold mb-8">Rejuveefy</Link>
           <div className="space-y-4 w-full max-w-xs">
             {[
-              { icon: '✨', text: 'Discover 500+ verified beauty professionals' },
-              { icon: '🛍️', text: 'Shop 100% authentic beauty products' },
-              { icon: '🤖', text: 'Get personalized AI beauty analysis' },
-              { icon: '📅', text: 'Book in minutes, cancel anytime' },
+              { icon: '✨', text: 'Book verified Rejuveefy services' },
+              { icon: '🛍️', text: 'Shop curated beauty products' },
+              { icon: '🤖', text: 'Get personalised AI beauty analysis' },
+              { icon: '📅', text: 'Manage bookings from your account' },
             ].map(f => (
               <div key={f.text} className="flex items-center gap-3 text-white">
                 <span className="text-xl">{f.icon}</span>
@@ -187,7 +187,7 @@ export function Register() {
         </div>
 
         <h1 className="font-display text-2xl font-bold text-gray-900 mb-1.5">Create Your Account</h1>
-        <p className="text-sm text-gray-500 mb-6">Join 10,000+ beauty lovers on Rejuveefy. It's free!</p>
+        <p className="text-sm text-gray-500 mb-6">Create a client, provider or affiliate-ready Rejuveefy account.</p>
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold px-3 py-2.5 rounded-xl">{error}</div>
