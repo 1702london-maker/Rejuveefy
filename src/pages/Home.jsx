@@ -327,17 +327,23 @@ export default function Home() {
                     </div>
                     <div className="p-4">
                       <h3 className="font-bold text-gray-900 mb-0.5">{p.name}</h3>
-                      <p className="text-xs text-gray-500 mb-2">{p.specialty || 'Hair Specialist'}</p>
+                      <p className="text-xs text-gray-500 mb-2">{p.specialty || p.speciality || 'Beauty Professional'}</p>
                       <div className="flex items-center gap-2 mb-3">
-                        <Stars val={p.rating || 4.9} size={12} />
-                        <span className="text-xs font-semibold text-gray-700">{p.rating || '4.9'}</span>
-                        <span className="text-xs text-gray-400">({p.review_count || '128'})</span>
+                        {p.rating ? (
+                          <>
+                            <Stars val={p.rating} size={12} />
+                            <span className="text-xs font-semibold text-gray-700">{p.rating}</span>
+                            <span className="text-xs text-gray-400">({p.review_count || 0})</span>
+                          </>
+                        ) : (
+                          <span className="text-xs font-semibold text-pink-500 bg-pink-50 px-2 py-1 rounded-full">New profile</span>
+                        )}
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 text-xs text-gray-500">
-                          <MapPin size={12} /> {p.location || 'London, UK'}
+                          <MapPin size={12} /> {p.location || 'Location to be confirmed'}
                         </div>
-                        <span className="text-pink-500 text-xs font-bold">From £{p.min_price || '35'}</span>
+                        <span className="text-pink-500 text-xs font-bold">From GBP {p.min_price || p.price_from || 0}</span>
                       </div>
                     </div>
                   </Link>
@@ -448,7 +454,7 @@ export default function Home() {
                     <span className="text-[11px] text-gray-500">({p.review_count || 0})</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-900">£{Number(p.price).toFixed(2)}</span>
+                    <span className="font-bold text-gray-900">GBP {Number(p.price).toFixed(2)}</span>
                     <button onClick={() => addToCart({ ...p, id: p.id || i })}
                       className="flex items-center gap-1.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
                       <ShoppingBag size={12} /> Add

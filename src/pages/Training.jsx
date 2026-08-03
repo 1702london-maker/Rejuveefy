@@ -8,12 +8,11 @@ const courses = [
     category: 'Braiding',
     level: 'Beginner to Intermediate',
     duration: '6 hours',
-    students: 12,
-    rating: 4.9,
+    status: 'Preparing',
     price: 149,
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=400&fit=crop',
     topics: ['Sectioning and tension control', 'Feed-in technique', 'Finishing and edges', 'Client aftercare advice'],
-    instructor: 'Amara K.',
+    instructor: 'Rejuveefy Training',
   },
   {
     id: 2,
@@ -21,12 +20,11 @@ const courses = [
     category: 'Wig Making',
     level: 'Intermediate',
     duration: '8 hours',
-    students: 8,
-    rating: 5.0,
+    status: 'Preparing',
     price: 199,
     image: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=600&h=400&fit=crop',
     topics: ['Cap construction and measurements', 'Lace frontal application', 'Customising hairlines', 'Wig maintenance and care'],
-    instructor: 'Silk & Crown',
+    instructor: 'Rejuveefy Training',
   },
   {
     id: 3,
@@ -34,12 +32,11 @@ const courses = [
     category: 'Locs',
     level: 'All Levels',
     duration: '5 hours',
-    students: 6,
-    rating: 4.8,
+    status: 'Preparing',
     price: 129,
     image: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600&h=400&fit=crop',
     topics: ['Starting locs on different hair types', 'Retwisting techniques', 'Loc health and moisture', 'Common mistakes to avoid'],
-    instructor: 'Naturelle Beauty',
+    instructor: 'Rejuveefy Training',
   },
   {
     id: 4,
@@ -47,33 +44,22 @@ const courses = [
     category: 'Natural Hair',
     level: 'All Levels',
     duration: '4 hours',
-    students: 15,
-    rating: 4.9,
+    status: 'Preparing',
     price: 99,
     image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&h=400&fit=crop',
     topics: ['Understanding hair porosity and density', 'Product selection for 4C hair', 'Wash day routines', 'Protective styling for growth'],
-    instructor: 'Amara K.',
+    instructor: 'Rejuveefy Training',
   },
 ]
 
 const benefits = [
-  'Learn from verified UK beauty professionals',
-  'Lifetime access to course materials',
-  'Certificate of completion for every course',
-  'Community support from fellow learners',
-  'Practical, hands-on techniques you can apply immediately',
-  'Courses designed for both beginners and experienced stylists',
+  'Training programmes are being prepared for UK beauty professionals',
+  'Course details will be shown before enrolment opens',
+  'Certificates will be confirmed for eligible courses',
+  'Group and salon training enquiries are open now',
+  'Practical techniques for beginners and experienced stylists',
+  'Reviewed training content before courses go live',
 ]
-
-function Stars({ val }) {
-  return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map(i => (
-        <Star key={i} size={11} className={i <= Math.round(val) ? 'fill-amber-400 text-amber-400' : 'text-gray-200 fill-gray-200'} />
-      ))}
-    </div>
-  )
-}
 
 export default function Training() {
   return (
@@ -94,7 +80,7 @@ export default function Training() {
             Master Your Craft.<br /><span className="text-pink-500">Grow Your Business.</span>
           </h1>
           <p className="text-gray-500 max-w-xl leading-relaxed mb-8">
-            Learn from the best stylists and beauty professionals in the UK. Our courses cover braiding, wig installation, locs, natural hair and more — with practical techniques you can use straight away.
+            Training programmes for braiding, wig installation, locs, natural hair and more are being prepared. Enquiries are open for custom and group sessions.
           </p>
           <div className="flex flex-wrap gap-4">
             <a href="#courses" className="bg-pink-500 text-white font-bold px-7 py-3.5 rounded-full hover:bg-pink-600 transition-colors flex items-center gap-2">
@@ -125,10 +111,10 @@ export default function Training() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { icon: BookOpen, label: 'Courses Available', value: `${courses.length}` },
-              { icon: Users, label: 'Students Enrolled', value: '40+' },
-              { icon: Award, label: 'Certificates Issued', value: '30+' },
-              { icon: Star, label: 'Average Rating', value: '4.9' },
+              { icon: BookOpen, label: 'Courses Preparing', value: `${courses.length}` },
+              { icon: Users, label: 'Group Enquiries', value: 'Open' },
+              { icon: Award, label: 'Certificates', value: 'Planned' },
+              { icon: Star, label: 'Quality Review', value: 'Active' },
             ].map((s) => (
               <div key={s.label} className="bg-pink-50 rounded-2xl p-5 text-center">
                 <s.icon size={22} className="text-pink-500 mx-auto mb-2" />
@@ -144,7 +130,7 @@ export default function Training() {
       <section id="courses" className="bg-gray-50 py-12">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900">Available Courses</h2>
+            <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900">Courses in Preparation</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {courses.map((course) => (
@@ -165,9 +151,9 @@ export default function Training() {
                   <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-1">{course.title}</h3>
                   <p className="text-xs text-gray-400 mb-2">by {course.instructor}</p>
                   <div className="flex items-center gap-2 mb-3">
-                    <Stars val={course.rating} />
-                    <span className="text-xs font-semibold text-gray-700">{course.rating}</span>
-                    <span className="text-xs text-gray-400">({course.students} students)</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-pink-500 bg-pink-50 px-2 py-1 rounded-full">
+                      <Clock size={11} /> {course.status}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
                     <span className="flex items-center gap-1"><Clock size={11} /> {course.duration}</span>
@@ -181,10 +167,10 @@ export default function Training() {
                     ))}
                   </ul>
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <span className="text-lg font-bold text-pink-500">£{course.price}</span>
+                    <span className="text-lg font-bold text-pink-500">GBP {course.price}</span>
                     <Link to="/contact"
                       className="bg-pink-500 text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-pink-600 transition-colors">
-                      Enrol Now
+                      Enquire
                     </Link>
                   </div>
                 </div>

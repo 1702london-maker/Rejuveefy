@@ -93,9 +93,9 @@ export default function Wishlist() {
 
                 {/* Price */}
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="font-bold text-gray-900">£{product.price.toFixed(2)}</span>
+                  <span className="font-bold text-gray-900">GBP {product.price.toFixed(2)}</span>
                   {product.originalPrice && (
-                    <span className="text-xs text-gray-400 line-through">£{product.originalPrice.toFixed(2)}</span>
+                    <span className="text-xs text-gray-400 line-through">GBP {product.originalPrice.toFixed(2)}</span>
                   )}
                 </div>
 

@@ -37,62 +37,10 @@ const cols = [
       { l: 'Returns & Refunds', p: '/returns-refunds' },
       { l: 'Track Order', p: '/track-order' },
       { l: 'Careers', p: '/careers' },
-      { l: 'Become a Provider', p: '/register?type=provider' },
+      { l: 'Become a Provider', p: '/providers-portal' },
     ],
   },
 ]
-
-function VisaLogo() {
-  return (
-    <svg viewBox="0 0 50 16" className="h-5 w-auto" aria-label="Visa">
-      <rect width="50" height="16" rx="3" fill="#1A1F71"/>
-      <text x="7" y="12" fontFamily="Arial" fontWeight="bold" fontSize="11" fill="white">VISA</text>
-    </svg>
-  )
-}
-function MastercardLogo() {
-  return (
-    <svg viewBox="0 0 38 24" className="h-5 w-auto" aria-label="Mastercard">
-      <rect width="38" height="24" rx="3" fill="#252525"/>
-      <circle cx="14" cy="12" r="8" fill="#EB001B"/>
-      <circle cx="24" cy="12" r="8" fill="#F79E1B"/>
-      <path d="M19 5.8a8 8 0 0 1 0 12.4A8 8 0 0 1 19 5.8z" fill="#FF5F00"/>
-    </svg>
-  )
-}
-function PayPalLogo() {
-  return (
-    <svg viewBox="0 0 60 16" className="h-5 w-auto" aria-label="PayPal">
-      <rect width="60" height="16" rx="3" fill="#003087"/>
-      <text x="6" y="12" fontFamily="Arial" fontWeight="bold" fontSize="10" fill="#009CDE">Pay</text>
-      <text x="22" y="12" fontFamily="Arial" fontWeight="bold" fontSize="10" fill="white">Pal</text>
-    </svg>
-  )
-}
-function KlarnaLogo() {
-  return (
-    <svg viewBox="0 0 52 16" className="h-5 w-auto" aria-label="Klarna">
-      <rect width="52" height="16" rx="3" fill="#FFB3C7"/>
-      <text x="7" y="12" fontFamily="Arial" fontWeight="bold" fontSize="10" fill="#17120F">klarna</text>
-    </svg>
-  )
-}
-function ApplePayLogo() {
-  return (
-    <svg viewBox="0 0 50 20" className="h-5 w-auto" aria-label="Apple Pay">
-      <rect width="50" height="20" rx="3" fill="#000"/>
-      <text x="5" y="14" fontFamily="Arial" fontWeight="600" fontSize="9" fill="white">Apple Pay</text>
-    </svg>
-  )
-}
-function GooglePayLogo() {
-  return (
-    <svg viewBox="0 0 54 20" className="h-5 w-auto" aria-label="Google Pay">
-      <rect width="54" height="20" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
-      <text x="5" y="14" fontFamily="Arial" fontWeight="500" fontSize="9" fill="#3c4043">Google Pay</text>
-    </svg>
-  )
-}
 
 export default function Footer() {
   const [email, setEmail] = useState('')
@@ -172,7 +120,7 @@ export default function Footer() {
             </p>
             {done ? (
               <div className="bg-pink-50 rounded-xl p-3 text-xs text-pink-600 font-semibold text-center">
-                ✨ You're subscribed!
+                You're subscribed.
               </div>
             ) : (
               <form onSubmit={sub} className="space-y-2">
@@ -202,14 +150,9 @@ export default function Footer() {
           {/* Left: copyright */}
           <p className="text-xs text-gray-400 shrink-0">© 2026 Rejuveefy Ltd. All rights reserved.</p>
 
-          {/* Centre: payment logos */}
-          <div className="flex gap-2 items-center">
-            <VisaLogo />
-            <MastercardLogo />
-            <PayPalLogo />
-            <KlarnaLogo />
-            <ApplePayLogo />
-            <GooglePayLogo />
+          {/* Centre: shop status */}
+          <div className="text-xs text-gray-400 font-medium">
+            Shop checkout coming soon
           </div>
 
           {/* Right: legal links */}
