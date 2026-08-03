@@ -446,7 +446,7 @@ export function ReviewsRatings() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-500">
-                    Reviews should be enabled only for completed bookings. You currently have {completedBookings.length} completed booking{completedBookings.length === 1 ? '' : 's'}.
+                    Reviews open after completed bookings. You currently have {completedBookings.length} completed booking{completedBookings.length === 1 ? '' : 's'}.
                   </p>
                 </div>
               </div>

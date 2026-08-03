@@ -87,7 +87,7 @@ export default function AffiliatePortal() {
           <div>
             <p className="text-pink-100 text-xs font-semibold uppercase tracking-wide mb-1">Affiliate setup</p>
             <p className="font-display text-2xl font-bold">
-              {application ? `Application ${application.status}` : 'No approved affiliate account connected yet'}
+              {application ? `Application ${application.status}` : 'Affiliate access is not active yet'}
             </p>
             <p className="text-pink-100 text-sm mt-1">
               {loadingApplication

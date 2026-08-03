@@ -158,7 +158,7 @@ export default function Book() {
                 <h3 className="text-sm font-semibold text-gray-800">Filters</h3>
               </div>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Filters will activate when approved provider profiles and service availability are connected.
+                Filters will expand as approved provider profiles and service availability go live.
               </p>
             </div>
           </aside>
@@ -203,7 +203,7 @@ export default function Book() {
                   <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
                     Book Maye
                   </Link>
-                  <Link to="/register?type=provider" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+                  <Link to="/providers-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
                     Apply as Provider
                   </Link>
                 </div>

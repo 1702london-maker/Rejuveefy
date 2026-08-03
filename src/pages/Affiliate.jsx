@@ -141,7 +141,7 @@ export default function Affiliate() {
       <section className="py-16 max-w-[1280px] mx-auto px-4 lg:px-6">
         <div className="text-center mb-12">
           <h2 className="font-display text-3xl font-bold text-gray-900 mb-3">Affiliate Flow</h2>
-          <p className="text-gray-500 max-w-xl mx-auto">The flow should stay reviewed and controlled until the tracking and payout rules are final.</p>
+          <p className="text-gray-500 max-w-xl mx-auto">Applications are reviewed before referral tools, reward details and portal access are opened.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {steps.map(({ title, desc, icon: Icon }, index) => (
@@ -161,8 +161,8 @@ export default function Affiliate() {
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid lg:grid-cols-3 gap-6">
           {[
             { icon: Users, title: 'Clean Partner Base', desc: 'No public affiliate dashboard is unlocked until an application is approved.' },
-            { icon: Share2, title: 'Controlled Referral Links', desc: 'Tracking links should be generated from approved affiliate records only.' },
-            { icon: Gift, title: 'Reward Rules Pending', desc: 'Commission and reward terms can be added once the business rule is final.' },
+            { icon: Share2, title: 'Controlled Referral Links', desc: 'Referral links are released only after partner approval.' },
+            { icon: Gift, title: 'Reward Details', desc: 'Commission and reward terms will be shared with approved partners.' },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-card">
               <div className="w-11 h-11 bg-pink-50 rounded-xl flex items-center justify-center mb-4">

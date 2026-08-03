@@ -64,8 +64,8 @@ function PageHero({ title, body, label }) {
 
 export function AboutUs() {
   const values = [
-    { icon: ShieldCheck, title: 'Reviewed Access', desc: 'Provider and affiliate access should be approved before public activity goes live.' },
-    { icon: Heart, title: 'Client Trust', desc: 'The app should show real data and clear empty states instead of placeholder proof.' },
+    { icon: ShieldCheck, title: 'Reviewed Access', desc: 'Provider and affiliate access is reviewed before public activity goes live.' },
+    { icon: Heart, title: 'Client Trust', desc: 'Rejuveefy uses real data and clear empty states instead of pretend activity.' },
     { icon: Users, title: 'Professional Growth', desc: 'Rejuveefy gives providers a path to profile, booking and service tools after approval.' },
     { icon: Search, title: 'Clean Discovery', desc: 'Clients can browse verified services, products and account activity from one place.' },
   ]
@@ -86,7 +86,7 @@ export function AboutUs() {
               A beauty platform built around trust and real activity
             </h2>
             <p className="text-sm text-gray-500 leading-relaxed mb-4">
-              The public experience should only show verified providers, real products, real bookings and reviewed partner access.
+              The public experience is designed to show verified providers, real products, real bookings and reviewed partner access.
             </p>
             <p className="text-sm text-gray-500 leading-relaxed mb-6">
               The current build keeps incomplete areas clean while provider, affiliate, checkout and review workflows are completed.
@@ -284,7 +284,7 @@ export function BookingHelp() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Booking Help" body="How client booking should work as approved provider profiles are connected." label="Booking Help" />
+      <PageHero title="Booking Help" body="How client booking works as approved provider profiles go live." label="Booking Help" />
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {guides.map(({ icon: Icon, title, sub }) => (
@@ -313,20 +313,20 @@ export function ReturnsRefunds() {
   const [open, setOpen] = useState({})
   const toggle = (id) => setOpen(prev => ({ ...prev, [id]: !prev[id] }))
   const items = [
-    { id: 'products', q: 'Are product returns live?', a: 'Returns policy should be finalised before product checkout is enabled. Keep live promises aligned with payment and fulfilment setup.' },
-    { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking cancellation rules should be set before full provider scheduling launches. For now, contact support about any booking record.' },
+    { id: 'products', q: 'Are product returns live?', a: 'Returns policy details will be shown before product checkout opens.' },
+    { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking cancellation rules will be shown before full provider scheduling launches. For now, contact support about any booking record.' },
     { id: 'refunds', q: 'How will refunds work?', a: 'Refund details will be shown clearly before checkout opens.' },
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Returns & Refunds" body="Policy details should stay clear while checkout and provider booking rules are finalised." label="Returns & Refunds" />
+      <PageHero title="Returns & Refunds" body="Policy details will stay clear as checkout and provider booking rules are finalised." label="Returns & Refunds" />
       <div className="max-w-[1000px] mx-auto px-4 lg:px-6 py-10">
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           {[
-            { icon: RotateCcw, title: 'Policy Pending', sub: 'Final rules should be added before launch.' },
+            { icon: RotateCcw, title: 'Policy Details', sub: 'Final rules will be shown before launch.' },
             { icon: Truck, title: 'Delivery Details', sub: 'Shipping and delivery details will be shown at launch.' },
-            { icon: Package, title: 'Order Records', sub: 'Returns depend on live order data.' },
+            { icon: Package, title: 'Order Details', sub: 'Return options appear after checkout.' },
           ].map(({ icon: Icon, title, sub }) => (
             <div key={title} className="bg-pink-50 rounded-2xl p-5 text-center">
               <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">

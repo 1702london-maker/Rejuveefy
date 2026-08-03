@@ -131,7 +131,7 @@ export default function ProvidersPortal() {
             <p className="text-pink-100 text-sm mt-1">
               {application
                 ? `Your provider application is ${application.status}.`
-                : 'Your live dashboard will populate once your provider application is submitted and approved.'}
+                : 'Submit your application to begin review. Provider tools unlock after approval.'}
             </p>
           </div>
           <span className="bg-white/15 border border-white/20 text-white rounded-full px-5 py-2.5 text-sm font-bold">
@@ -147,7 +147,7 @@ export default function ProvidersPortal() {
               </div>
               <div>
                 <h2 className="font-display text-xl font-bold text-gray-900 mb-1">Submit Provider Application</h2>
-                <p className="text-sm text-gray-500">Tell us what you offer. Approved providers can unlock services, calendar, bookings and payout tools after review.</p>
+                <p className="text-sm text-gray-500">Tell us what you offer. Approved providers can access services, calendar, bookings and payout tools after review.</p>
               </div>
             </div>
 
@@ -201,13 +201,13 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={Calendar}
             title="Bookings"
-            body="No bookings are displayed until real client appointments are saved against your provider profile."
-            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> Waiting for booking data</span>}
+            body="Client appointments will appear here once your provider profile is approved and taking bookings."
+            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> Waiting for appointments</span>}
           />
           <EmptyPanel
             icon={Settings}
             title="Services"
-            body="Services should be added from your approved provider profile, not from placeholder data."
+            body="Service management opens after approval so your public profile stays accurate."
             action={<button className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold cursor-not-allowed"><Plus size={15} /> Add service after approval</button>}
           />
         </div>

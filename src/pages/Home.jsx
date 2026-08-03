@@ -315,7 +315,7 @@ export default function Home() {
                 <motion.div key={p.id} variants={cardItem}
                   whileHover={{ y: -6, transition: { duration: 0.25 } }}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100 group">
-                  <Link to={`/providers/${p.id}`}>
+                  <Link to={`/providers/${p.slug || p.id}`}>
                     <div className="relative h-52 overflow-hidden">
                       <img src={p.avatar || p.image || '/assets/hero-beauty.png'}
                         alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -356,7 +356,7 @@ export default function Home() {
                 <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
                   Book Maye
                 </Link>
-                <Link to="/register?type=provider" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+                <Link to="/providers-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
                   Apply as Provider
                 </Link>
               </div>
