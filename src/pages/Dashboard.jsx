@@ -195,7 +195,7 @@ export function DashboardHome() {
               {[
                 { icon: Calendar, label: 'Bookings', value: bookings.length, sub: `${upcoming.length} upcoming`, color: 'bg-blue-50 text-blue-500' },
                 { icon: Star, label: 'Reviews', value: reviews.length, sub: 'From completed activity', color: 'bg-amber-50 text-amber-500' },
-                { icon: Gift, label: 'Referrals', value: referrals.length, sub: 'Tracked in Supabase', color: 'bg-pink-50 text-pink-500' },
+                { icon: Gift, label: 'Referrals', value: referrals.length, sub: 'Tracked in your account', color: 'bg-pink-50 text-pink-500' },
                 { icon: Heart, label: 'Wishlist', value: 'Saved', sub: 'Managed on this device', color: 'bg-green-50 text-green-500' },
               ].map(({ icon: Icon, label, value, sub, color }) => (
                 <div key={label} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4">
@@ -347,7 +347,7 @@ export function ReferAndEarn() {
                 <Gift size={32} />
               </div>
               <h1 className="font-display text-2xl font-bold mb-2">Referrals</h1>
-              <p className="text-pink-100 text-sm">Share your unique link. Rewards can be configured once the business rule is final.</p>
+              <p className="text-pink-100 text-sm">Share your unique link. Reward details will appear when the referral programme opens.</p>
             </div>
 
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">

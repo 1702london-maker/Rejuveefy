@@ -15,6 +15,15 @@ import {
 import { createBooking, fetchProvider, fetchProviders } from '../lib/db'
 import { useApp } from '../context/AppContext'
 
+const verifyingProviders = [
+  'Hair Stylist',
+  'Braids Specialist',
+  'Wig Installation',
+  'Makeup Artist',
+  'Barber',
+  'Skin Specialist',
+]
+
 function Stars({ val = 0, size = 12 }) {
   return (
     <div className="flex gap-0.5">
@@ -25,22 +34,49 @@ function Stars({ val = 0, size = 12 }) {
   )
 }
 
+function VerifyingProviderGrid() {
+  return (
+    <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      {verifyingProviders.map((label, index) => (
+        <div key={label} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-card">
+          <div className="h-36 bg-gradient-to-br from-pink-50 via-white to-gray-50 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-pink-100 flex items-center justify-center shadow-sm">
+              <ShieldCheck size={22} className="text-pink-300" />
+            </div>
+          </div>
+          <div className="p-4">
+            <p className="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Verifying details</p>
+            <h3 className="text-sm font-semibold text-gray-900 mt-1">{label}</h3>
+            <p className="text-xs text-gray-400 mt-1">Profile coming soon</p>
+            <div className="flex gap-1 mt-3">
+              {[1, 2, 3].map(i => <span key={i} className={`h-1.5 rounded-full flex-1 ${index % 2 ? 'bg-pink-100' : 'bg-pink-200'}`} />)}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function EmptyDirectory() {
   return (
-    <div className="bg-white border border-dashed border-pink-200 rounded-2xl p-8 text-center">
-      <ShieldCheck size={34} className="text-pink-400 mx-auto mb-3" />
-      <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Provider profiles are being verified</h2>
-      <p className="text-sm text-gray-500 max-w-xl mx-auto mb-5">
-        Rejuveefy only shows approved provider profiles. Book Maye now or apply to join the provider directory.
-      </p>
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
-          Book Maye
-        </Link>
-        <Link to="/register?type=provider" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
-          Apply as Provider
-        </Link>
+    <div>
+      <div className="bg-white border border-dashed border-pink-200 rounded-2xl p-8 text-center mb-4">
+        <ShieldCheck size={34} className="text-pink-400 mx-auto mb-3" />
+        <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Provider profiles are being verified</h2>
+        <p className="text-sm text-gray-500 max-w-xl mx-auto mb-5">
+          New provider profiles are being checked and prepared. Details will appear here soon.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
+            Book Maye
+          </Link>
+          <Link to="/providers-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+            Apply as Provider
+          </Link>
+        </div>
       </div>
+      <VerifyingProviderGrid />
     </div>
   )
 }
@@ -93,9 +129,7 @@ export default function Providers() {
               <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2 mb-3">
                 <SlidersHorizontal size={14} /> Filters
               </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                Advanced filters will activate when approved provider services, availability and locations are connected.
-              </p>
+              <p className="text-xs text-gray-500 leading-relaxed">Filters will expand as provider details become available.</p>
             </div>
           </aside>
 
@@ -176,6 +210,21 @@ export default function Providers() {
                 </div>
               ))}
             </div>
+
+            {filtered.length > 0 && (
+              <section className="mt-8">
+                <div className="flex items-end justify-between gap-4 mb-4">
+                  <div>
+                    <h2 className="font-display text-xl font-bold text-gray-900">More providers coming soon</h2>
+                    <p className="text-sm text-gray-500">New profiles are being verified and prepared.</p>
+                  </div>
+                  <Link to="/providers-portal" className="hidden sm:inline-flex text-sm font-semibold text-pink-500 hover:text-pink-600">
+                    Apply as Provider
+                  </Link>
+                </div>
+                <VerifyingProviderGrid />
+              </section>
+            )}
           </div>
         </div>
       </div>

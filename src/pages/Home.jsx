@@ -52,7 +52,7 @@ const howItWorks = [
 const testimonials = [
   { name: 'Client account', role: 'Booking flow', text: 'Clients can create an account, choose services, and manage appointments from the dashboard.', rating: 5, avatar: '/assets/hero-beauty.png' },
   { name: 'AI analyser', role: 'Beauty tech', text: 'The analyser supports personalised hair and beauty guidance from uploaded photos.', rating: 5, avatar: '/assets/spa-interior.png' },
-  { name: 'Provider setup', role: 'Portal flow', text: 'Providers can register now, with verified profiles and services ready to connect to Supabase.', rating: 5, avatar: '/assets/wellness-lifestyle.png' },
+  { name: 'Provider setup', role: 'Portal flow', text: 'Providers can register now, with verified profiles and service details prepared before going live.', rating: 5, avatar: '/assets/wellness-lifestyle.png' },
 ]
 
 export default function Home() {
@@ -462,7 +462,7 @@ export default function Home() {
                 <ShoppingBag size={34} className="text-pink-400 mx-auto mb-3" />
                 <h3 className="font-display text-xl font-bold text-gray-900 mb-2">Products are being prepared</h3>
                 <p className="text-sm text-gray-500 max-w-xl mx-auto">
-                  Best sellers will appear here once active products are connected in Supabase.
+                  Best sellers will appear here as the shop catalogue is prepared.
                 </p>
               </div>
             )}

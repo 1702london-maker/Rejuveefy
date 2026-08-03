@@ -42,7 +42,6 @@ const cols = [
   },
 ]
 
-// Real payment provider SVG logos
 function VisaLogo() {
   return (
     <svg viewBox="0 0 50 16" className="h-5 w-auto" aria-label="Visa">

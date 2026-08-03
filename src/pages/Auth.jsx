@@ -162,7 +162,7 @@ export default function Login() {
           <Link to="/register" className="text-pink-500 font-semibold hover:underline">Create one free</Link>
         </p>
 
-        <p className="text-center text-[10px] text-gray-400 mt-4">Email verification is handled by Supabase.</p>
+        <p className="text-center text-[10px] text-gray-400 mt-4">Check your inbox after registering to verify your email.</p>
       </div>
     </AuthLayout>
   )

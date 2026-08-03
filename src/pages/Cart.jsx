@@ -162,7 +162,7 @@ export default function Cart() {
                 Continue to Checkout <CreditCard size={15} />
               </button>
               <p className="text-[10px] text-gray-400 text-center mt-3">
-                Payment collection will be enabled once the live checkout provider is connected.
+                Payment collection will open when checkout launches.
               </p>
             </div>
           </aside>
@@ -287,7 +287,7 @@ export function Checkout() {
                 <CreditCard size={15} className="text-pink-500" /> Payment
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                Card and wallet payments are not enabled in this build yet. Connect the payment provider and orders table before accepting live payments.
+                Card and wallet payments are coming soon. Checkout will open when live payments are ready.
               </p>
               <button disabled
                 className="w-full bg-gray-200 text-gray-500 py-3 rounded-full font-semibold text-sm cursor-not-allowed">
@@ -313,7 +313,7 @@ export function OrderSuccess() {
         </div>
         <h1 className="font-display text-3xl font-bold text-gray-900 mb-3">Order Flow Pending</h1>
         <p className="text-sm text-gray-500 mb-6">
-          This page will show confirmed order details after the live checkout and order records are connected.
+          This page will show confirmed order details when checkout launches.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link to="/cart" className="flex-1 bg-pink-500 text-white py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">Back to Cart</Link>

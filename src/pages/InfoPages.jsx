@@ -25,7 +25,7 @@ const faqs = [
   {
     category: 'Accounts',
     items: [
-      { id: 'account-create', question: 'How do I create a client account?', answer: 'Use the register page with email, Google or Facebook. Email verification is handled by Supabase.' },
+      { id: 'account-create', question: 'How do I create a client account?', answer: 'Use the register page with email, Google or Facebook, then check your inbox to verify your account.' },
       { id: 'provider-apply', question: 'How do providers join?', answer: 'Providers create an account, then submit the provider application in the provider portal. Access is reviewed before provider tools unlock.' },
       { id: 'affiliate-apply', question: 'How do affiliates join?', answer: 'Affiliates create an account and submit the affiliate application. Approved partners receive next steps by email.' },
     ],
@@ -33,15 +33,15 @@ const faqs = [
   {
     category: 'Bookings',
     items: [
-      { id: 'booking-data', question: 'Why are some provider lists empty?', answer: 'Only active, approved providers from Supabase are shown. Empty states mean profiles are still being verified or connected.' },
+      { id: 'booking-data', question: 'Why are some provider lists empty?', answer: 'Only approved providers are shown. Empty states mean profiles are still being verified and prepared.' },
       { id: 'booking-status', question: 'Where can I see bookings?', answer: 'Signed-in clients can see booking activity in the dashboard once bookings are saved against their account.' },
     ],
   },
   {
     category: 'Shop',
     items: [
-      { id: 'shop-products', question: 'Where do products come from?', answer: 'The shop reads active products from Supabase. Product lists stay empty until real catalogue data is connected.' },
-      { id: 'checkout', question: 'Can I pay for products now?', answer: 'The cart and checkout screens are prepared, but payment collection should be enabled only after the live payment provider and orders table are wired.' },
+      { id: 'shop-products', question: 'When will products be available?', answer: 'The shop catalogue is being prepared. Coming soon product cards will be replaced as items are released.' },
+      { id: 'checkout', question: 'Can I pay for products now?', answer: 'Checkout will open when the shop launches.' },
     ],
   },
 ]
@@ -89,7 +89,7 @@ export function AboutUs() {
               The public experience should only show verified providers, real products, real bookings and reviewed partner access.
             </p>
             <p className="text-sm text-gray-500 leading-relaxed mb-6">
-              The current build connects key flows to Supabase and keeps incomplete areas honest while provider, affiliate, checkout and admin review workflows are completed.
+              The current build keeps incomplete areas clean while provider, affiliate, checkout and review workflows are completed.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link to="/book" className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
@@ -160,7 +160,7 @@ export function ContactUs() {
                   <CheckCircle size={32} className="text-green-500" />
                 </div>
                 <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Message Sent</h2>
-                <p className="text-sm text-gray-500 mb-5">Your message has been saved. The team can review it from Supabase.</p>
+                <p className="text-sm text-gray-500 mb-5">Your message has been received. The team will review it.</p>
                 <button onClick={() => { setSent(false); setForm({ name: '', email: '', subject: '', message: '' }) }}
                   className="bg-pink-500 text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
                   Send Another Message
@@ -315,7 +315,7 @@ export function ReturnsRefunds() {
   const items = [
     { id: 'products', q: 'Are product returns live?', a: 'Returns policy should be finalised before product checkout is enabled. Keep live promises aligned with payment and fulfilment setup.' },
     { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking cancellation rules should be set before full provider scheduling launches. For now, contact support about any booking record.' },
-    { id: 'refunds', q: 'How will refunds work?', a: 'Refunds should be handled through the chosen payment provider once live payments are connected.' },
+    { id: 'refunds', q: 'How will refunds work?', a: 'Refund details will be shown clearly before checkout opens.' },
   ]
 
   return (
@@ -325,7 +325,7 @@ export function ReturnsRefunds() {
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           {[
             { icon: RotateCcw, title: 'Policy Pending', sub: 'Final rules should be added before launch.' },
-            { icon: Truck, title: 'Fulfilment Pending', sub: 'Shipping and delivery rules need checkout wiring.' },
+            { icon: Truck, title: 'Delivery Details', sub: 'Shipping and delivery details will be shown at launch.' },
             { icon: Package, title: 'Order Records', sub: 'Returns depend on live order data.' },
           ].map(({ icon: Icon, title, sub }) => (
             <div key={title} className="bg-pink-50 rounded-2xl p-5 text-center">
@@ -360,7 +360,7 @@ export function TrackOrder() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Track Order" body="Order tracking will use live order records once checkout and fulfilment are connected." label="Track Order" />
+      <PageHero title="Track Order" body="Order tracking will appear when the shop checkout launches." label="Track Order" />
       <div className="max-w-[700px] mx-auto px-4 lg:px-6 py-10">
         <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-6 mb-6">
           <div className="space-y-3">
@@ -383,8 +383,8 @@ export function TrackOrder() {
         {checked && (
           <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6 text-center">
             <Package size={30} className="text-pink-500 mx-auto mb-3" />
-            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Live tracking is not connected yet</h2>
-            <p className="text-sm text-gray-500">Order status will appear here after checkout, order records and fulfilment tracking are wired.</p>
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Tracking Coming Soon</h2>
+            <p className="text-sm text-gray-500">Order status will appear here when checkout and fulfilment tracking launch.</p>
           </div>
         )}
       </div>
@@ -405,7 +405,7 @@ export function Careers() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Careers" body="Open roles are shown only when they are connected from Supabase." label="Careers" />
+      <PageHero title="Careers" body="Open roles will appear here when recruitment opens." label="Careers" />
       <section id="jobs" className="bg-gray-50 py-12">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <h2 className="font-display text-2xl font-bold text-gray-900 mb-6">Open Positions</h2>
@@ -444,8 +444,8 @@ export function Careers() {
           {filtered.length === 0 && (
             <div className="text-center py-12 text-gray-400">
               <Briefcase size={40} className="mx-auto mb-3 text-gray-200" />
-              <p className="text-sm">No open roles are connected right now.</p>
-              <p className="text-xs mt-1">Add jobs in Supabase when recruitment is ready.</p>
+              <p className="text-sm">No open roles right now.</p>
+              <p className="text-xs mt-1">Check back when recruitment opens.</p>
             </div>
           )}
         </div>

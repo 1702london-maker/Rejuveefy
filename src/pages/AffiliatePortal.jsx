@@ -127,7 +127,7 @@ export default function AffiliatePortal() {
           </div>
           <h2 className="font-display text-xl font-bold text-gray-900 mb-2">No affiliate activity yet</h2>
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
-            Transactions, campaign assets and payout history should come from Supabase after the affiliate tables are created and applications are reviewed.
+            Transactions, campaign assets and payout history will appear here after approval and launch.
           </p>
         </div>
       </div>

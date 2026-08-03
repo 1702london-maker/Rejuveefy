@@ -33,7 +33,7 @@ const steps = [
   },
   {
     title: 'Track',
-    desc: 'Referral links, conversions, commission rules and payouts should come from the live affiliate tables.',
+    desc: 'Referral links, conversions and payout details will appear after approval.',
     icon: BarChart2,
   },
 ]
@@ -49,11 +49,11 @@ const faqs = [
   },
   {
     q: 'How are rewards handled?',
-    a: 'Reward and commission rules should be configured before launch. The public page should not promise fixed payouts until those terms are final.',
+    a: 'Reward and commission details will be shared with approved partners when the programme opens.',
   },
   {
     q: 'How will I know I am approved?',
-    a: 'Approved applicants should receive an email through the configured Resend flow with their portal access instructions.',
+    a: 'Approved applicants will receive an email with portal access instructions.',
   },
 ]
 
@@ -124,7 +124,7 @@ export default function Affiliate() {
               {[
                 { icon: FileText, label: 'Application', value: 'Required' },
                 { icon: ShieldCheck, label: 'Review', value: 'Manual' },
-                { icon: Mail, label: 'Email', value: 'Resend' },
+                { icon: Mail, label: 'Email', value: 'Approval updates' },
                 { icon: Share2, label: 'Tracking', value: 'After approval' },
               ].map(({ icon: Icon, label, value }) => (
                 <div key={label} className="bg-white rounded-xl p-4 text-gray-900">
@@ -179,7 +179,7 @@ export default function Affiliate() {
         <div className="max-w-2xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl lg:text-4xl font-bold mb-3">Apply to Join</h2>
-            <p className="text-pink-100">Submitted applications are saved for review. Approval emails should be handled through Resend.</p>
+            <p className="text-pink-100">Submitted applications are reviewed before affiliate access opens.</p>
           </div>
 
           {submitted ? (

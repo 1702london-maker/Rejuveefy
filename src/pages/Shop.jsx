@@ -24,6 +24,11 @@ const categories = [
   { id: 'makeup', label: 'Makeup' },
 ]
 
+const comingSoonProducts = Array.from({ length: 20 }, (_, index) => ({
+  id: `coming-soon-${index + 1}`,
+  label: ['Hair Care', 'Hair Bundles', 'Accessories', 'Lashes', 'Skin Care', 'Makeup'][index % 6],
+}))
+
 function NewsletterForm() {
   const [email, setEmail] = useState('')
   const [done, setDone] = useState(false)
@@ -99,14 +104,19 @@ function ProductCard({ product }) {
   )
 }
 
-function EmptyProducts({ category }) {
+function ComingSoonProductCard({ item }) {
   return (
-    <div className="col-span-full bg-white border border-dashed border-pink-200 rounded-2xl p-8 text-center">
-      <ShoppingBag size={34} className="text-pink-400 mx-auto mb-3" />
-      <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Products are being prepared</h2>
-      <p className="text-sm text-gray-500 max-w-xl mx-auto">
-        {category ? 'This category will show active products once they are connected in Supabase.' : 'The shop will show real active products once they are connected in Supabase.'}
-      </p>
+    <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden">
+      <div className="aspect-square bg-gradient-to-br from-pink-50 via-white to-gray-50 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-2xl bg-white border border-pink-100 flex items-center justify-center shadow-sm">
+          <ShoppingBag size={22} className="text-pink-300" />
+        </div>
+      </div>
+      <div className="p-3">
+        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</p>
+        <p className="text-xs font-semibold text-gray-800 mt-1">Coming Soon</p>
+        <p className="text-[10px] text-gray-400 mt-1">Product details are being prepared.</p>
+      </div>
     </div>
   )
 }
@@ -134,14 +144,14 @@ export default function Shop() {
               Rejuveefy Shop
             </h1>
             <p className="text-sm text-gray-500 mb-5">
-              Curated beauty products will appear here when active products are connected from Supabase.
+              Curated beauty products are being prepared and will be released here soon.
             </p>
             <div className="flex gap-3">
               <Link to="/shop" className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">All Products</Link>
               <Link to="/wishlist" className="border border-pink-500 text-pink-500 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-50 transition-colors">Wishlist</Link>
             </div>
             <div className="flex flex-wrap gap-5 mt-5">
-              {['Real product catalogue', 'Secure checkout flow', 'Account-based orders'].map(t => (
+              {['Curated catalogue', 'Secure account flow', 'Beauty essentials'].map(t => (
                 <div key={t} className="flex items-center gap-1.5 text-xs text-gray-500">
                   <ShieldCheck size={13} className="text-pink-400" /> {t}
                 </div>
@@ -186,17 +196,17 @@ export default function Shop() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
-          {filtered.length === 0 && <EmptyProducts category={category} />}
+          {filtered.length === 0 && comingSoonProducts.map((item) => <ComingSoonProductCard key={item.id} item={item} />)}
         </div>
       </section>
 
       <section className="bg-gray-50 border-t border-gray-100 py-6">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { icon: ShieldCheck, title: 'Authentic Catalogue', sub: 'Products are managed from Supabase' },
-            { icon: RotateCcw, title: 'Returns Flow', sub: 'Policy details available before launch' },
-            { icon: Truck, title: 'Delivery Setup', sub: 'Shipping rules can connect at checkout' },
-            { icon: CreditCard, title: 'Secure Payments', sub: 'Checkout wiring can connect to payments' },
+            { icon: ShieldCheck, title: 'Curated Selection', sub: 'Beauty essentials launching soon' },
+            { icon: RotateCcw, title: 'Clear Returns', sub: 'Policy details will be shown before checkout' },
+            { icon: Truck, title: 'Delivery Details', sub: 'Shipping options will be confirmed at launch' },
+            { icon: CreditCard, title: 'Secure Checkout', sub: 'Payments will open with the shop launch' },
           ].map(({ icon: Icon, title, sub }) => (
             <div key={title} className="flex items-center gap-3">
               <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
@@ -220,7 +230,7 @@ export default function Shop() {
           </div>
           <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6">
             <h3 className="font-semibold text-gray-800 mb-2">Want to sell through Rejuveefy?</h3>
-            <p className="text-sm text-gray-500 mb-4">Provider and partner flows are reviewed before anything goes live.</p>
+            <p className="text-sm text-gray-500 mb-4">Partnership enquiries are open while the shop catalogue is prepared.</p>
             <Link to="/contact" className="inline-flex items-center gap-2 bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">
               Contact Us <ArrowRight size={14} />
             </Link>
@@ -312,10 +322,10 @@ export function ProductDetail() {
 
             <div className="grid grid-cols-2 gap-2">
               {[
-                { icon: ShieldCheck, label: 'Catalogue Product', sub: 'Managed in Supabase' },
-                { icon: RotateCcw, label: 'Returns Policy', sub: 'Confirm before launch' },
-                { icon: Truck, label: 'Delivery Setup', sub: 'Connect shipping rules' },
-                { icon: CreditCard, label: 'Checkout Ready', sub: 'Payment provider pending' },
+                { icon: ShieldCheck, label: 'Curated Product', sub: 'Selected for Rejuveefy customers' },
+                { icon: RotateCcw, label: 'Returns Policy', sub: 'Shown before checkout' },
+                { icon: Truck, label: 'Delivery Details', sub: 'Confirmed at checkout' },
+                { icon: CreditCard, label: 'Secure Checkout', sub: 'Available at launch' },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex items-center gap-2 p-2 bg-white border border-gray-100 rounded-xl">
                   <div className="w-7 h-7 bg-pink-50 rounded-lg flex items-center justify-center shrink-0">
