@@ -9,7 +9,7 @@ const nav = [
   {
     label: 'Book', path: '/book',
     sub: [
-      { label: '✨ Book Maye — Founder', path: '/book/maye' },
+      { label: 'Book Maye - Founder', path: '/book/maye' },
       { label: 'Braids', path: '/book/braids' },
       { label: 'Twists', path: '/book/twists' },
       { label: 'Locks', path: '/book/locks' },
@@ -36,9 +36,8 @@ const nav = [
       { label: 'Hair Care', path: '/shop/hair-care' },
       { label: 'Skin Care', path: '/shop/skin-care' },
       { label: 'Makeup', path: '/shop/makeup' },
-      { label: 'Tools & Brushes', path: '/shop/tools-brushes' },
-      { label: 'Wellness', path: '/shop/wellness' },
-      { label: 'Best Sellers', path: '/shop?sort=bestseller' },
+      { label: 'Accessories', path: '/shop/accessories' },
+      { label: 'Lashes', path: '/shop/lashes' },
     ],
   },
   { label: 'AI Analyser', path: '/ai-beauty/hair' },
@@ -85,8 +84,8 @@ export default function Header() {
       {/* Announcement bar */}
       {announce && (
         <div className="bg-gray-800 text-gray-100 text-xs text-center py-2 px-4 flex items-center justify-center gap-2 relative">
-          <span>🎁 <strong>NEW OFFER:</strong> Get 10% off your first booking and free delivery on orders over £50. Use code: <strong>BEAUTY15</strong></span>
-          <Link to="/book" className="underline font-semibold ml-1">Get It Now →</Link>
+          <span><strong>REJUVEEFY:</strong> Provider applications and affiliate applications are now open for review.</span>
+          <Link to="/providers-portal" className="underline font-semibold ml-1">Apply</Link>
           <button onClick={() => setAnnounce(false)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
             <X size={14} />
           </button>
