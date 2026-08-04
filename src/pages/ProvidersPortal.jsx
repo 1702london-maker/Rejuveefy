@@ -5,6 +5,7 @@ import {
   CheckCircle,
   Clock,
   FileText,
+  Image,
   Lock,
   Mail,
   MapPin,
@@ -14,7 +15,7 @@ import {
   User,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus, updateProviderServices } from '../lib/db'
+import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus, updateProviderProfile, updateProviderServices } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
 
@@ -135,6 +136,16 @@ export default function ProvidersPortal() {
   const [savingServices, setSavingServices] = useState(false)
   const [serviceMessage, setServiceMessage] = useState('')
   const [serviceError, setServiceError] = useState('')
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    speciality: '',
+    location: '',
+    bio: '',
+    image_url: '',
+  })
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileMessage, setProfileMessage] = useState('')
+  const [profileError, setProfileError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -181,6 +192,13 @@ export default function ProvidersPortal() {
   useEffect(() => {
     if (!provider?.id) {
       setServiceRows([blankService()])
+      setProfileForm({
+        name: '',
+        speciality: '',
+        location: '',
+        bio: '',
+        image_url: '',
+      })
       return
     }
 
@@ -194,11 +212,21 @@ export default function ProvidersPortal() {
         price: service.price ?? '',
       }))
       : [blankService()])
+    setProfileForm({
+      name: provider.name || '',
+      speciality: provider.speciality || '',
+      location: provider.location || '',
+      bio: provider.bio || '',
+      image_url: provider.image_url || '',
+    })
     setServiceMessage('')
     setServiceError('')
+    setProfileMessage('')
+    setProfileError('')
   }, [provider?.id, provider?.services])
 
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
+  const updateProfile = (key, value) => setProfileForm(prev => ({ ...prev, [key]: value }))
 
   const updateBooking = async (id, status) => {
     setBookingError('')
@@ -261,6 +289,38 @@ export default function ProvidersPortal() {
       setServiceError('We could not save services. Admin can still update the provider profile while access is reviewed.')
     } finally {
       setSavingServices(false)
+    }
+  }
+
+  const saveProfile = async (e) => {
+    e.preventDefault()
+    if (!provider?.id) return
+
+    setProfileMessage('')
+    setProfileError('')
+
+    const profile = {
+      name: profileForm.name.trim(),
+      speciality: profileForm.speciality.trim(),
+      location: profileForm.location.trim(),
+      bio: profileForm.bio.trim(),
+      image_url: profileForm.image_url.trim(),
+    }
+
+    if (!profile.name || !profile.speciality || !profile.location) {
+      setProfileError('Name, speciality and location are required before saving.')
+      return
+    }
+
+    setSavingProfile(true)
+    try {
+      const updated = await updateProviderProfile(provider.id, profile)
+      setProvider(updated)
+      setProfileMessage('Profile saved. Your public provider page has been updated.')
+    } catch {
+      setProfileError('We could not save profile details. Admin can still update the profile while access is reviewed.')
+    } finally {
+      setSavingProfile(false)
     }
   }
 
@@ -513,6 +573,77 @@ export default function ProvidersPortal() {
                   className="w-fit inline-flex items-center gap-2 rounded-full border border-pink-200 px-5 py-2.5 text-sm font-bold text-pink-600 hover:bg-pink-50">
                   <Plus size={15} /> Add Service
                 </button>
+              </div>
+            )}
+          </div>
+        </form>
+
+        <form onSubmit={saveProfile} className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="font-semibold text-gray-900">Public profile</h2>
+              <p className="text-sm text-gray-500">These details appear on your provider listing and profile page.</p>
+            </div>
+            {provider && (
+              <button type="submit" disabled={savingProfile}
+                className="rounded-full bg-pink-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-pink-600 disabled:opacity-60">
+                {savingProfile ? 'Saving...' : 'Save Profile'}
+              </button>
+            )}
+          </div>
+
+          <div className="p-6">
+            {application?.status !== 'approved' || !provider ? (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center mx-auto mb-3">
+                  <User size={20} />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">Profile editing unlocks after approval</p>
+                <p className="text-sm text-gray-500 mt-1">Approved profiles can be completed from this portal.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {profileMessage && (
+                  <div className="rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                    {profileMessage}
+                  </div>
+                )}
+                {profileError && (
+                  <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                    {profileError}
+                  </div>
+                )}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Display Name *</label>
+                    <input value={profileForm.name} onChange={e => updateProfile('name', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Speciality *</label>
+                    <input value={profileForm.speciality} onChange={e => updateProfile('speciality', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Location *</label>
+                    <input value={profileForm.location} onChange={e => updateProfile('location', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Profile Image URL</label>
+                    <div className="flex items-center gap-2">
+                      <Image size={18} className="text-gray-400 shrink-0" />
+                      <input value={profileForm.image_url} onChange={e => updateProfile('image_url', e.target.value)}
+                        placeholder="https://..."
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Bio</label>
+                    <textarea rows={4} value={profileForm.bio} onChange={e => updateProfile('bio', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 resize-none" />
+                  </div>
+                </div>
               </div>
             )}
           </div>
