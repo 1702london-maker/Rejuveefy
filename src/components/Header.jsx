@@ -47,17 +47,6 @@ const nav = [
       { label: 'Apply as Affiliate', path: '/my-portal' },
     ],
   },
-  {
-    label: 'My Portal', path: '/my-portal',
-    sub: [
-      { label: 'My Portal Home', path: '/my-portal' },
-      { label: 'Client Dashboard', path: '/dashboard' },
-      { label: 'Provider Portal', path: '/providers-portal' },
-      { label: 'Affiliate Portal', path: '/affiliate-portal' },
-      { label: 'Sign In', path: '/login' },
-      { label: 'Create Account', path: '/register' },
-    ],
-  },
   { label: 'Training', path: '/training' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
