@@ -128,7 +128,8 @@ export default function App() {
           <Route path="/training" element={<PageWrapper><Training /></PageWrapper>} />
 
           {/* Portal */}
-          <Route path="/portal" element={<PageWrapper><Portal /></PageWrapper>} />
+          <Route path="/my-portal" element={<PageWrapper><Portal /></PageWrapper>} />
+          <Route path="/portal" element={<Navigate to="/my-portal" replace />} />
 
           {/* Providers Portal */}
           <Route path="/providers-portal" element={<PageWrapper><ProvidersPortal /></PageWrapper>} />

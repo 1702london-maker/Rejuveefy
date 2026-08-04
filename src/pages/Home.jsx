@@ -362,7 +362,7 @@ export default function Home() {
                 <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
                   Book Maye
                 </Link>
-                <Link to="/providers-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+                <Link to="/my-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
                   Apply as Provider
                 </Link>
               </div>
@@ -537,7 +537,7 @@ export default function Home() {
             <p className="text-pink-100 text-lg">Apply to join the verified Rejuveefy directory. Applications are reviewed before profiles go live.</p>
           </div>
           <div className="flex gap-3 shrink-0">
-            <Link to="/providers-portal" className="bg-white text-pink-500 font-bold px-8 py-4 rounded-xl hover:bg-pink-50 transition-colors shadow-lg">
+            <Link to="/my-portal" className="bg-white text-pink-500 font-bold px-8 py-4 rounded-xl hover:bg-pink-50 transition-colors shadow-lg">
               Join as Provider
             </Link>
             <Link to="/about" className="border border-white/50 text-white font-bold px-8 py-4 rounded-xl hover:bg-white/10 transition-colors">

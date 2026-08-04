@@ -95,7 +95,7 @@ export function AboutUs() {
               <Link to="/book" className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
                 Book a Service <ArrowRight size={15} />
               </Link>
-              <Link to="/providers-portal" className="inline-flex items-center gap-2 border border-pink-500 text-pink-500 px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-50 transition-colors">
+              <Link to="/my-portal" className="inline-flex items-center gap-2 border border-pink-500 text-pink-500 px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-50 transition-colors">
                 Apply as Provider
               </Link>
             </div>
@@ -212,7 +212,7 @@ export function ContactUs() {
           <div className="space-y-4">
             {[
               { icon: Mail, title: 'Email', val: 'hello@rejuveefy.com', sub: 'Use for support and application questions', color: 'bg-blue-50 text-blue-500' },
-              { icon: ShieldCheck, title: 'Provider Review', val: 'Provider Portal', sub: 'Submit and track your application', color: 'bg-pink-50 text-pink-500', to: '/providers-portal' },
+              { icon: ShieldCheck, title: 'Provider Review', val: 'Provider Portal', sub: 'Submit and track your application', color: 'bg-pink-50 text-pink-500', to: '/my-portal' },
               { icon: Users, title: 'Affiliate Review', val: 'Affiliate Programme', sub: 'Apply and check partner access', color: 'bg-green-50 text-green-500', to: '/affiliate' },
             ].map((item) => (
               <div key={item.title} className="bg-white border border-gray-100 rounded-2xl shadow-card p-4 flex items-center gap-4">

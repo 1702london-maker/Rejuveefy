@@ -113,8 +113,8 @@ export default function Affiliate() {
               <a href="#apply" className="bg-white text-pink-600 font-bold px-8 py-3.5 rounded-full hover:bg-pink-50 transition-colors shadow-lg text-center">
                 Apply Now
               </a>
-              <Link to="/affiliate-portal" className="border-2 border-white/40 text-white font-semibold px-8 py-3.5 rounded-full hover:bg-white/10 transition-colors text-center">
-                Affiliate Portal
+              <Link to="/my-portal" className="border-2 border-white/40 text-white font-semibold px-8 py-3.5 rounded-full hover:bg-white/10 transition-colors text-center">
+                My Portal
               </Link>
             </div>
           </div>
@@ -189,8 +189,8 @@ export default function Affiliate() {
               </div>
               <h3 className="font-display text-2xl font-bold mb-2">Application Submitted</h3>
               <p className="text-gray-500 mb-6">We will review your application and email you after a decision has been made.</p>
-              <Link to="/affiliate-portal" className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 transition-colors">
-                Go to Affiliate Portal
+              <Link to="/my-portal" className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 transition-colors">
+                Go to My Portal
               </Link>
             </div>
           ) : (

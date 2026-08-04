@@ -93,7 +93,7 @@ function EmptyDirectory() {
           <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
             Book Maye
           </Link>
-          <Link to="/providers-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
+          <Link to="/my-portal" className="border border-pink-200 text-pink-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-50 transition-colors">
             Apply as Provider
           </Link>
         </div>
@@ -240,7 +240,7 @@ export default function Providers() {
                     <h2 className="font-display text-xl font-bold text-gray-900">More providers coming soon</h2>
                     <p className="text-sm text-gray-500">New profiles are being verified and prepared.</p>
                   </div>
-                  <Link to="/providers-portal" className="hidden sm:inline-flex text-sm font-semibold text-pink-500 hover:text-pink-600">
+                  <Link to="/my-portal" className="hidden sm:inline-flex text-sm font-semibold text-pink-500 hover:text-pink-600">
                     Apply as Provider
                   </Link>
                 </div>

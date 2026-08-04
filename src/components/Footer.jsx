@@ -37,7 +37,7 @@ const cols = [
       { l: 'Returns & Refunds', p: '/returns-refunds' },
       { l: 'Track Order', p: '/track-order' },
       { l: 'Careers', p: '/careers' },
-      { l: 'Become a Provider', p: '/providers-portal' },
+      { l: 'Become a Provider', p: '/my-portal' },
     ],
   },
 ]

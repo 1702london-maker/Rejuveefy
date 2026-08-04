@@ -25,7 +25,7 @@ const nav = [
     label: 'Providers', path: '/providers',
     sub: [
       { label: 'Find Providers', path: '/providers' },
-      { label: 'Join as Provider', path: '/portal' },
+      { label: 'Join as Provider', path: '/my-portal' },
     ],
   },
   {
@@ -44,17 +44,17 @@ const nav = [
     label: 'Affiliate', path: '/affiliate',
     sub: [
       { label: 'Affiliate Programme', path: '/affiliate' },
-      { label: 'Apply as Affiliate', path: '/portal' },
+      { label: 'Apply as Affiliate', path: '/my-portal' },
     ],
   },
   {
-    label: 'Portal', path: '/portal',
+    label: 'My Portal', path: '/my-portal',
     sub: [
-      { label: 'Portal Home', path: '/portal' },
+      { label: 'My Portal Home', path: '/my-portal' },
       { label: 'Client Dashboard', path: '/dashboard' },
       { label: 'Provider Portal', path: '/providers-portal' },
       { label: 'Affiliate Portal', path: '/affiliate-portal' },
-      { label: 'Login', path: '/login' },
+      { label: 'Sign In', path: '/login' },
       { label: 'Create Account', path: '/register' },
     ],
   },
@@ -95,7 +95,7 @@ export default function Header() {
       {announce && (
         <div className="bg-gray-800 text-gray-100 text-xs text-center py-2 px-4 flex items-center justify-center gap-2 relative">
           <span><strong>REJUVEEFY:</strong> Provider applications and affiliate applications are now open for review.</span>
-          <Link to="/portal" className="underline font-semibold ml-1">Portal</Link>
+          <Link to="/my-portal" className="underline font-semibold ml-1">My Portal</Link>
           <button onClick={() => setAnnounce(false)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
             <X size={14} />
           </button>
@@ -193,13 +193,13 @@ export default function Header() {
               <Bell size={18} />
             </button>
 
-            {/* My Account */}
+            {/* My Portal */}
             <div className="hidden sm:flex items-center gap-1.5 ml-1 pl-2 border-l border-gray-200">
-              <Link to="/dashboard" className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-pink-500 hover:bg-pink-50 transition-colors">
+              <Link to="/my-portal" className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:text-pink-500 hover:bg-pink-50 transition-colors">
                 <div className="w-6 h-6 bg-pink-100 rounded-full flex items-center justify-center">
                   <User size={13} className="text-pink-500" />
                 </div>
-                <span className="text-[13px] font-medium">My Account</span>
+                <span className="text-[13px] font-medium">My Portal</span>
                 <ChevronDown size={13} className="text-gray-400" />
               </Link>
             </div>
@@ -254,8 +254,8 @@ export default function Header() {
                 ))}
               </div>
               <div className="p-4 border-t border-gray-100 flex flex-col gap-2">
-                <Link to="/login" onClick={() => setMobile(false)}
-                  className="w-full text-center border border-pink-500 text-pink-500 py-2.5 rounded-full text-sm font-semibold">Login</Link>
+                <Link to="/my-portal" onClick={() => setMobile(false)}
+                  className="w-full text-center border border-pink-500 text-pink-500 py-2.5 rounded-full text-sm font-semibold">My Portal</Link>
                 <Link to="/register" onClick={() => setMobile(false)}
                   className="w-full text-center bg-pink-500 text-white py-2.5 rounded-full text-sm font-semibold">Sign Up</Link>
               </div>
