@@ -114,7 +114,7 @@ function ComingSoonProductCard({ item }) {
       </div>
       <div className="p-3">
         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</p>
-        <p className="text-xs font-semibold text-gray-800 mt-1">Coming Soon</p>
+        <p className="text-xs font-semibold text-gray-800 mt-1">Launch Preview</p>
         <p className="text-[10px] text-gray-400 mt-1">Product details are being prepared.</p>
       </div>
     </div>
@@ -204,7 +204,7 @@ export default function Shop() {
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { icon: ShieldCheck, title: 'Curated Selection', sub: 'Beauty essentials launching soon' },
-            { icon: RotateCcw, title: 'Clear Returns', sub: 'Policy details will be shown before checkout' },
+            { icon: RotateCcw, title: 'Clear Returns', sub: 'Policy details publish before checkout' },
             { icon: Truck, title: 'Delivery Details', sub: 'Shipping options will be confirmed at launch' },
             { icon: CreditCard, title: 'Secure Checkout', sub: 'Payments activate with the shop launch' },
           ].map(({ icon: Icon, title, sub }) => (
@@ -323,8 +323,8 @@ export function ProductDetail() {
             <div className="grid grid-cols-2 gap-2">
               {[
                 { icon: ShieldCheck, label: 'Curated Product', sub: 'Selected for Rejuveefy customers' },
-                { icon: RotateCcw, label: 'Returns Policy', sub: 'Shown before checkout' },
-                { icon: Truck, label: 'Delivery Details', sub: 'Confirmed at checkout' },
+                { icon: RotateCcw, label: 'Returns Policy', sub: 'Published before checkout' },
+                { icon: Truck, label: 'Delivery Details', sub: 'Confirmed before payment' },
                 { icon: CreditCard, label: 'Secure Checkout', sub: 'Available at launch' },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex items-center gap-2 p-2 bg-white border border-gray-100 rounded-xl">

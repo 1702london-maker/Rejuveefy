@@ -13,7 +13,6 @@ import Book from './pages/Book'
 import BookMaye from './pages/BookMaye'
 import Providers, { ProviderProfile, BookingFlow, BookingConfirmation } from './pages/Providers'
 import Shop, { ShopCategory, ProductDetail } from './pages/Shop'
-import Cart, { Checkout, OrderSuccess } from './pages/Cart'
 import AIHairAnalysis, { AISkinAnalysis } from './pages/AIAnalyzer'
 import MyBookings, { DashboardHome, ReferAndEarn, ReviewsRatings } from './pages/Dashboard'
 import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers, PrivacyPolicy, TermsConditions, CookiePolicy, Accessibility } from './pages/InfoPages'
@@ -88,10 +87,10 @@ export default function App() {
           <Route path="/shop/:category" element={<PageWrapper><ShopCategory /></PageWrapper>} />
           <Route path="/product/:id" element={<PageWrapper><ProductDetail /></PageWrapper>} />
 
-          {/* Cart & Checkout */}
-          <Route path="/cart" element={<PageWrapper><Cart /></PageWrapper>} />
-          <Route path="/checkout" element={<PageWrapper><Checkout /></PageWrapper>} />
-          <Route path="/order-success" element={<PageWrapper><OrderSuccess /></PageWrapper>} />
+          {/* Shop preview */}
+          <Route path="/cart" element={<Navigate to="/shop" replace />} />
+          <Route path="/checkout" element={<Navigate to="/shop" replace />} />
+          <Route path="/order-success" element={<Navigate to="/shop" replace />} />
 
           {/* AI Analyzer */}
           <Route path="/ai-beauty" element={<PageWrapper><AIHairAnalysis /></PageWrapper>} />

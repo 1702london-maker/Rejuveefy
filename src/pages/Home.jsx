@@ -119,7 +119,7 @@ export default function Home() {
                   <input
                     value={query}
                     onChange={e => setQuery(e.target.value)}
-                    placeholder="Search services, providers, products..."
+                    placeholder="Search services or providers..."
                     className="flex-1 text-sm text-gray-700 outline-none bg-transparent placeholder:text-gray-400 py-1"
                   />
                 </div>
