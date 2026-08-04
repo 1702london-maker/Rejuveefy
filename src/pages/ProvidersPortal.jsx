@@ -15,9 +15,18 @@ import {
   User,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus, updateProviderProfile, updateProviderServices } from '../lib/db'
+import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus, updateProviderAvailability, updateProviderProfile, updateProviderServices } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
+const weekDays = [
+  { key: 'monday', label: 'Mon' },
+  { key: 'tuesday', label: 'Tue' },
+  { key: 'wednesday', label: 'Wed' },
+  { key: 'thursday', label: 'Thu' },
+  { key: 'friday', label: 'Fri' },
+  { key: 'saturday', label: 'Sat' },
+  { key: 'sunday', label: 'Sun' },
+]
 
 function EmptyPanel({ icon: Icon, title, body, action }) {
   return (
@@ -146,6 +155,15 @@ export default function ProvidersPortal() {
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileMessage, setProfileMessage] = useState('')
   const [profileError, setProfileError] = useState('')
+  const [availabilityForm, setAvailabilityForm] = useState({
+    days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+    start: '09:00',
+    end: '17:00',
+    notice: '24',
+  })
+  const [savingAvailability, setSavingAvailability] = useState(false)
+  const [availabilityMessage, setAvailabilityMessage] = useState('')
+  const [availabilityError, setAvailabilityError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -199,10 +217,17 @@ export default function ProvidersPortal() {
         bio: '',
         image_url: '',
       })
+      setAvailabilityForm({
+        days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+        start: '09:00',
+        end: '17:00',
+        notice: '24',
+      })
       return
     }
 
     const existing = Array.isArray(provider.services) ? provider.services : []
+    const availability = provider.availability || {}
     setServiceRows(existing.length
       ? existing.map((service, index) => ({
         id: service.id || `service-${index + 1}`,
@@ -219,14 +244,29 @@ export default function ProvidersPortal() {
       bio: provider.bio || '',
       image_url: provider.image_url || '',
     })
+    setAvailabilityForm({
+      days: Array.isArray(availability.days) && availability.days.length ? availability.days : ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+      start: availability.start || '09:00',
+      end: availability.end || '17:00',
+      notice: String(availability.notice || '24'),
+    })
     setServiceMessage('')
     setServiceError('')
     setProfileMessage('')
     setProfileError('')
-  }, [provider?.id, provider?.services])
+    setAvailabilityMessage('')
+    setAvailabilityError('')
+  }, [provider?.id, provider?.services, provider?.availability])
 
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
   const updateProfile = (key, value) => setProfileForm(prev => ({ ...prev, [key]: value }))
+  const updateAvailability = (key, value) => setAvailabilityForm(prev => ({ ...prev, [key]: value }))
+  const toggleAvailabilityDay = (day) => {
+    setAvailabilityForm(prev => ({
+      ...prev,
+      days: prev.days.includes(day) ? prev.days.filter(item => item !== day) : [...prev.days, day],
+    }))
+  }
 
   const updateBooking = async (id, status) => {
     setBookingError('')
@@ -321,6 +361,40 @@ export default function ProvidersPortal() {
       setProfileError('We could not save profile details. Admin can still update the profile while access is reviewed.')
     } finally {
       setSavingProfile(false)
+    }
+  }
+
+  const saveAvailability = async (e) => {
+    e.preventDefault()
+    if (!provider?.id) return
+
+    setAvailabilityMessage('')
+    setAvailabilityError('')
+
+    if (!availabilityForm.days.length) {
+      setAvailabilityError('Choose at least one working day.')
+      return
+    }
+
+    if (availabilityForm.start >= availabilityForm.end) {
+      setAvailabilityError('Start time must be before end time.')
+      return
+    }
+
+    setSavingAvailability(true)
+    try {
+      const updated = await updateProviderAvailability(provider.id, {
+        days: availabilityForm.days,
+        start: availabilityForm.start,
+        end: availabilityForm.end,
+        notice: Number(availabilityForm.notice) || 24,
+      })
+      setProvider(updated)
+      setAvailabilityMessage('Availability saved. Clients will see these booking hours.')
+    } catch {
+      setAvailabilityError('We could not save availability. If this keeps happening, the providers table needs an availability column.')
+    } finally {
+      setSavingAvailability(false)
     }
   }
 
@@ -642,6 +716,82 @@ export default function ProvidersPortal() {
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Bio</label>
                     <textarea rows={4} value={profileForm.bio} onChange={e => updateProfile('bio', e.target.value)}
                       className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 resize-none" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </form>
+
+        <form onSubmit={saveAvailability} className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="font-semibold text-gray-900">Calendar availability</h2>
+              <p className="text-sm text-gray-500">Set the regular days and hours clients should request bookings within.</p>
+            </div>
+            {provider && (
+              <button type="submit" disabled={savingAvailability}
+                className="rounded-full bg-pink-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-pink-600 disabled:opacity-60">
+                {savingAvailability ? 'Saving...' : 'Save Availability'}
+              </button>
+            )}
+          </div>
+
+          <div className="p-6">
+            {application?.status !== 'approved' || !provider ? (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center mx-auto mb-3">
+                  <Calendar size={20} />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">Calendar unlocks after approval</p>
+                <p className="text-sm text-gray-500 mt-1">Approved providers can set booking days and hours here.</p>
+              </div>
+            ) : (
+              <div className="grid gap-5">
+                {availabilityMessage && (
+                  <div className="rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                    {availabilityMessage}
+                  </div>
+                )}
+                {availabilityError && (
+                  <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                    {availabilityError}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Working Days</label>
+                  <div className="flex flex-wrap gap-2">
+                    {weekDays.map(day => {
+                      const active = availabilityForm.days.includes(day.key)
+                      return (
+                        <button key={day.key} type="button" onClick={() => toggleAvailabilityDay(day.key)}
+                          className={`rounded-full border px-4 py-2 text-sm font-bold ${active ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
+                          {day.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Start Time</label>
+                    <input type="time" value={availabilityForm.start} onChange={e => updateAvailability('start', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">End Time</label>
+                    <input type="time" value={availabilityForm.end} onChange={e => updateAvailability('end', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Minimum Notice</label>
+                    <select value={availabilityForm.notice} onChange={e => updateAvailability('notice', e.target.value)}
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100">
+                      <option value="12">12 hours</option>
+                      <option value="24">24 hours</option>
+                      <option value="48">48 hours</option>
+                      <option value="72">72 hours</option>
+                    </select>
                   </div>
                 </div>
               </div>

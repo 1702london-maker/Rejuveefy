@@ -24,6 +24,28 @@ const verifyingProviders = [
   'Skin Specialist',
 ]
 
+const dayLabels = {
+  monday: 'Mon',
+  tuesday: 'Tue',
+  wednesday: 'Wed',
+  thursday: 'Thu',
+  friday: 'Fri',
+  saturday: 'Sat',
+  sunday: 'Sun',
+}
+
+function dayKeyFromDate(value) {
+  if (!value) return ''
+  const date = new Date(`${value}T12:00:00`)
+  return ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'][date.getDay()]
+}
+
+function isWithinAvailability(availability, date, time) {
+  if (!availability?.days?.length || !date || !time) return true
+  const day = dayKeyFromDate(date)
+  return availability.days.includes(day) && time >= availability.start && time <= availability.end
+}
+
 function Stars({ val = 0, size = 12 }) {
   return (
     <div className="flex gap-0.5">
@@ -369,6 +391,8 @@ export function BookingFlow() {
 
   const services = Array.isArray(provider?.services) ? provider.services : []
   const chosen = services.find(s => String(s.name) === selectedService)
+  const availability = provider?.availability || null
+  const availabilityDays = availability?.days?.map(day => dayLabels[day] || day).join(', ')
 
   const submit = async (e) => {
     e.preventDefault()
@@ -379,6 +403,10 @@ export function BookingFlow() {
     }
     if (!provider || !chosen || !selectedDate || !selectedTime) {
       setError('Choose a service, date and time to continue.')
+      return
+    }
+    if (!isWithinAvailability(availability, selectedDate, selectedTime)) {
+      setError('Choose a time inside this provider availability window.')
       return
     }
     try {
@@ -417,6 +445,18 @@ export function BookingFlow() {
           <div>
             <h1 className="font-display text-2xl font-bold text-gray-900 mb-1">Book {provider.name}</h1>
             <p className="text-sm text-gray-500">Your request will be saved as pending until confirmed.</p>
+          </div>
+
+          <div className="rounded-2xl border border-pink-100 bg-pink-50 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-pink-600 mb-1">Provider availability</p>
+            {availability?.days?.length ? (
+              <p className="text-sm text-gray-700">
+                {availabilityDays} from {availability.start || '09:00'} to {availability.end || '17:00'}.
+                {availability.notice ? ` Minimum notice: ${availability.notice} hours.` : ''}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">Availability has not been set yet. Your request will still be sent for review.</p>
+            )}
           </div>
 
           {services.length === 0 ? (

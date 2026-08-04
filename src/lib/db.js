@@ -95,6 +95,17 @@ export async function updateProviderProfile(providerId, profile) {
   return normaliseProvider(data)
 }
 
+export async function updateProviderAvailability(providerId, availability) {
+  const { data, error } = await supabase
+    .from('providers')
+    .update({ availability })
+    .eq('id', providerId)
+    .select()
+    .single()
+  if (error) throw error
+  return normaliseProvider(data)
+}
+
 // ── PRODUCTS ──────────────────────────────────────────────────────────────────
 export async function fetchProducts({ category = null, featured = false, limit = 50 } = {}) {
   let q = supabase.from('products').select('*').eq('is_active', true).order('rating', { ascending: false })
