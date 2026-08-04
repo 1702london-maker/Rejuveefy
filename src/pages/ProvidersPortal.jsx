@@ -7,12 +7,14 @@ import {
   FileText,
   Lock,
   Mail,
+  MapPin,
   Plus,
   Settings,
   ShieldCheck,
+  User,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { fetchProviderApplication, fetchProviderByUser, submitProviderApplication } from '../lib/db'
+import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
 
@@ -29,11 +31,72 @@ function EmptyPanel({ icon: Icon, title, body, action }) {
   )
 }
 
+function statusClass(status = 'pending') {
+  const styles = {
+    pending: 'bg-amber-50 text-amber-700 border-amber-100',
+    confirmed: 'bg-green-50 text-green-700 border-green-100',
+    completed: 'bg-blue-50 text-blue-700 border-blue-100',
+    cancelled: 'bg-gray-50 text-gray-600 border-gray-100',
+  }
+  return styles[status] || styles.pending
+}
+
+function BookingRequestCard({ booking }) {
+  const bookingDate = booking.booking_date ? new Date(booking.booking_date) : null
+  const createdDate = booking.created_at ? new Date(booking.created_at) : null
+  const price = booking.service_price ?? booking.total_price ?? booking.price
+
+  return (
+    <div className="border border-gray-100 rounded-2xl p-5 bg-white">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+        <div>
+          <h3 className="font-display text-lg font-bold text-gray-900">{booking.service_name || booking.service || 'Booking request'}</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            {bookingDate ? bookingDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : 'Date to be confirmed'}
+            {booking.booking_time ? ` at ${booking.booking_time}` : ''}
+          </p>
+        </div>
+        <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold capitalize ${statusClass(booking.status)}`}>
+          {booking.status || 'pending'}
+        </span>
+      </div>
+
+      <div className="grid sm:grid-cols-3 gap-3 text-sm">
+        <div className="rounded-xl bg-gray-50 px-4 py-3">
+          <div className="flex items-center gap-2 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">
+            <User size={13} /> Client
+          </div>
+          <p className="font-semibold text-gray-900">{booking.client_name || booking.customer_name || 'Client details pending'}</p>
+        </div>
+        <div className="rounded-xl bg-gray-50 px-4 py-3">
+          <div className="flex items-center gap-2 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">
+            <MapPin size={13} /> Location
+          </div>
+          <p className="font-semibold text-gray-900">{booking.location || booking.address || 'To be confirmed'}</p>
+        </div>
+        <div className="rounded-xl bg-gray-50 px-4 py-3">
+          <div className="flex items-center gap-2 text-gray-500 text-xs font-semibold uppercase tracking-wide mb-1">
+            <Clock size={13} /> Request
+          </div>
+          <p className="font-semibold text-gray-900">{createdDate ? createdDate.toLocaleDateString('en-GB') : 'Recently submitted'}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-sm text-gray-500">{booking.notes || booking.message || 'No extra notes added.'}</p>
+        {price ? <p className="text-sm font-bold text-gray-900">From £{price}</p> : null}
+      </div>
+    </div>
+  )
+}
+
 export default function ProvidersPortal() {
   const { user, userDisplay } = useApp()
   const [application, setApplication] = useState(null)
   const [provider, setProvider] = useState(null)
+  const [bookings, setBookings] = useState([])
   const [loadingApplication, setLoadingApplication] = useState(false)
+  const [loadingBookings, setLoadingBookings] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -53,14 +116,29 @@ export default function ProvidersPortal() {
           return fetchProviderByUser(user.id).then(setProvider).catch(() => setProvider(null))
         }
         setProvider(null)
+        setBookings([])
         return null
       })
       .catch(() => {
         setApplication(null)
         setProvider(null)
+        setBookings([])
       })
       .finally(() => setLoadingApplication(false))
   }, [user?.id, user?.email])
+
+  useEffect(() => {
+    if (!provider?.id) {
+      setBookings([])
+      return
+    }
+
+    setLoadingBookings(true)
+    fetchProviderBookings(provider.id)
+      .then(setBookings)
+      .catch(() => setBookings([]))
+      .finally(() => setLoadingBookings(false))
+  }, [provider?.id])
 
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
 
@@ -241,8 +319,8 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={Calendar}
             title="Bookings"
-            body={application?.status === 'approved' ? 'Client appointments will appear here when booking requests are made against your profile.' : 'Client appointments will appear here once your provider profile is approved and taking bookings.'}
-            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> {application?.status === 'approved' ? 'No appointments yet' : 'Waiting for appointments'}</span>}
+            body={application?.status === 'approved' ? `${bookings.length} booking request${bookings.length === 1 ? '' : 's'} connected to your profile.` : 'Client appointments will appear here once your provider profile is approved and taking bookings.'}
+            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> {loadingBookings ? 'Checking bookings' : application?.status === 'approved' ? 'Live booking queue' : 'Waiting for approval'}</span>}
           />
           <EmptyPanel
             icon={Settings}
@@ -250,6 +328,41 @@ export default function ProvidersPortal() {
             body={application?.status === 'approved' ? 'Initial services are created from your application. Full service editing is coming next.' : 'Service management opens after approval so your public profile stays accurate.'}
             action={<button className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold cursor-not-allowed"><Plus size={15} /> {application?.status === 'approved' ? 'Service editing coming soon' : 'Add service after approval'}</button>}
           />
+        </div>
+
+        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="font-semibold text-gray-900">Booking requests</h2>
+              <p className="text-sm text-gray-500">Requests created from your public provider profile.</p>
+            </div>
+            {provider && (
+              <Link to={`/providers/${provider.slug}`} className="text-sm font-semibold text-pink-600 hover:text-pink-700">
+                View profile
+              </Link>
+            )}
+          </div>
+          <div className="p-6">
+            {loadingBookings ? (
+              <p className="text-sm text-gray-500">Checking booking requests...</p>
+            ) : bookings.length ? (
+              <div className="grid gap-4">
+                {bookings.map(booking => <BookingRequestCard key={booking.id} booking={booking} />)}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto mb-3">
+                  <Calendar size={20} />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">No booking requests yet</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {application?.status === 'approved'
+                    ? 'New client booking requests will appear here once your profile receives appointments.'
+                    : 'Booking requests unlock after the provider application is approved.'}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">

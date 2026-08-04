@@ -89,6 +89,16 @@ export async function fetchUserBookings(userId) {
   return data || []
 }
 
+export async function fetchProviderBookings(providerId) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('*')
+    .eq('provider_id', providerId)
+    .order('booking_date', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
 export async function createBooking(booking) {
   const { data, error } = await supabase.from('bookings').insert(booking).select().single()
   if (error) throw error
