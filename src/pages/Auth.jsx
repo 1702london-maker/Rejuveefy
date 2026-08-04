@@ -54,6 +54,8 @@ async function signInWithProvider(provider, accountType = 'client') {
 }
 export default function Login() {
   const navigate = useNavigate()
+  const { search } = useLocation()
+  const nextPath = new URLSearchParams(search).get('next') || '/dashboard'
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -68,7 +70,7 @@ export default function Login() {
     const { error: err } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
     setLoading(false)
     if (err) { setError(err.message); return }
-    navigate('/dashboard')
+    navigate(nextPath.startsWith('/') ? nextPath : '/dashboard')
   }
   const socialSignIn = async (provider) => {
     setError('')
@@ -159,7 +161,7 @@ export default function Login() {
 
         <p className="text-center text-sm text-gray-500">
           Don't have an account?{' '}
-          <Link to="/register" className="text-pink-500 font-semibold hover:underline">Create one free</Link>
+          <Link to={`/register${nextPath !== '/dashboard' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="text-pink-500 font-semibold hover:underline">Create one free</Link>
         </p>
 
         <p className="text-center text-[10px] text-gray-400 mt-4">Check your inbox after registering to verify your email.</p>
@@ -172,7 +174,9 @@ export default function Login() {
 export function Register() {
   const navigate = useNavigate()
   const { search } = useLocation()
-  const initialType = new URLSearchParams(search).get('type') === 'provider' ? 'provider' : 'client'
+  const params = new URLSearchParams(search)
+  const initialType = params.get('type') === 'provider' ? 'provider' : params.get('type') === 'affiliate' ? 'affiliate' : 'client'
+  const nextPath = params.get('next') || null
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '', accountType: initialType })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -195,7 +199,7 @@ export function Register() {
     })
     if (err) { setError(err.message); setLoading(false); return }
     setLoading(false)
-    navigate(form.accountType === 'provider' ? '/providers-portal' : form.accountType === 'affiliate' ? '/affiliate' : '/dashboard')
+    navigate(nextPath && nextPath.startsWith('/') ? nextPath : form.accountType === 'provider' ? '/providers-portal' : form.accountType === 'affiliate' ? '/affiliate' : '/dashboard')
   }
 
   const socialSignUp = async (provider) => {
@@ -342,7 +346,7 @@ export function Register() {
 
         <p className="text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <Link to="/login" className="text-pink-500 font-semibold hover:underline">Sign In</Link>
+          <Link to={`/login${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="text-pink-500 font-semibold hover:underline">Sign In</Link>
         </p>
       </div>
     </AuthLayout>

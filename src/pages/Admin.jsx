@@ -180,7 +180,7 @@ function BookingCard({ item, onStatus, busy }) {
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         <Field label="Date" value={item.booking_date || item.date} />
         <Field label="Time" value={item.booking_time || item.time} />
-        <Field label="Total" value={item.total_price || item.price} />
+        <Field label="Total" value={item.service_price || item.total_price || item.price} />
         <Field label="Notes" value={item.notes} />
       </div>
       <div className="flex flex-wrap gap-2">

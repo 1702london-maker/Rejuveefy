@@ -288,6 +288,26 @@ export default function MyBookings() {
               ))}
             </div>
 
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-4 mb-5">
+              <div className="grid sm:grid-cols-3 gap-3">
+                {[
+                  { label: 'Pending', body: 'Request received and waiting for review.' },
+                  { label: 'Confirmed', body: 'Admin or provider has confirmed the appointment.' },
+                  { label: 'Completed', body: 'Appointment finished and review can be added.' },
+                ].map((step, index) => (
+                  <div key={step.label} className="flex gap-3">
+                    <div className="w-7 h-7 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center text-xs font-bold shrink-0">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-900">{step.label}</p>
+                      <p className="text-[11px] text-gray-500 leading-relaxed">{step.body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="flex gap-1 mb-4 bg-gray-100 rounded-xl p-1">
               {tabs.map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}

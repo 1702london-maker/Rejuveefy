@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
   ArrowRight,
   Calendar,
@@ -349,6 +349,7 @@ export function ProviderProfile() {
 
 export function BookingFlow() {
   const { slug } = useParams()
+  const bookingPath = `/providers/${slug}/book`
   const navigate = useNavigate()
   const { user } = useApp()
   const [provider, setProvider] = useState(null)
@@ -373,7 +374,7 @@ export function BookingFlow() {
     e.preventDefault()
     setError('')
     if (!user) {
-      navigate('/login')
+      navigate(`/login?next=${encodeURIComponent(bookingPath)}`)
       return
     }
     if (!provider || !chosen || !selectedDate || !selectedTime) {
@@ -381,7 +382,7 @@ export function BookingFlow() {
       return
     }
     try {
-      await createBooking({
+      const created = await createBooking({
         user_id: user.id,
         provider_id: provider.id,
         service_name: chosen.name,
@@ -392,7 +393,7 @@ export function BookingFlow() {
         notes,
         status: 'pending',
       })
-      navigate('/booking-confirmation')
+      navigate(`/booking-confirmation?id=${created.id}`)
     } catch (err) {
       setError(err.message || 'Booking could not be saved.')
     }
@@ -469,14 +470,18 @@ export function BookingFlow() {
 
 export function BookingConfirmation() {
   const { user } = useApp()
+  const [sp] = useSearchParams()
   const [booking, setBooking] = useState(null)
 
   useEffect(() => {
     if (!user) return
+    const bookingId = sp.get('id')
     import('../lib/db').then(({ fetchUserBookings }) =>
-      fetchUserBookings(user.id).then(bs => setBooking(bs[0] || null)).catch(() => setBooking(null))
+      fetchUserBookings(user.id)
+        .then(bs => setBooking(bookingId ? bs.find(item => String(item.id) === bookingId) || bs[0] || null : bs[0] || null))
+        .catch(() => setBooking(null))
     )
-  }, [user])
+  }, [user, sp])
 
   return (
     <div className="min-h-screen bg-gray-50">
