@@ -57,6 +57,27 @@ export async function fetchProviderByUser(userId) {
   return data?.[0] ? normaliseProvider(data[0]) : null
 }
 
+export async function updateProviderServices(providerId, services) {
+  const firstService = services?.[0]
+  const prices = (services || [])
+    .map(service => Number(service.price))
+    .filter(price => Number.isFinite(price) && price > 0)
+  const priceFrom = prices.length ? Math.min(...prices) : 0
+
+  const { data, error } = await supabase
+    .from('providers')
+    .update({
+      services,
+      speciality: firstService?.name || 'Beauty Professional',
+      price_from: priceFrom,
+    })
+    .eq('id', providerId)
+    .select()
+    .single()
+  if (error) throw error
+  return normaliseProvider(data)
+}
+
 // ── PRODUCTS ──────────────────────────────────────────────────────────────────
 export async function fetchProducts({ category = null, featured = false, limit = 50 } = {}) {
   let q = supabase.from('products').select('*').eq('is_active', true).order('rating', { ascending: false })

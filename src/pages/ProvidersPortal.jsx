@@ -14,7 +14,7 @@ import {
   User,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus } from '../lib/db'
+import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus, updateProviderServices } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
 
@@ -112,6 +112,16 @@ function BookingRequestCard({ booking, onStatus, busy }) {
   )
 }
 
+function blankService(index = 0) {
+  return {
+    id: `service-${Date.now()}-${index}`,
+    name: '',
+    desc: '',
+    duration: '',
+    price: '',
+  }
+}
+
 export default function ProvidersPortal() {
   const { user, userDisplay } = useApp()
   const [application, setApplication] = useState(null)
@@ -121,6 +131,10 @@ export default function ProvidersPortal() {
   const [loadingBookings, setLoadingBookings] = useState(false)
   const [bookingBusy, setBookingBusy] = useState('')
   const [bookingError, setBookingError] = useState('')
+  const [serviceRows, setServiceRows] = useState([blankService()])
+  const [savingServices, setSavingServices] = useState(false)
+  const [serviceMessage, setServiceMessage] = useState('')
+  const [serviceError, setServiceError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -164,6 +178,26 @@ export default function ProvidersPortal() {
       .finally(() => setLoadingBookings(false))
   }, [provider?.id])
 
+  useEffect(() => {
+    if (!provider?.id) {
+      setServiceRows([blankService()])
+      return
+    }
+
+    const existing = Array.isArray(provider.services) ? provider.services : []
+    setServiceRows(existing.length
+      ? existing.map((service, index) => ({
+        id: service.id || `service-${index + 1}`,
+        name: service.name || '',
+        desc: service.desc || service.description || '',
+        duration: service.duration || '',
+        price: service.price ?? '',
+      }))
+      : [blankService()])
+    setServiceMessage('')
+    setServiceError('')
+  }, [provider?.id, provider?.services])
+
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
 
   const updateBooking = async (id, status) => {
@@ -176,6 +210,57 @@ export default function ProvidersPortal() {
       setBookingError('We could not update this booking. Admin can still manage it from the review dashboard.')
     } finally {
       setBookingBusy('')
+    }
+  }
+
+  const updateServiceRow = (index, key, value) => {
+    setServiceRows(prev => prev.map((service, itemIndex) => (
+      itemIndex === index ? { ...service, [key]: value } : service
+    )))
+  }
+
+  const addServiceRow = () => {
+    setServiceRows(prev => [...prev, blankService(prev.length)])
+  }
+
+  const removeServiceRow = (index) => {
+    setServiceRows(prev => {
+      const next = prev.filter((_, itemIndex) => itemIndex !== index)
+      return next.length ? next : [blankService()]
+    })
+  }
+
+  const saveServices = async (e) => {
+    e.preventDefault()
+    if (!provider?.id) return
+
+    setServiceMessage('')
+    setServiceError('')
+
+    const services = serviceRows
+      .map((service, index) => ({
+        id: service.id || `service-${index + 1}`,
+        name: service.name.trim(),
+        desc: service.desc.trim(),
+        duration: service.duration.trim(),
+        price: service.price === '' ? 0 : Number(service.price),
+      }))
+      .filter(service => service.name)
+
+    if (!services.length) {
+      setServiceError('Add at least one service name before saving.')
+      return
+    }
+
+    setSavingServices(true)
+    try {
+      const updated = await updateProviderServices(provider.id, services)
+      setProvider(updated)
+      setServiceMessage('Services saved. Your public profile has been updated.')
+    } catch {
+      setServiceError('We could not save services. Admin can still update the provider profile while access is reviewed.')
+    } finally {
+      setSavingServices(false)
     }
   }
 
@@ -362,10 +447,76 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={Settings}
             title="Services"
-            body={application?.status === 'approved' ? 'Initial services are created from your application. Full service editing is coming next.' : 'Service management opens after approval so your public profile stays accurate.'}
-            action={<button className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold cursor-not-allowed"><Plus size={15} /> {application?.status === 'approved' ? 'Service editing coming soon' : 'Add service after approval'}</button>}
+            body={application?.status === 'approved' ? `${serviceRows.filter(service => service.name.trim()).length} service${serviceRows.filter(service => service.name.trim()).length === 1 ? '' : 's'} ready for your public profile.` : 'Service management opens after approval so your public profile stays accurate.'}
+            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Plus size={15} /> {application?.status === 'approved' ? 'Editable below' : 'Add service after approval'}</span>}
           />
         </div>
+
+        <form onSubmit={saveServices} className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="font-semibold text-gray-900">Services</h2>
+              <p className="text-sm text-gray-500">These services appear on your public provider profile and booking page.</p>
+            </div>
+            {provider && (
+              <button type="submit" disabled={savingServices}
+                className="rounded-full bg-pink-500 px-5 py-2.5 text-sm font-bold text-white hover:bg-pink-600 disabled:opacity-60">
+                {savingServices ? 'Saving...' : 'Save Services'}
+              </button>
+            )}
+          </div>
+
+          <div className="p-6">
+            {application?.status !== 'approved' || !provider ? (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center mx-auto mb-3">
+                  <Settings size={20} />
+                </div>
+                <p className="text-sm font-semibold text-gray-900">Service editing unlocks after approval</p>
+                <p className="text-sm text-gray-500 mt-1">Your submitted services will be reviewed before your public profile goes live.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {serviceMessage && (
+                  <div className="rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+                    {serviceMessage}
+                  </div>
+                )}
+                {serviceError && (
+                  <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                    {serviceError}
+                  </div>
+                )}
+                {serviceRows.map((service, index) => (
+                  <div key={service.id} className="rounded-2xl border border-gray-100 p-4">
+                    <div className="grid md:grid-cols-12 gap-3">
+                      <input value={service.name} onChange={e => updateServiceRow(index, 'name', e.target.value)}
+                        placeholder="Service name"
+                        className="md:col-span-3 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                      <input value={service.desc} onChange={e => updateServiceRow(index, 'desc', e.target.value)}
+                        placeholder="Short description"
+                        className="md:col-span-4 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                      <input value={service.duration} onChange={e => updateServiceRow(index, 'duration', e.target.value)}
+                        placeholder="Duration"
+                        className="md:col-span-2 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                      <input type="number" min="0" step="1" value={service.price} onChange={e => updateServiceRow(index, 'price', e.target.value)}
+                        placeholder="Price"
+                        className="md:col-span-2 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100" />
+                      <button type="button" onClick={() => removeServiceRow(index)}
+                        className="md:col-span-1 rounded-xl border border-gray-200 px-3 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50">
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <button type="button" onClick={addServiceRow}
+                  className="w-fit inline-flex items-center gap-2 rounded-full border border-pink-200 px-5 py-2.5 text-sm font-bold text-pink-600 hover:bg-pink-50">
+                  <Plus size={15} /> Add Service
+                </button>
+              </div>
+            )}
+          </div>
+        </form>
 
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
