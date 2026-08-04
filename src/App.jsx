@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Navigate, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AppProvider } from './context/AppContext'
@@ -16,7 +16,7 @@ import Shop, { ShopCategory, ProductDetail } from './pages/Shop'
 import Cart, { Checkout, OrderSuccess } from './pages/Cart'
 import AIHairAnalysis, { AISkinAnalysis } from './pages/AIAnalyzer'
 import MyBookings, { DashboardHome, ReferAndEarn, ReviewsRatings } from './pages/Dashboard'
-import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers } from './pages/InfoPages'
+import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers, PrivacyPolicy, TermsConditions } from './pages/InfoPages'
 import Login, { Register, ForgotPassword } from './pages/Auth'
 import Wishlist from './pages/Wishlist'
 import Affiliate from './pages/Affiliate'
@@ -24,6 +24,7 @@ import AffiliatePortal from './pages/AffiliatePortal'
 import ProvidersPortal from './pages/ProvidersPortal'
 import Training from './pages/Training'
 import Admin from './pages/Admin'
+import Portal from './pages/Portal'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
           <Route path="/book" element={<PageWrapper><Book /></PageWrapper>} />
           <Route path="/book/maye" element={<PageWrapper><BookMaye /></PageWrapper>} />
+          <Route path="/book/:category" element={<PageWrapper><Book /></PageWrapper>} />
 
           {/* Providers */}
           <Route path="/providers" element={<PageWrapper><Providers /></PageWrapper>} />
@@ -100,6 +102,7 @@ export default function App() {
           <Route path="/dashboard" element={<PageWrapper><DashboardHome /></PageWrapper>} />
           <Route path="/bookings" element={<PageWrapper><MyBookings /></PageWrapper>} />
           <Route path="/referrals" element={<PageWrapper><ReferAndEarn /></PageWrapper>} />
+          <Route path="/refer" element={<Navigate to="/referrals" replace />} />
           <Route path="/reviews" element={<PageWrapper><ReviewsRatings /></PageWrapper>} />
 
           {/* Info pages */}
@@ -110,6 +113,9 @@ export default function App() {
           <Route path="/returns-refunds" element={<PageWrapper><ReturnsRefunds /></PageWrapper>} />
           <Route path="/track-order" element={<PageWrapper><TrackOrder /></PageWrapper>} />
           <Route path="/careers" element={<PageWrapper><Careers /></PageWrapper>} />
+          <Route path="/jobs" element={<Navigate to="/careers" replace />} />
+          <Route path="/privacy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
+          <Route path="/terms" element={<PageWrapper><TermsConditions /></PageWrapper>} />
 
           {/* Wishlist */}
           <Route path="/wishlist" element={<PageWrapper><Wishlist /></PageWrapper>} />
@@ -120,6 +126,9 @@ export default function App() {
 
           {/* Training */}
           <Route path="/training" element={<PageWrapper><Training /></PageWrapper>} />
+
+          {/* Portal */}
+          <Route path="/portal" element={<PageWrapper><Portal /></PageWrapper>} />
 
           {/* Providers Portal */}
           <Route path="/providers-portal" element={<PageWrapper><ProvidersPortal /></PageWrapper>} />

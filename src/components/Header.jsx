@@ -25,8 +25,7 @@ const nav = [
     label: 'Providers', path: '/providers',
     sub: [
       { label: 'Find Providers', path: '/providers' },
-      { label: 'Provider Portal', path: '/providers-portal' },
-      { label: 'Join as Provider', path: '/providers-portal' },
+      { label: 'Join as Provider', path: '/portal' },
     ],
   },
   {
@@ -45,7 +44,18 @@ const nav = [
     label: 'Affiliate', path: '/affiliate',
     sub: [
       { label: 'Affiliate Programme', path: '/affiliate' },
+      { label: 'Apply as Affiliate', path: '/portal' },
+    ],
+  },
+  {
+    label: 'Portal', path: '/portal',
+    sub: [
+      { label: 'Portal Home', path: '/portal' },
+      { label: 'Client Dashboard', path: '/dashboard' },
+      { label: 'Provider Portal', path: '/providers-portal' },
       { label: 'Affiliate Portal', path: '/affiliate-portal' },
+      { label: 'Login', path: '/login' },
+      { label: 'Create Account', path: '/register' },
     ],
   },
   { label: 'Training', path: '/training' },
@@ -85,7 +95,7 @@ export default function Header() {
       {announce && (
         <div className="bg-gray-800 text-gray-100 text-xs text-center py-2 px-4 flex items-center justify-center gap-2 relative">
           <span><strong>REJUVEEFY:</strong> Provider applications and affiliate applications are now open for review.</span>
-          <Link to="/providers-portal" className="underline font-semibold ml-1">Apply</Link>
+          <Link to="/portal" className="underline font-semibold ml-1">Portal</Link>
           <button onClick={() => setAnnounce(false)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
             <X size={14} />
           </button>

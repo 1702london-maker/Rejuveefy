@@ -453,3 +453,50 @@ export function Careers() {
     </div>
   )
 }
+
+export function PrivacyPolicy() {
+  return (
+    <div className="min-h-screen bg-white">
+      <PageHero title="Privacy Policy" body="How Rejuveefy handles account, booking, provider and affiliate information." label="Privacy" />
+      <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
+        {[
+          ['Information We Collect', 'Rejuveefy collects information you provide when creating an account, submitting applications, making booking requests, joining the affiliate programme, contacting support, or using site forms.'],
+          ['How Information Is Used', 'Information is used to manage accounts, review provider and affiliate applications, process booking requests, support users, improve services, and send relevant account or application updates.'],
+          ['Reviewed Access', 'Provider and affiliate access is reviewed before public activity or referral tools are enabled. We keep incomplete public data hidden until it is ready.'],
+          ['Your Choices', 'You can contact Rejuveefy to request updates, corrections, or deletion of information where applicable. Some records may need to be retained for account, booking, legal, or operational reasons.'],
+        ].map(([title, body]) => (
+          <div key={title} className="border border-gray-100 rounded-2xl p-6">
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">{title}</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+          </div>
+        ))}
+        <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6">
+          <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Contact</h2>
+          <p className="text-sm text-gray-500">For privacy questions, contact support through the Rejuveefy contact page.</p>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+export function TermsConditions() {
+  return (
+    <div className="min-h-screen bg-white">
+      <PageHero title="Terms & Conditions" body="The current service terms for using Rejuveefy accounts, bookings, provider tools and affiliate access." label="Terms" />
+      <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
+        {[
+          ['Account Use', 'Users are responsible for keeping account details accurate and secure. Provider and affiliate tools are only available after review and approval.'],
+          ['Bookings', 'Booking requests are saved as pending until confirmed. Providers or admin may confirm, complete, or cancel booking requests according to availability and operational review.'],
+          ['Provider & Affiliate Applications', 'Submitting an application does not guarantee approval. Rejuveefy may review, approve, reject, suspend, or request more information before access is granted.'],
+          ['Shop & Training', 'Shop checkout, training enrolment, product fulfilment, returns and refund details will be shown clearly before those services become fully available.'],
+          ['Changes', 'Rejuveefy may update these terms as the platform develops. Continued use of the service means you accept the latest terms shown on this page.'],
+        ].map(([title, body]) => (
+          <div key={title} className="border border-gray-100 rounded-2xl p-6">
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">{title}</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+          </div>
+        ))}
+      </section>
+    </div>
+  )
+}
