@@ -14,7 +14,7 @@ import {
   User,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication } from '../lib/db'
+import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
 
@@ -41,10 +41,11 @@ function statusClass(status = 'pending') {
   return styles[status] || styles.pending
 }
 
-function BookingRequestCard({ booking }) {
+function BookingRequestCard({ booking, onStatus, busy }) {
   const bookingDate = booking.booking_date ? new Date(booking.booking_date) : null
   const createdDate = booking.created_at ? new Date(booking.created_at) : null
   const price = booking.service_price ?? booking.total_price ?? booking.price
+  const status = booking.status || 'pending'
 
   return (
     <div className="border border-gray-100 rounded-2xl p-5 bg-white">
@@ -56,8 +57,8 @@ function BookingRequestCard({ booking }) {
             {booking.booking_time ? ` at ${booking.booking_time}` : ''}
           </p>
         </div>
-        <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold capitalize ${statusClass(booking.status)}`}>
-          {booking.status || 'pending'}
+        <span className={`w-fit rounded-full border px-3 py-1 text-xs font-bold capitalize ${statusClass(status)}`}>
+          {status}
         </span>
       </div>
 
@@ -86,6 +87,27 @@ function BookingRequestCard({ booking }) {
         <p className="text-sm text-gray-500">{booking.notes || booking.message || 'No extra notes added.'}</p>
         {price ? <p className="text-sm font-bold text-gray-900">From £{price}</p> : null}
       </div>
+
+      <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+        {status !== 'confirmed' && status !== 'completed' && status !== 'cancelled' && (
+          <button type="button" onClick={() => onStatus(booking.id, 'confirmed')} disabled={busy}
+            className="rounded-full bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 disabled:opacity-50">
+            Confirm
+          </button>
+        )}
+        {status === 'confirmed' && (
+          <button type="button" onClick={() => onStatus(booking.id, 'completed')} disabled={busy}
+            className="rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-50">
+            Mark Completed
+          </button>
+        )}
+        {status !== 'completed' && status !== 'cancelled' && (
+          <button type="button" onClick={() => onStatus(booking.id, 'cancelled')} disabled={busy}
+            className="rounded-full border border-red-100 bg-red-50 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-100 disabled:opacity-50">
+            Cancel
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -97,6 +119,8 @@ export default function ProvidersPortal() {
   const [bookings, setBookings] = useState([])
   const [loadingApplication, setLoadingApplication] = useState(false)
   const [loadingBookings, setLoadingBookings] = useState(false)
+  const [bookingBusy, setBookingBusy] = useState('')
+  const [bookingError, setBookingError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -141,6 +165,19 @@ export default function ProvidersPortal() {
   }, [provider?.id])
 
   const update = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
+
+  const updateBooking = async (id, status) => {
+    setBookingError('')
+    setBookingBusy(id)
+    try {
+      const updated = await updateBookingStatus(id, status)
+      setBookings(prev => prev.map(item => item.id === id ? { ...item, ...updated } : item))
+    } catch {
+      setBookingError('We could not update this booking. Admin can still manage it from the review dashboard.')
+    } finally {
+      setBookingBusy('')
+    }
+  }
 
   const submitApplication = async (e) => {
     e.preventDefault()
@@ -343,11 +380,23 @@ export default function ProvidersPortal() {
             )}
           </div>
           <div className="p-6">
+            {bookingError && (
+              <div className="mb-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                {bookingError}
+              </div>
+            )}
             {loadingBookings ? (
               <p className="text-sm text-gray-500">Checking booking requests...</p>
             ) : bookings.length ? (
               <div className="grid gap-4">
-                {bookings.map(booking => <BookingRequestCard key={booking.id} booking={booking} />)}
+                {bookings.map(booking => (
+                  <BookingRequestCard
+                    key={booking.id}
+                    booking={booking}
+                    onStatus={updateBooking}
+                    busy={bookingBusy === booking.id}
+                  />
+                ))}
               </div>
             ) : (
               <div className="text-center py-8">
