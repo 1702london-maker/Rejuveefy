@@ -3,6 +3,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, ShieldCheck, ArrowLeft, CheckCircle, Mail, Lock, User, Phone } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
+function safeNextPath(path, fallback = '/my-portal') {
+  if (!path || !path.startsWith('/') || path.startsWith('//')) return fallback
+  return path
+}
+
 function AuthLayout({ children, image }) {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -38,13 +43,13 @@ function AuthLayout({ children, image }) {
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 
 async function signInWithProvider(provider, accountType = 'client', redirectPath = null) {
-  const target = redirectPath?.startsWith('/')
-    ? redirectPath
+  const target = redirectPath
+    ? safeNextPath(redirectPath)
     : accountType === 'provider'
-    ? '/providers-portal'
-    : accountType === 'affiliate'
-      ? '/affiliate'
-      : '/dashboard'
+      ? '/my-portal'
+      : accountType === 'affiliate'
+        ? '/my-portal'
+        : '/dashboard'
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
@@ -57,7 +62,7 @@ async function signInWithProvider(provider, accountType = 'client', redirectPath
 export default function Login() {
   const navigate = useNavigate()
   const { search } = useLocation()
-  const nextPath = new URLSearchParams(search).get('next') || '/dashboard'
+  const nextPath = safeNextPath(new URLSearchParams(search).get('next'), '/dashboard')
   const [form, setForm] = useState({ email: '', password: '' })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -72,7 +77,7 @@ export default function Login() {
     const { error: err } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
     setLoading(false)
     if (err) { setError(err.message); return }
-    navigate(nextPath.startsWith('/') ? nextPath : '/dashboard')
+    navigate(nextPath)
   }
   const socialSignIn = async (provider) => {
     setError('')
@@ -115,7 +120,7 @@ export default function Login() {
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-xs font-semibold text-gray-600">Password</label>
-              <Link to="/forgot-password" className="text-xs text-pink-500 hover:underline">Forgot password?</Link>
+              <Link to={`/forgot-password?next=${encodeURIComponent(nextPath)}`} className="text-xs text-pink-500 hover:underline">Forgot password?</Link>
             </div>
             <div className="relative">
               <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -178,7 +183,7 @@ export function Register() {
   const { search } = useLocation()
   const params = new URLSearchParams(search)
   const initialType = params.get('type') === 'provider' ? 'provider' : params.get('type') === 'affiliate' ? 'affiliate' : 'client'
-  const nextPath = params.get('next') || null
+  const nextPath = params.get('next') ? safeNextPath(params.get('next')) : null
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '', accountType: initialType })
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -201,7 +206,7 @@ export function Register() {
     })
     if (err) { setError(err.message); setLoading(false); return }
     setLoading(false)
-    navigate(nextPath && nextPath.startsWith('/') ? nextPath : form.accountType === 'provider' ? '/providers-portal' : form.accountType === 'affiliate' ? '/affiliate-portal' : '/dashboard')
+    navigate(nextPath || '/my-portal')
   }
 
   const socialSignUp = async (provider) => {
@@ -357,6 +362,8 @@ export function Register() {
 
 // ── FORGOT PASSWORD ───────────────────────────────────────────────────────────
 export function ForgotPassword() {
+  const { search } = useLocation()
+  const nextPath = safeNextPath(new URLSearchParams(search).get('next'), '/login')
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -377,7 +384,7 @@ export function ForgotPassword() {
   return (
     <AuthLayout image="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800&h=1200&fit=crop">
       <div>
-        <Link to="/login" className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-pink-500 transition-colors mb-8">
+        <Link to={`/login${nextPath !== '/login' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-pink-500 transition-colors mb-8">
           <ArrowLeft size={15} /> Back to Sign In
         </Link>
 
@@ -416,7 +423,7 @@ export function ForgotPassword() {
             <p className="text-xs text-gray-400 mb-6">Didn't receive the email? Check your spam folder, or{' '}
               <button onClick={() => setSent(false)} className="text-pink-500 hover:underline">try again</button>.
             </p>
-            <Link to="/login" className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
+            <Link to={`/login${nextPath !== '/login' ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
               Back to Sign In
             </Link>
           </div>

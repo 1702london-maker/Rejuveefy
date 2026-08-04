@@ -72,13 +72,13 @@ export default function AffiliatePortal() {
           </div>
           <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Affiliate Portal</h1>
           <p className="text-sm text-gray-500 leading-relaxed mb-6">
-            Sign in to manage your affiliate application, referral links, commission reporting and payouts.
+            Sign in to manage your affiliate application, referral link access, commission reporting and payout history.
           </p>
           <div className="flex flex-col gap-3">
             <Link to="/login?next=/affiliate-portal" className="bg-pink-500 text-white rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
               Sign In
             </Link>
-            <Link to="/register?type=affiliate&next=/affiliate-portal" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
+            <Link to="/register?type=affiliate&next=/my-portal" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
               Apply as Affiliate
             </Link>
           </div>
@@ -116,8 +116,8 @@ export default function AffiliatePortal() {
                 : approved
                   ? 'Your referral link is ready. Campaign metrics will start from approved links.'
                   : application
-                  ? `Submitted ${new Date(application.created_at).toLocaleDateString('en-GB')}. Referral tools unlock after approval.`
-                  : 'Once approved, this portal opens referral links, campaign reporting, commissions and payout history.'}
+                  ? `Submitted ${new Date(application.created_at).toLocaleDateString('en-GB')}. Referral tools become available after approval.`
+                  : 'After approval, this portal shows referral links, campaign reporting, commissions and payout history.'}
             </p>
           </div>
           {approved ? (
@@ -163,7 +163,7 @@ export default function AffiliatePortal() {
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
             {approved
               ? 'Clicks, conversions and payout history are tracked from approved referral activity.'
-              : 'Campaign assets, transactions and payout history open after approval.'}
+              : 'Campaign assets, transactions and payout history are available after approval.'}
           </p>
         </div>
       </div>

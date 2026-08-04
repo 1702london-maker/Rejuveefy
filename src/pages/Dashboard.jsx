@@ -96,6 +96,9 @@ function Sidebar() {
 }
 
 function AuthRequired() {
+  const { pathname } = useLocation()
+  const next = encodeURIComponent(pathname)
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-20">
       <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-8 text-center max-w-md">
@@ -103,8 +106,8 @@ function AuthRequired() {
         <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Sign in required</h1>
         <p className="text-sm text-gray-500 mb-6">Create or sign in to your Rejuveefy account to see bookings, reviews, wishlist and referrals.</p>
         <div className="flex gap-3 justify-center">
-          <Link to="/login" className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">Sign In</Link>
-          <Link to="/register" className="border border-pink-500 text-pink-500 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-50 transition-colors">Create Account</Link>
+          <Link to={`/login?next=${next}`} className="bg-pink-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-600 transition-colors">Sign In</Link>
+          <Link to={`/register?next=${next}`} className="border border-pink-500 text-pink-500 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-pink-50 transition-colors">Create Account</Link>
         </div>
       </div>
     </div>

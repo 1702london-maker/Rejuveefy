@@ -398,7 +398,7 @@ export default function ProvidersPortal() {
       setProvider(updated)
       setAvailabilityMessage('Availability saved. Clients will see these booking hours.')
     } catch {
-      setAvailabilityError('We could not save availability. If this keeps happening, the providers table needs an availability column.')
+      setAvailabilityError('We could not save availability. Please try again or contact support if this keeps happening.')
     } finally {
       setSavingAvailability(false)
     }
@@ -436,13 +436,13 @@ export default function ProvidersPortal() {
           </div>
           <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Provider Portal</h1>
           <p className="text-sm text-gray-500 leading-relaxed mb-6">
-            Sign in to manage your Rejuveefy provider application, services, calendar, bookings and payouts.
+            Sign in to manage your Rejuveefy provider application, services, calendar and booking requests.
           </p>
           <div className="flex flex-col gap-3">
             <Link to="/login?next=/providers-portal" className="bg-pink-500 text-white rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
               Sign In
             </Link>
-            <Link to="/register?type=provider&next=/providers-portal" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
+            <Link to="/register?type=provider&next=/my-portal" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
               Create Provider Account
             </Link>
           </div>
@@ -489,7 +489,7 @@ export default function ProvidersPortal() {
                 ? 'Your provider access is approved. Your public profile can now be completed.'
                 : application
                   ? `Your provider application is ${application.status}.`
-                : 'Submit your application to begin review. Provider tools unlock after approval.'}
+                : 'Submit your application to begin review. Provider tools become available after approval.'}
             </p>
           </div>
           {provider ? (
@@ -592,7 +592,7 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={Settings}
             title="Services"
-            body={application?.status === 'approved' ? `${serviceRows.filter(service => service.name.trim()).length} service${serviceRows.filter(service => service.name.trim()).length === 1 ? '' : 's'} ready for your public profile.` : 'Service management opens after approval so your public profile stays accurate.'}
+            body={application?.status === 'approved' ? `${serviceRows.filter(service => service.name.trim()).length} service${serviceRows.filter(service => service.name.trim()).length === 1 ? '' : 's'} ready for your public profile.` : 'Service management becomes available after approval so your public profile stays accurate.'}
             action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Plus size={15} /> {application?.status === 'approved' ? 'Editable below' : 'Add service after approval'}</span>}
           />
         </div>
@@ -617,7 +617,7 @@ export default function ProvidersPortal() {
                 <div className="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center mx-auto mb-3">
                   <Settings size={20} />
                 </div>
-                <p className="text-sm font-semibold text-gray-900">Service editing unlocks after approval</p>
+                <p className="text-sm font-semibold text-gray-900">Service editing is available after approval</p>
                 <p className="text-sm text-gray-500 mt-1">Your submitted services will be reviewed before your public profile goes live.</p>
               </div>
             ) : (
@@ -683,7 +683,7 @@ export default function ProvidersPortal() {
                 <div className="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center mx-auto mb-3">
                   <User size={20} />
                 </div>
-                <p className="text-sm font-semibold text-gray-900">Profile editing unlocks after approval</p>
+                <p className="text-sm font-semibold text-gray-900">Profile editing is available after approval</p>
                 <p className="text-sm text-gray-500 mt-1">Approved profiles can be completed from this portal.</p>
               </div>
             ) : (
@@ -754,7 +754,7 @@ export default function ProvidersPortal() {
                 <div className="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center mx-auto mb-3">
                   <Calendar size={20} />
                 </div>
-                <p className="text-sm font-semibold text-gray-900">Calendar unlocks after approval</p>
+                <p className="text-sm font-semibold text-gray-900">Calendar tools are available after approval</p>
                 <p className="text-sm text-gray-500 mt-1">Approved providers can set booking days and hours here.</p>
               </div>
             ) : (
@@ -850,7 +850,7 @@ export default function ProvidersPortal() {
                 <p className="text-sm text-gray-500 mt-1">
                   {application?.status === 'approved'
                     ? 'New client booking requests are listed here after clients submit them from your public profile.'
-                    : 'Booking requests unlock after the provider application is approved.'}
+                    : 'Booking requests are available after the provider application is approved.'}
                 </p>
               </div>
             )}

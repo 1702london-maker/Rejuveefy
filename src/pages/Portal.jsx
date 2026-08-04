@@ -47,7 +47,7 @@ const destinations = [
 const steps = [
   { icon: UserRoundCheck, title: 'Create account', body: 'Start with a Rejuveefy account using email, Google or Facebook.' },
   { icon: ClipboardCheck, title: 'Choose your access', body: 'Clients can book immediately. Providers and affiliates submit applications.' },
-  { icon: CheckCircle, title: 'Review unlocks tools', body: 'Approved users get the right portal tools while public pages stay accurate.' },
+  { icon: CheckCircle, title: 'Review confirms access', body: 'Approved users see the right portal tools while public pages stay accurate.' },
 ]
 
 export default function Portal() {
@@ -138,7 +138,7 @@ export default function Portal() {
             </div>
             <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">Access stays reviewed</h2>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Provider and affiliate tools open after review. This keeps the public site trustworthy while profiles, terms, content and approved activity are completed.
+              Provider and affiliate tools become available after review. This keeps the public site trustworthy while profiles, terms, content and approved activity are completed.
             </p>
           </div>
 
