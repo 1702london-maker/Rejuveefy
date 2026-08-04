@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Instagram, Linkedin, Mail } from 'lucide-react'
 import { subscribeNewsletter } from '../lib/db'
 
 const cols = [
@@ -42,6 +42,12 @@ const cols = [
   },
 ]
 
+const socialLinks = [
+  { label: 'Instagram', href: 'https://www.instagram.com/rejuveefy', icon: Instagram },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/rejuveefy', icon: Linkedin },
+  { label: 'Email', href: 'mailto:hello@rejuveefy.com', icon: Mail },
+]
+
 export default function Footer() {
   const [email, setEmail] = useState('')
   const [consent, setConsent] = useState(false)
@@ -70,9 +76,10 @@ export default function Footer() {
               Rejuveefy is a modern beauty-tech marketplace connecting you with verified professionals and premium beauty products across the UK.
             </p>
             <div className="flex gap-2 mb-4">
-              {['IG', 'X', 'FB', 'YT'].map((label) => (
-                <a key={label} href="#" aria-label={label} className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-500 hover:bg-pink-100 hover:text-pink-500 transition-colors">
-                  {label}
+              {socialLinks.map(({ label, href, icon: Icon }) => (
+                <a key={label} href={href} aria-label={label} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noreferrer' : undefined}
+                  className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-pink-100 hover:text-pink-500 transition-colors">
+                  <Icon size={14} />
                 </a>
               ))}
             </div>
@@ -152,7 +159,7 @@ export default function Footer() {
 
           {/* Centre: shop status */}
           <div className="text-xs text-gray-400 font-medium">
-            Shop checkout coming soon
+            Verified beauty bookings and reviewed marketplace access
           </div>
 
           {/* Right: legal links */}

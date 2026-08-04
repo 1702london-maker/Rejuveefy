@@ -16,7 +16,7 @@ import Shop, { ShopCategory, ProductDetail } from './pages/Shop'
 import Cart, { Checkout, OrderSuccess } from './pages/Cart'
 import AIHairAnalysis, { AISkinAnalysis } from './pages/AIAnalyzer'
 import MyBookings, { DashboardHome, ReferAndEarn, ReviewsRatings } from './pages/Dashboard'
-import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers, PrivacyPolicy, TermsConditions } from './pages/InfoPages'
+import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers, PrivacyPolicy, TermsConditions, CookiePolicy, Accessibility } from './pages/InfoPages'
 import Login, { Register, ForgotPassword } from './pages/Auth'
 import Wishlist from './pages/Wishlist'
 import Affiliate from './pages/Affiliate'
@@ -116,6 +116,8 @@ export default function App() {
           <Route path="/jobs" element={<Navigate to="/careers" replace />} />
           <Route path="/privacy" element={<PageWrapper><PrivacyPolicy /></PageWrapper>} />
           <Route path="/terms" element={<PageWrapper><TermsConditions /></PageWrapper>} />
+          <Route path="/cookie-policy" element={<PageWrapper><CookiePolicy /></PageWrapper>} />
+          <Route path="/accessibility" element={<PageWrapper><Accessibility /></PageWrapper>} />
 
           {/* Wishlist */}
           <Route path="/wishlist" element={<PageWrapper><Wishlist /></PageWrapper>} />

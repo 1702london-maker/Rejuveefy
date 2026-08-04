@@ -500,3 +500,45 @@ export function TermsConditions() {
     </div>
   )
 }
+
+export function CookiePolicy() {
+  return (
+    <div className="min-h-screen bg-white">
+      <PageHero title="Cookie Policy" body="How Rejuveefy uses cookies and similar technologies across the website." label="Cookie Policy" />
+      <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
+        {[
+          ['Essential Cookies', 'Some cookies are needed for account sessions, navigation, forms, cart state and basic site security.'],
+          ['Preference Cookies', 'Preference cookies may remember choices such as interface settings, saved cart items or wishlist activity.'],
+          ['Analytics & Marketing', 'Analytics and marketing tools will only be used where configured and appropriate. Rejuveefy will keep these choices clear as the platform grows.'],
+          ['Managing Cookies', 'You can control cookies through your browser settings. Blocking some cookies may affect account, cart, checkout or portal features.'],
+        ].map(([title, body]) => (
+          <div key={title} className="border border-gray-100 rounded-2xl p-6">
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">{title}</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+          </div>
+        ))}
+      </section>
+    </div>
+  )
+}
+
+export function Accessibility() {
+  return (
+    <div className="min-h-screen bg-white">
+      <PageHero title="Accessibility" body="Rejuveefy is designed to be usable, readable and accessible as the service develops." label="Accessibility" />
+      <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
+        {[
+          ['Readable Interface', 'We aim to keep text clear, contrast strong, buttons recognisable and forms easy to understand across mobile and desktop.'],
+          ['Keyboard & Screen Reader Support', 'Interactive areas should remain reachable through standard browser controls, semantic links, labels and focus states.'],
+          ['Ongoing Improvements', 'As booking, provider, affiliate, shop and training features expand, accessibility checks should be part of each release.'],
+          ['Feedback', 'If something is difficult to use, contact Rejuveefy through the contact page so the issue can be reviewed.'],
+        ].map(([title, body]) => (
+          <div key={title} className="border border-gray-100 rounded-2xl p-6">
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">{title}</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">{body}</p>
+          </div>
+        ))}
+      </section>
+    </div>
+  )
+}
