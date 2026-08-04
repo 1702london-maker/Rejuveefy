@@ -77,6 +77,11 @@ function Field({ label, value }) {
   )
 }
 
+function affiliateCode(item) {
+  const source = item?.id || item?.email || 'partner'
+  return `RJYF-${String(source).replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}`
+}
+
 function ActionButton({ type = 'approve', children, onClick, disabled }) {
   const styles = type === 'reject'
     ? 'border-red-200 text-red-600 hover:bg-red-50'
@@ -121,6 +126,7 @@ function ApplicationCard({ item, type, onStatus, busy }) {
             <Field label="Platform" value={item.platform} />
             <Field label="Audience" value={item.followers || item.audience} />
             <Field label="Niche / Plan" value={item.niche} />
+            {item.status === 'approved' && <Field label="Referral Code" value={affiliateCode(item)} />}
           </>
         )}
       </div>
@@ -152,7 +158,7 @@ function MessageCard({ item }) {
         <div>
           <p className="text-xs text-gray-400 mb-1">{item.created_at ? new Date(item.created_at).toLocaleString('en-GB') : 'No date'}</p>
           <h3 className="font-display text-xl font-bold text-gray-900">{item.subject || 'Message'}</h3>
-          <p className="text-sm text-gray-500">{item.name || 'Unknown'} · {item.email || 'No email'}</p>
+          <p className="text-sm text-gray-500">{item.name || 'Unknown'} / {item.email || 'No email'}</p>
         </div>
       </div>
       <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{item.message || 'No message body.'}</p>

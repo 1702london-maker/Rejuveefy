@@ -13,7 +13,12 @@ import {
 import { useApp } from '../context/AppContext'
 import { fetchAffiliateApplication } from '../lib/db'
 
-function MetricCard({ icon: Icon, label }) {
+function affiliateCode(application, user) {
+  const source = application?.id || application?.email || user?.email || 'partner'
+  return `RJYF-${String(source).replace(/[^a-z0-9]/gi, '').slice(0, 8).toUpperCase()}`
+}
+
+function MetricCard({ icon: Icon, label, active }) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-gray-100">
       <div className="flex items-center justify-between mb-3">
@@ -22,8 +27,8 @@ function MetricCard({ icon: Icon, label }) {
           <Icon size={15} />
         </div>
       </div>
-      <p className="font-display text-2xl font-bold text-gray-900 mb-1">--</p>
-      <p className="text-xs text-gray-400">Available after approval</p>
+      <p className="font-display text-2xl font-bold text-gray-900 mb-1">0</p>
+      <p className="text-xs text-gray-400">{active ? 'Tracking starts from approved links' : 'Available after approval'}</p>
     </div>
   )
 }
@@ -32,6 +37,7 @@ export default function AffiliatePortal() {
   const { user, userDisplay } = useApp()
   const [application, setApplication] = useState(null)
   const [loadingApplication, setLoadingApplication] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (!user?.email) return
@@ -41,6 +47,21 @@ export default function AffiliatePortal() {
       .catch(() => setApplication(null))
       .finally(() => setLoadingApplication(false))
   }, [user?.id, user?.email])
+
+  const approved = application?.status === 'approved'
+  const code = affiliateCode(application, user)
+  const referralLink = `${window.location.origin}/?ref=${code}`
+
+  const copyReferral = async () => {
+    if (!approved) return
+    try {
+      await navigator.clipboard.writeText(referralLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      setCopied(false)
+    }
+  }
 
   if (!user) {
     return (
@@ -87,36 +108,49 @@ export default function AffiliatePortal() {
           <div>
             <p className="text-pink-100 text-xs font-semibold uppercase tracking-wide mb-1">Affiliate setup</p>
             <p className="font-display text-2xl font-bold">
-              {application ? `Application ${application.status}` : 'Affiliate access is not active yet'}
+              {approved ? 'Affiliate access approved' : application ? `Application ${application.status}` : 'Affiliate access is not active yet'}
             </p>
             <p className="text-pink-100 text-sm mt-1">
               {loadingApplication
                 ? 'Checking your latest affiliate application...'
-                : application
+                : approved
+                  ? 'Your referral link is ready. Campaign metrics will start from approved links.'
+                  : application
                   ? `Submitted ${new Date(application.created_at).toLocaleDateString('en-GB')}. Referral tools unlock after approval.`
                   : 'Once approved, this portal will show live referral links, clicks, conversions, commissions and payouts.'}
             </p>
           </div>
-          <Link to="/affiliate#apply" className="bg-white text-pink-600 rounded-full px-5 py-2.5 text-sm font-bold hover:bg-pink-50 transition-colors">
-            Complete Application
-          </Link>
+          {approved ? (
+            <span className="bg-white/15 border border-white/20 text-white rounded-full px-5 py-2.5 text-sm font-bold">
+              {code}
+            </span>
+          ) : (
+            <Link to="/affiliate#apply" className="bg-white text-pink-600 rounded-full px-5 py-2.5 text-sm font-bold hover:bg-pink-50 transition-colors">
+              Complete Application
+            </Link>
+          )}
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <MetricCard icon={DollarSign} label="Total earned" />
-          <MetricCard icon={BarChart2} label="Clicks" />
-          <MetricCard icon={ExternalLink} label="Conversions" />
-          <MetricCard icon={CheckCircle} label="Payouts" />
+          <MetricCard icon={DollarSign} label="Total earned" active={approved} />
+          <MetricCard icon={BarChart2} label="Clicks" active={approved} />
+          <MetricCard icon={ExternalLink} label="Conversions" active={approved} />
+          <MetricCard icon={CheckCircle} label="Payouts" active={approved} />
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-8">
           <h2 className="font-semibold text-gray-900 mb-4">Referral link</h2>
           <div className="flex gap-3 flex-col sm:flex-row">
-            <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-400 font-mono truncate">
-              Generated after approval
+            <div className={`flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono truncate ${approved ? 'text-gray-800' : 'text-gray-400'}`}>
+              {approved ? referralLink : 'Generated after approval'}
             </div>
-            <button className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gray-100 text-gray-400 font-semibold text-sm cursor-not-allowed">
-              <Copy size={15} /> Copy Link
+            <button
+              type="button"
+              onClick={copyReferral}
+              disabled={!approved}
+              className={`flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm ${approved ? 'bg-pink-500 text-white hover:bg-pink-600' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+            >
+              <Copy size={15} /> {copied ? 'Copied' : 'Copy Link'}
             </button>
           </div>
         </div>
@@ -127,7 +161,9 @@ export default function AffiliatePortal() {
           </div>
           <h2 className="font-display text-xl font-bold text-gray-900 mb-2">No affiliate activity yet</h2>
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
-            Transactions, campaign assets and payout history will appear here after approval and launch.
+            {approved
+              ? 'Clicks, conversions and payout history will appear here as approved referral activity is tracked.'
+              : 'Transactions, campaign assets and payout history will appear here after approval and launch.'}
           </p>
         </div>
       </div>
