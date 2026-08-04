@@ -18,7 +18,7 @@ const tracks = [
     category: 'Braiding',
     level: 'Beginner to Intermediate',
     duration: 'One-day format planned',
-    status: 'Details coming soon',
+    status: 'Register interest',
     topics: ['Sectioning and tension control', 'Feed-in technique', 'Finishing and aftercare'],
   },
   {
@@ -26,7 +26,7 @@ const tracks = [
     category: 'Wig Making',
     level: 'Intermediate',
     duration: 'Workshop format planned',
-    status: 'Details coming soon',
+    status: 'Register interest',
     topics: ['Cap measurements', 'Lace application', 'Hairline customisation'],
   },
   {
@@ -34,7 +34,7 @@ const tracks = [
     category: 'Locs',
     level: 'All Levels',
     duration: 'Practical format planned',
-    status: 'Details coming soon',
+    status: 'Register interest',
     topics: ['Starting methods', 'Retwist technique', 'Loc care guidance'],
   },
   {
@@ -42,7 +42,7 @@ const tracks = [
     category: 'Natural Hair',
     level: 'All Levels',
     duration: 'Short course planned',
-    status: 'Details coming soon',
+    status: 'Register interest',
     topics: ['Hair porosity', 'Product selection', 'Protective styling'],
   },
 ]
@@ -117,10 +117,10 @@ export default function Training() {
           <div className="grid lg:grid-cols-[1fr_360px] gap-10 items-end">
             <div>
               <h1 className="font-display text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4">
-                Beauty training programmes are being prepared.
+                Professional beauty training, built with care.
               </h1>
               <p className="text-gray-500 max-w-2xl leading-relaxed mb-8">
-                Rejuveefy training will cover practical hair and beauty skills for stylists, salons and learners. Course pages will stay clean until dates, pricing and enrolment details are confirmed.
+                Rejuveefy training will cover practical hair and beauty skills for stylists, salons and learners. Register your interest now and receive details when dates, pricing and enrolment open.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a href="#tracks" className="bg-pink-500 text-white font-bold px-7 py-3.5 rounded-full hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
@@ -132,11 +132,11 @@ export default function Training() {
               </div>
             </div>
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
-              <p className="text-xs font-bold text-pink-500 uppercase tracking-widest mb-4">Current Status</p>
+            <p className="text-xs font-bold text-pink-500 uppercase tracking-widest mb-4">Training Pathway</p>
               <div className="space-y-3">
                 {[
                   { icon: BookOpen, label: 'Tracks', value: `${tracks.length} planned` },
-                  { icon: Calendar, label: 'Dates', value: 'To be confirmed' },
+                  { icon: Calendar, label: 'Dates', value: 'Register interest' },
                   { icon: Award, label: 'Certificates', value: 'Planned' },
                   { icon: ShieldCheck, label: 'Review', value: 'In progress' },
                 ].map(({ icon: Icon, label, value }) => (

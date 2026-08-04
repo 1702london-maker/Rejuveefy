@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Search, Heart, ShoppingBag, Bell, ChevronDown, X, Menu, User } from 'lucide-react'
+import { Search, Heart, ShoppingBag, ChevronDown, X, Menu, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../context/AppContext'
 
@@ -177,10 +177,6 @@ export default function Header() {
                 </span>
               )}
             </Link>
-
-            <button className="hidden sm:flex p-2 rounded-lg text-gray-500 hover:text-pink-500 hover:bg-pink-50 transition-colors">
-              <Bell size={18} />
-            </button>
 
             {/* My Portal */}
             <div className="hidden sm:flex items-center gap-1.5 ml-1 pl-2 border-l border-gray-200">

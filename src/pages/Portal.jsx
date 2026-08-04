@@ -47,7 +47,7 @@ const destinations = [
 const steps = [
   { icon: UserRoundCheck, title: 'Create account', body: 'Start with a Rejuveefy account using email, Google or Facebook.' },
   { icon: ClipboardCheck, title: 'Choose your access', body: 'Clients can book immediately. Providers and affiliates submit applications.' },
-  { icon: CheckCircle, title: 'Review unlocks tools', body: 'Approved users get the right portal tools without fake public data.' },
+  { icon: CheckCircle, title: 'Review unlocks tools', body: 'Approved users get the right portal tools while public pages stay accurate.' },
 ]
 
 export default function Portal() {
@@ -138,7 +138,7 @@ export default function Portal() {
             </div>
             <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">Access stays reviewed</h2>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Provider and affiliate tools open after review. This keeps the public site clean while the business fills with real profiles, terms, content and approved activity.
+              Provider and affiliate tools open after review. This keeps the public site trustworthy while profiles, terms, content and approved activity are completed.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ export default function Portal() {
             <HeartHandshake size={22} className="text-pink-300 shrink-0 mt-1" />
             <div>
               <h2 className="font-display text-xl font-bold">Joining Rejuveefy?</h2>
-              <p className="text-sm text-gray-300 mt-1">Create an account first, then submit the provider or affiliate application from your portal route.</p>
+              <p className="text-sm text-gray-300 mt-1">Create an account first, then submit the provider or affiliate application from My Portal.</p>
             </div>
           </div>
           <Link to="/register?next=/my-portal" className="w-fit rounded-full bg-white px-5 py-2.5 text-sm font-bold text-gray-900 hover:bg-pink-50">

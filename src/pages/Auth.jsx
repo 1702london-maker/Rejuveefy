@@ -320,7 +320,7 @@ export function Register() {
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Creating Account...
               </>
-            ) : 'Create My Account'}
+            ) : 'Create Account'}
           </button>
         </form>
 
