@@ -12,7 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { fetchProviderApplication, submitProviderApplication } from '../lib/db'
+import { fetchProviderApplication, fetchProviderByUser, submitProviderApplication } from '../lib/db'
 
 const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
 
@@ -32,6 +32,7 @@ function EmptyPanel({ icon: Icon, title, body, action }) {
 export default function ProvidersPortal() {
   const { user, userDisplay } = useApp()
   const [application, setApplication] = useState(null)
+  const [provider, setProvider] = useState(null)
   const [loadingApplication, setLoadingApplication] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -46,8 +47,18 @@ export default function ProvidersPortal() {
     if (!user?.email) return
     setLoadingApplication(true)
     fetchProviderApplication({ userId: user.id, email: user.email })
-      .then(setApplication)
-      .catch(() => setApplication(null))
+      .then(app => {
+        setApplication(app)
+        if (app?.status === 'approved') {
+          return fetchProviderByUser(user.id).then(setProvider).catch(() => setProvider(null))
+        }
+        setProvider(null)
+        return null
+      })
+      .catch(() => {
+        setApplication(null)
+        setProvider(null)
+      })
       .finally(() => setLoadingApplication(false))
   }, [user?.id, user?.email])
 
@@ -129,15 +140,44 @@ export default function ProvidersPortal() {
           <div>
             <p className="font-display text-xl font-bold">Provider setup</p>
             <p className="text-pink-100 text-sm mt-1">
-              {application
-                ? `Your provider application is ${application.status}.`
+              {application?.status === 'approved'
+                ? 'Your provider access is approved. Your public profile can now be completed.'
+                : application
+                  ? `Your provider application is ${application.status}.`
                 : 'Submit your application to begin review. Provider tools unlock after approval.'}
             </p>
           </div>
-          <span className="bg-white/15 border border-white/20 text-white rounded-full px-5 py-2.5 text-sm font-bold">
-            Reviewed access only
-          </span>
+          {provider ? (
+            <Link to={`/providers/${provider.slug}`} className="bg-white text-pink-600 rounded-full px-5 py-2.5 text-sm font-bold hover:bg-pink-50">
+              View Public Profile
+            </Link>
+          ) : (
+            <span className="bg-white/15 border border-white/20 text-white rounded-full px-5 py-2.5 text-sm font-bold">
+              Reviewed access only
+            </span>
+          )}
         </div>
+
+        {application?.status === 'approved' && (
+          <div className="bg-white border border-green-100 rounded-2xl p-6 mb-8 shadow-card">
+            <div className="flex items-start gap-3">
+              <div className="w-11 h-11 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                <ShieldCheck size={20} />
+              </div>
+              <div>
+                <h2 className="font-display text-xl font-bold text-gray-900 mb-1">Approved Provider Access</h2>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Your profile is active. Service editing, calendar management and payout setup will open from this portal as each tool is completed.
+                </p>
+                {provider && (
+                  <Link to={`/providers/${provider.slug}`} className="inline-flex mt-4 bg-pink-500 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-pink-600">
+                    Open Public Profile
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {!loadingApplication && !application && (
           <form onSubmit={submitApplication} className="bg-white border border-gray-100 rounded-2xl p-6 mb-8 shadow-card">
@@ -201,14 +241,14 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={Calendar}
             title="Bookings"
-            body="Client appointments will appear here once your provider profile is approved and taking bookings."
-            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> Waiting for appointments</span>}
+            body={application?.status === 'approved' ? 'Client appointments will appear here when booking requests are made against your profile.' : 'Client appointments will appear here once your provider profile is approved and taking bookings.'}
+            action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> {application?.status === 'approved' ? 'No appointments yet' : 'Waiting for appointments'}</span>}
           />
           <EmptyPanel
             icon={Settings}
             title="Services"
-            body="Service management opens after approval so your public profile stays accurate."
-            action={<button className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold cursor-not-allowed"><Plus size={15} /> Add service after approval</button>}
+            body={application?.status === 'approved' ? 'Initial services are created from your application. Full service editing is coming next.' : 'Service management opens after approval so your public profile stays accurate.'}
+            action={<button className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold cursor-not-allowed"><Plus size={15} /> {application?.status === 'approved' ? 'Service editing coming soon' : 'Add service after approval'}</button>}
           />
         </div>
 

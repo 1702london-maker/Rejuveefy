@@ -46,6 +46,17 @@ export async function fetchProvider(slug) {
   return normaliseProvider(data)
 }
 
+export async function fetchProviderByUser(userId) {
+  const { data, error } = await supabase
+    .from('providers')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .limit(1)
+  if (error) throw error
+  return data?.[0] ? normaliseProvider(data[0]) : null
+}
+
 // ── PRODUCTS ──────────────────────────────────────────────────────────────────
 export async function fetchProducts({ category = null, featured = false, limit = 50 } = {}) {
   let q = supabase.from('products').select('*').eq('is_active', true).order('rating', { ascending: false })
@@ -196,10 +207,36 @@ export async function fetchAdminReviewData() {
   }
 }
 
+function slugify(value = '') {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+}
+
+function servicesFromApplication(app) {
+  const services = Array.isArray(app.services)
+    ? app.services
+    : String(app.services || '')
+      .split(',')
+      .map(item => item.trim())
+      .filter(Boolean)
+
+  return services.map((name, index) => ({
+    id: `${slugify(name) || 'service'}-${index + 1}`,
+    name,
+    desc: 'Service details are being completed.',
+    duration: 'To be confirmed',
+    price: 0,
+  }))
+}
+
 export async function updateProviderApplicationStatus(id, status) {
   const { data, error } = await supabase
     .from('provider_applications')
-    .update({ status, reviewed_at: new Date().toISOString() })
+    .update({ status })
     .eq('id', id)
     .select()
     .single()
@@ -207,10 +244,64 @@ export async function updateProviderApplicationStatus(id, status) {
   return data
 }
 
+export async function approveProviderApplication(id) {
+  const { data: app, error: appError } = await supabase
+    .from('provider_applications')
+    .select('*')
+    .eq('id', id)
+    .single()
+  if (appError) throw appError
+
+  const name = app.full_name || app.name || app.email?.split('@')[0] || 'Rejuveefy Provider'
+  const baseSlug = slugify(name) || `provider-${id}`
+  const slug = `${baseSlug}-${String(id).slice(0, 8)}`
+  const services = servicesFromApplication(app)
+
+  const providerPayload = {
+    user_id: app.user_id || null,
+    name,
+    slug,
+    speciality: services[0]?.name || 'Beauty Professional',
+    services,
+    location: app.location || null,
+    bio: app.bio || app.experience || 'This provider profile is being completed.',
+    price_from: 0,
+    rating: 0,
+    review_count: 0,
+    is_active: true,
+    is_featured: false,
+  }
+
+  const { data: existing } = app.user_id
+    ? await supabase.from('providers').select('id').eq('user_id', app.user_id).limit(1)
+    : { data: [] }
+
+  let providerResult
+  if (existing?.[0]?.id) {
+    providerResult = await supabase
+      .from('providers')
+      .update(providerPayload)
+      .eq('id', existing[0].id)
+      .select()
+      .single()
+  } else {
+    providerResult = await supabase
+      .from('providers')
+      .insert(providerPayload)
+      .select()
+      .single()
+  }
+
+  if (providerResult.error) throw providerResult.error
+
+  const updated = await updateProviderApplicationStatus(id, 'approved')
+  return { application: updated, provider: providerResult.data }
+}
+
 export async function updateAffiliateApplicationStatus(id, status) {
   const { data, error } = await supabase
     .from('affiliate_applications')
-    .update({ status, reviewed_at: new Date().toISOString() })
+    .update({ status })
     .eq('id', id)
     .select()
     .single()

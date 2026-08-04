@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import {
+  approveProviderApplication,
   fetchAdminReviewData,
   updateAffiliateApplicationStatus,
   updateBookingStatus,
@@ -126,7 +127,7 @@ function ApplicationCard({ item, type, onStatus, busy }) {
 
       <div className="flex flex-wrap gap-2">
         <ActionButton onClick={() => onStatus(item.id, 'approved')} disabled={busy}>
-          <CheckCircle size={14} /> Approve
+          <CheckCircle size={14} /> {isProvider ? 'Approve & Create Profile' : 'Approve'}
         </ActionButton>
         <ActionButton type="reject" onClick={() => onStatus(item.id, 'rejected')} disabled={busy}>
           <XCircle size={14} /> Reject
@@ -134,6 +135,11 @@ function ApplicationCard({ item, type, onStatus, busy }) {
         <ActionButton type="neutral" onClick={() => onStatus(item.id, 'pending')} disabled={busy}>
           <Clock size={14} /> Mark Pending
         </ActionButton>
+        {isProvider && item.provider_slug && (
+          <Link to={`/providers/${item.provider_slug}`} className="inline-flex items-center justify-center rounded-full border border-pink-200 px-3 py-2 text-xs font-bold text-pink-600 hover:bg-pink-50">
+            View Profile
+          </Link>
+        )}
       </div>
     </div>
   )
@@ -229,13 +235,17 @@ export default function Admin() {
     setBusy(true)
     setError('')
     try {
-      const updated = await updateProviderApplicationStatus(id, status)
+      const result = status === 'approved'
+        ? await approveProviderApplication(id)
+        : { application: await updateProviderApplicationStatus(id, status), provider: null }
+      const updated = result.application
+      const providerSlug = result.provider?.slug
       setData(prev => ({
         ...prev,
-        providerApplications: prev.providerApplications.map(item => item.id === id ? updated : item),
+        providerApplications: prev.providerApplications.map(item => item.id === id ? { ...updated, provider_slug: providerSlug || item.provider_slug } : item),
       }))
     } catch (err) {
-      setError(err.message || 'Could not update provider application.')
+      setError(err.message || 'Could not approve provider application.')
     } finally {
       setBusy(false)
     }
