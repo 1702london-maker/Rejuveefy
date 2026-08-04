@@ -18,24 +18,49 @@ import { useApp } from '../context/AppContext'
 const steps = [
   {
     title: 'Apply',
-    desc: 'Tell us who you are, where your audience is, and how you want to promote Rejuveefy.',
+    desc: 'Tell us who you are, where your audience is, and how you would introduce Rejuveefy responsibly.',
     icon: FileText,
   },
   {
     title: 'Review',
-    desc: 'The Rejuveefy team reviews each application before affiliate access is activated.',
+    desc: 'Applications are checked for audience fit, brand alignment, clear channels and compliant promotion plans.',
     icon: ShieldCheck,
   },
   {
     title: 'Approve',
-    desc: 'Approved affiliates receive an email with the next steps for portal access and tracking.',
+    desc: 'Approved partners receive email instructions for portal access, referral setup and programme expectations.',
     icon: Mail,
   },
   {
     title: 'Track',
-    desc: 'Referral links, conversion reporting and payout details open after approval.',
+    desc: 'Approved partners can use referral tools and review performance once tracking is activated.',
     icon: BarChart2,
   },
+]
+
+const standards = [
+  {
+    icon: Users,
+    title: 'Relevant Audience',
+    desc: 'Beauty, wellness, lifestyle, training or local-service audiences are reviewed for fit before approval.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Responsible Promotion',
+    desc: 'Partners must use accurate claims, clear disclosures and respectful marketing that protects the Rejuveefy brand.',
+  },
+  {
+    icon: Gift,
+    title: 'Clear Rewards',
+    desc: 'Commission, reward rules and payout timing are shared with approved partners before live promotion begins.',
+  },
+]
+
+const misuseRules = [
+  'No spam, bulk unsolicited messaging or misleading discount claims.',
+  'No paid ads, impersonation or brand-name bidding unless written approval is given.',
+  'No self-referrals, fake leads, coupon abuse or attempts to manipulate tracking.',
+  'No promotion on unsafe, adult, hateful, deceptive or illegal content channels.',
 ]
 
 const faqs = [
@@ -49,7 +74,11 @@ const faqs = [
   },
   {
     q: 'How are rewards handled?',
-    a: 'Reward and commission details will be shared with approved partners when the programme opens.',
+    a: 'Commission and payout expectations are confirmed with approved partners before referral activity begins. Exact rates are not promised at application stage.',
+  },
+  {
+    q: 'What promotion is not allowed?',
+    a: 'Spam, misleading claims, fake leads, self-referrals, unauthorised paid ads and any activity that damages client trust are not allowed.',
   },
   {
     q: 'How will I know I am approved?',
@@ -107,7 +136,7 @@ export default function Affiliate() {
               Partner With Rejuveefy
             </h1>
             <p className="text-lg text-pink-100 max-w-2xl mb-8">
-              Apply to join the affiliate programme. Approved partners will get access to referral tools after review.
+              Apply to join the Rejuveefy affiliate programme. Approved partners can promote the brand through responsible channels and receive referral tools after review.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="#apply" className="bg-white text-pink-600 font-bold px-8 py-3.5 rounded-full hover:bg-pink-50 transition-colors shadow-lg text-center">
@@ -123,7 +152,7 @@ export default function Affiliate() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 { icon: FileText, label: 'Application', value: 'Required' },
-                { icon: ShieldCheck, label: 'Review', value: 'Manual' },
+                { icon: ShieldCheck, label: 'Review', value: 'Quality checked' },
                 { icon: Mail, label: 'Email', value: 'Approval updates' },
                 { icon: Share2, label: 'Tracking', value: 'After approval' },
               ].map(({ icon: Icon, label, value }) => (
@@ -159,11 +188,7 @@ export default function Affiliate() {
 
       <section className="py-16 bg-gray-50">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6 grid lg:grid-cols-3 gap-6">
-          {[
-            { icon: Users, title: 'Clean Partner Base', desc: 'No public affiliate dashboard is unlocked until an application is approved.' },
-            { icon: Share2, title: 'Controlled Referral Links', desc: 'Referral links are released only after partner approval.' },
-            { icon: Gift, title: 'Reward Details', desc: 'Commission and reward terms will be shared with approved partners.' },
-          ].map(({ icon: Icon, title, desc }) => (
+          {standards.map(({ icon: Icon, title, desc }) => (
             <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-card">
               <div className="w-11 h-11 bg-pink-50 rounded-xl flex items-center justify-center mb-4">
                 <Icon size={20} className="text-pink-500" />
@@ -175,11 +200,31 @@ export default function Affiliate() {
         </div>
       </section>
 
+      <section className="py-16 max-w-[1280px] mx-auto px-4 lg:px-6">
+        <div className="grid lg:grid-cols-[360px_1fr] gap-8 items-start">
+          <div>
+            <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">Programme Rules</p>
+            <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900 mb-4">Protecting trust before scale</h2>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Affiliate access is approval-based so promotions stay accurate, respectful and aligned with the customer experience Rejuveefy is building.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {misuseRules.map(rule => (
+              <div key={rule} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+                <CheckCircle size={18} className="text-pink-500 mb-3" />
+                <p className="text-sm text-gray-600 leading-relaxed">{rule}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="apply" className="py-16 bg-gradient-to-br from-pink-600 to-rose-500 text-white">
         <div className="max-w-2xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl lg:text-4xl font-bold mb-3">Apply to Join</h2>
-            <p className="text-pink-100">Submitted applications are reviewed before affiliate access opens.</p>
+            <p className="text-pink-100">Submitted applications are reviewed before affiliate access, referral tools or reward terms are issued.</p>
           </div>
 
           {submitted ? (
@@ -234,7 +279,7 @@ export default function Affiliate() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">How will you promote Rejuveefy?</label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">How will you promote Rejuveefy responsibly?</label>
                 <textarea rows={4} value={form.niche} onChange={e => update('niche', e.target.value)}
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 resize-none" />
               </div>

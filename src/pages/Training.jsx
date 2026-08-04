@@ -17,47 +17,61 @@ const tracks = [
     title: 'Braiding Foundations',
     category: 'Braiding',
     level: 'Beginner to Intermediate',
-    duration: 'One-day format planned',
+    duration: 'One-day practical',
     status: 'Register interest',
-    topics: ['Sectioning and tension control', 'Feed-in technique', 'Finishing and aftercare'],
+    topics: ['Sectioning and clean parting', 'Tension control and client comfort', 'Feed-in technique and finishing', 'Aftercare guidance for clients'],
   },
   {
     title: 'Wig Construction and Installation',
     category: 'Wig Making',
     level: 'Intermediate',
-    duration: 'Workshop format planned',
+    duration: 'Workshop format',
     status: 'Register interest',
-    topics: ['Cap measurements', 'Lace application', 'Hairline customisation'],
+    topics: ['Cap measurements and preparation', 'Lace application fundamentals', 'Hairline customisation', 'Maintenance and client handover'],
   },
   {
     title: 'Loc Starter and Maintenance',
     category: 'Locs',
     level: 'All Levels',
-    duration: 'Practical format planned',
+    duration: 'Practical format',
     status: 'Register interest',
-    topics: ['Starting methods', 'Retwist technique', 'Loc care guidance'],
+    topics: ['Starter method selection', 'Retwist technique and sectioning', 'Loc health checks', 'Home-care guidance'],
   },
   {
     title: 'Natural Hair Care for Professionals',
     category: 'Natural Hair',
     level: 'All Levels',
-    duration: 'Short course planned',
+    duration: 'Short course',
     status: 'Register interest',
-    topics: ['Hair porosity', 'Product selection', 'Protective styling'],
+    topics: ['Hair and scalp assessment', 'Porosity and product selection', 'Protective styling standards', 'Client consultation notes'],
   },
 ]
 
 const principles = [
-  'Course details will be confirmed before enrolment opens.',
-  'Training content is reviewed before public release.',
-  'Group, salon and academy enquiries are open now.',
-  'Certificates and pricing will be shown clearly before booking.',
+  'Every course page will show level, format, learning outcomes and learner requirements before enrolment.',
+  'Training is designed around practical demonstration, supervised practice and clear client-care standards.',
+  'Group, salon and academy enquiries can be reviewed before dates are released publicly.',
+  'Pricing, certificate details and cancellation terms are provided before any booking is accepted.',
 ]
 
 const enquiryTypes = [
   { icon: Users, title: 'Salon Teams', body: 'Group sessions for teams that need consistent techniques and service standards.' },
   { icon: GraduationCap, title: 'New Stylists', body: 'Foundation training for learners building confidence before taking clients.' },
   { icon: Award, title: 'Professional Upskill', body: 'Focused practical sessions for stylists adding new services.' },
+]
+
+const learnerOutcomes = [
+  'A structured skills checklist for the selected training track.',
+  'Practical technique guidance with hygiene, consultation and aftercare standards.',
+  'A certificate of attendance or completion where the course criteria are met.',
+  'Follow-up instructions so learners know what to practise after the session.',
+]
+
+const enquirySteps = [
+  'Choose the training area that matches your goal.',
+  'Send your preferred topic, location, learner level and group size.',
+  'The team reviews suitability, availability and any kit requirements.',
+  'Confirmed details are shared before enrolment or payment is requested.',
 ]
 
 function TrackCard({ track }) {
@@ -71,7 +85,7 @@ function TrackCard({ track }) {
       <div className="p-5">
         <div className="flex items-center justify-between gap-3 mb-3">
           <span className="text-[10px] font-bold text-pink-500 uppercase tracking-wider">{track.category}</span>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Preparing</span>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Interest Open</span>
         </div>
         <h3 className="font-display text-lg font-bold text-gray-900 leading-tight mb-2">{track.title}</h3>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -120,11 +134,11 @@ export default function Training() {
                 Professional beauty training, built with care.
               </h1>
               <p className="text-gray-500 max-w-2xl leading-relaxed mb-8">
-                Rejuveefy training will cover practical hair and beauty skills for stylists, salons and learners. Register your interest now and receive details when dates, pricing and enrolment open.
+                Practical hair and beauty training for learners, stylists and salon teams who want stronger technique, cleaner client-care standards and a clear route into professional service delivery.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a href="#tracks" className="bg-pink-500 text-white font-bold px-7 py-3.5 rounded-full hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
-                  View Planned Tracks <ArrowRight size={16} />
+                  View Training Tracks <ArrowRight size={16} />
                 </a>
                 <Link to="/contact" className="border border-pink-200 text-pink-600 font-semibold px-7 py-3.5 rounded-full hover:bg-pink-50 transition-colors flex items-center justify-center gap-2">
                   <Mail size={16} /> Enquire About Training
@@ -135,10 +149,10 @@ export default function Training() {
             <p className="text-xs font-bold text-pink-500 uppercase tracking-widest mb-4">Training Pathway</p>
               <div className="space-y-3">
                 {[
-                  { icon: BookOpen, label: 'Tracks', value: `${tracks.length} planned` },
-                  { icon: Calendar, label: 'Dates', value: 'Register interest' },
-                  { icon: Award, label: 'Certificates', value: 'Planned' },
-                  { icon: ShieldCheck, label: 'Review', value: 'In progress' },
+                  { icon: BookOpen, label: 'Tracks', value: `${tracks.length} areas` },
+                  { icon: Calendar, label: 'Dates', value: 'By enquiry' },
+                  { icon: Award, label: 'Certificates', value: 'Course based' },
+                  { icon: ShieldCheck, label: 'Standards', value: 'Reviewed' },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="flex items-center justify-between gap-4 border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
                     <span className="flex items-center gap-2 text-sm text-gray-500"><Icon size={15} className="text-pink-400" /> {label}</span>
@@ -154,10 +168,10 @@ export default function Training() {
       <section className="max-w-[1280px] mx-auto px-4 lg:px-6 py-12">
         <div className="grid lg:grid-cols-[360px_1fr] gap-10">
           <div>
-            <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">How this will launch</p>
+            <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">Training Standards</p>
             <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900 mb-4">Clear details before enrolment</h2>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Training should feel trustworthy from the start. That means confirmed course details, clear enrolment steps, and no checkout until the programme information is ready.
+              Training should feel trustworthy from the first enquiry. Learners should understand what they will practise, what they need to bring, how certificates work and what happens after they register interest.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -175,7 +189,7 @@ export default function Training() {
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8">
             <div>
-              <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">Planned Tracks</p>
+              <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">Training Tracks</p>
               <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900">Training Areas</h2>
             </div>
             <Link to="/contact" className="text-sm font-semibold text-pink-500 hover:text-pink-600">
@@ -184,6 +198,35 @@ export default function Training() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {tracks.map(track => <TrackCard key={track.title} track={track} />)}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-[1280px] mx-auto px-4 lg:px-6 py-14">
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div>
+            <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">What Learners Get</p>
+            <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900 mb-5">Practical training with a professional standard</h2>
+            <div className="space-y-3">
+              {learnerOutcomes.map(item => (
+                <div key={item} className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <CheckCircle size={18} className="text-pink-500 shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-600 leading-relaxed">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-pink-500 uppercase tracking-widest mb-2">Enquiry Flow</p>
+            <h2 className="font-display text-2xl lg:text-3xl font-bold text-gray-900 mb-5">How training enquiries are handled</h2>
+            <div className="space-y-3">
+              {enquirySteps.map((item, index) => (
+                <div key={item} className="flex items-start gap-4 rounded-2xl bg-gray-50 p-4">
+                  <span className="w-8 h-8 rounded-full bg-pink-500 text-white text-xs font-bold flex items-center justify-center shrink-0">{index + 1}</span>
+                  <p className="text-sm text-gray-600 leading-relaxed pt-1">{item}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -206,7 +249,7 @@ export default function Training() {
               <GraduationCap size={38} className="mb-4 opacity-80" />
               <h2 className="font-display text-2xl lg:text-3xl font-bold mb-3">Interested in training?</h2>
               <p className="text-pink-100 leading-relaxed mb-6">
-                Send your training interest, location, group size and preferred topic. The team can follow up when the right programme is ready.
+                Send your training interest, location, learner level, group size and preferred topic. The team can follow up with the most suitable route.
               </p>
             </div>
             <Link to="/contact" className="inline-flex items-center justify-center gap-2 bg-white text-pink-500 font-bold px-6 py-3.5 rounded-full hover:bg-pink-50 transition-colors">
