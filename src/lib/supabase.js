@@ -35,6 +35,7 @@ function disabledQuery() {
   const query = {
     select: () => query,
     insert: () => query,
+    update: () => query,
     upsert: () => query,
     eq: () => query,
     or: () => query,

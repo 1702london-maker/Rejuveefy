@@ -171,6 +171,64 @@ export async function fetchProviderApplication({ userId, email }) {
   return data?.[0] || null
 }
 
+// ADMIN REVIEW
+export async function fetchAdminReviewData() {
+  const [
+    providerApplications,
+    affiliateApplications,
+    contactMessages,
+    bookings,
+  ] = await Promise.all([
+    supabase.from('provider_applications').select('*').order('created_at', { ascending: false }).limit(100),
+    supabase.from('affiliate_applications').select('*').order('created_at', { ascending: false }).limit(100),
+    supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(100),
+    supabase.from('bookings').select('*, providers(name, slug)').order('created_at', { ascending: false }).limit(100),
+  ])
+
+  const firstError = [providerApplications, affiliateApplications, contactMessages, bookings].find(result => result.error)?.error
+  if (firstError) throw firstError
+
+  return {
+    providerApplications: providerApplications.data || [],
+    affiliateApplications: affiliateApplications.data || [],
+    contactMessages: contactMessages.data || [],
+    bookings: bookings.data || [],
+  }
+}
+
+export async function updateProviderApplicationStatus(id, status) {
+  const { data, error } = await supabase
+    .from('provider_applications')
+    .update({ status, reviewed_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateAffiliateApplicationStatus(id, status) {
+  const { data, error } = await supabase
+    .from('affiliate_applications')
+    .update({ status, reviewed_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateBookingStatus(id, status) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .update({ status })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 // ── CONTACT ───────────────────────────────────────────────────────────────────
 export async function submitContactMessage(msg) {
   const { error } = await supabase.from('contact_messages').insert(msg)

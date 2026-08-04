@@ -23,6 +23,7 @@ import Affiliate from './pages/Affiliate'
 import AffiliatePortal from './pages/AffiliatePortal'
 import ProvidersPortal from './pages/ProvidersPortal'
 import Training from './pages/Training'
+import Admin from './pages/Admin'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -122,6 +123,9 @@ export default function App() {
 
           {/* Providers Portal */}
           <Route path="/providers-portal" element={<PageWrapper><ProvidersPortal /></PageWrapper>} />
+
+          {/* Admin */}
+          <Route path="/admin" element={<PageWrapper><Admin /></PageWrapper>} />
 
           {/* Auth */}
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
