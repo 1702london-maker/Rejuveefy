@@ -70,7 +70,7 @@ export default function Cart() {
           <ShoppingBag size={36} className="text-pink-300" />
         </div>
         <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-        <p className="text-sm text-gray-500 mb-6 text-center">Products you add from the shop will appear here.</p>
+        <p className="text-sm text-gray-500 mb-6 text-center">Products added from the shop are saved here.</p>
         <Link to="/shop" className="bg-pink-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-pink-600 transition-colors">
           Continue Shopping
         </Link>
@@ -97,9 +97,9 @@ export default function Cart() {
           <div className="space-y-3">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-card px-5 py-3 flex flex-wrap gap-4">
               {[
-                { icon: ShieldCheck, label: 'Real catalogue items' },
-                { icon: Lock, label: 'Checkout setup in progress' },
-                { icon: Truck, label: 'Shipping rules to confirm' },
+                { icon: ShieldCheck, label: 'Curated beauty essentials' },
+                { icon: Lock, label: 'Secure checkout preparation' },
+                { icon: Truck, label: 'Delivery details reviewed before payment' },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-1.5 text-xs text-gray-600">
                   <Icon size={14} className="text-pink-500" /> {label}
@@ -162,7 +162,7 @@ export default function Cart() {
                 Continue to Checkout <CreditCard size={15} />
               </button>
               <p className="text-[10px] text-gray-400 text-center mt-3">
-                Payment collection will open when checkout launches.
+                Payment is collected only after delivery and order details are confirmed.
               </p>
             </div>
           </aside>
@@ -287,11 +287,11 @@ export function Checkout() {
                 <CreditCard size={15} className="text-pink-500" /> Payment
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                Card and wallet payments are coming soon. Checkout will open when live payments are ready.
+                Review your delivery details now. Card and wallet payment will be available once the shop catalogue is ready to accept orders.
               </p>
               <button disabled
                 className="w-full bg-gray-200 text-gray-500 py-3 rounded-full font-semibold text-sm cursor-not-allowed">
-                Payment Setup Required
+                Payment Not Available Yet
               </button>
               {!canReview && <p className="text-xs text-gray-400 mt-3">Complete the delivery fields before payment is enabled.</p>}
             </div>
@@ -311,9 +311,9 @@ export function OrderSuccess() {
         <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle size={40} className="text-pink-500" />
         </div>
-        <h1 className="font-display text-3xl font-bold text-gray-900 mb-3">Order Flow Pending</h1>
+        <h1 className="font-display text-3xl font-bold text-gray-900 mb-3">Order Review</h1>
         <p className="text-sm text-gray-500 mb-6">
-          This page will show confirmed order details when checkout launches.
+          Confirmed order details and delivery updates are shown here once checkout is available.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link to="/cart" className="flex-1 bg-pink-500 text-white py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">Back to Cart</Link>

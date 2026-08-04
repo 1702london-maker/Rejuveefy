@@ -117,7 +117,7 @@ export default function AffiliatePortal() {
                   ? 'Your referral link is ready. Campaign metrics will start from approved links.'
                   : application
                   ? `Submitted ${new Date(application.created_at).toLocaleDateString('en-GB')}. Referral tools unlock after approval.`
-                  : 'Once approved, this portal will show live referral links, clicks, conversions, commissions and payouts.'}
+                  : 'Once approved, this portal opens referral links, campaign reporting, commissions and payout history.'}
             </p>
           </div>
           {approved ? (
@@ -162,8 +162,8 @@ export default function AffiliatePortal() {
           <h2 className="font-display text-xl font-bold text-gray-900 mb-2">No affiliate activity yet</h2>
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
             {approved
-              ? 'Clicks, conversions and payout history will appear here as approved referral activity is tracked.'
-              : 'Transactions, campaign assets and payout history will appear here after approval and launch.'}
+              ? 'Clicks, conversions and payout history are tracked from approved referral activity.'
+              : 'Campaign assets, transactions and payout history open after approval.'}
           </p>
         </div>
       </div>

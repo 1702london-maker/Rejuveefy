@@ -869,7 +869,7 @@ function Step7({ location, service, cfg, hairChoice, hairProducts, date, time, d
               <p className="text-sm font-bold text-gray-800">Pay by Card</p>
               <p className="text-xs text-gray-500 font-medium mt-0.5">Secure card payment. Coming soon.</p>
             </div>
-            <span className="text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-1 shrink-0">Coming Soon</span>
+            <span className="text-[10px] bg-amber-100 text-amber-700 font-bold px-2 py-1 shrink-0">Preparing</span>
           </button>
         </div>
       </div>
@@ -895,7 +895,7 @@ function Step7({ location, service, cfg, hairChoice, hairProducts, date, time, d
 
       <button type="submit" disabled={loading || payMethod === 'card'}
         className="w-full bg-pink-500 text-white font-bold text-xs tracking-[2.5px] uppercase py-5 hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-        {loading ? 'Sending...' : payMethod === 'bank' ? 'Open WhatsApp & Pay Deposit' : payMethod === 'card' ? 'Card payment coming soon' : 'Confirm Appointment'}
+        {loading ? 'Sending...' : payMethod === 'bank' ? 'Open WhatsApp & Pay Deposit' : payMethod === 'card' ? 'Card Payments Preparing' : 'Confirm Appointment'}
       </button>
 
       <div className="mt-4">

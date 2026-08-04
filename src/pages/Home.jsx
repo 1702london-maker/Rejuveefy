@@ -49,10 +49,10 @@ const howItWorks = [
   { step: '03', title: 'Stay Connected', desc: 'Track appointments, referrals, provider applications and affiliate status from one place.', icon: Sparkles },
 ]
 
-const testimonials = [
-  { name: 'Client account', role: 'Booking flow', text: 'Clients can create an account, choose services, and manage appointments from the dashboard.', rating: 5, avatar: '/assets/hero-beauty.png' },
-  { name: 'AI analyser', role: 'Beauty tech', text: 'The analyser supports personalised hair and beauty guidance from uploaded photos.', rating: 5, avatar: '/assets/spa-interior.png' },
-  { name: 'Provider setup', role: 'Portal flow', text: 'Providers can register now, with verified profiles and service details prepared before going live.', rating: 5, avatar: '/assets/wellness-lifestyle.png' },
+const platformHighlights = [
+  { title: 'Reviewed Providers', label: 'Directory standard', text: 'Provider applications are reviewed before public profiles are published.', icon: ShieldCheck },
+  { title: 'Clean Booking Flow', label: 'Client experience', text: 'Clients can request services and keep appointment details connected to their account.', icon: CheckCircle },
+  { title: 'Beauty Tech Tools', label: 'Guided support', text: 'Dora and the Rejuveefy account area bring advice, services and partner access into one place.', icon: Sparkles },
 ]
 
 export default function Home() {
@@ -256,7 +256,7 @@ export default function Home() {
               <span className="inline-flex items-center gap-2 bg-pink-500 hover:bg-pink-400 text-white font-black text-sm sm:text-base px-8 py-4 rounded-2xl transition-all group-hover:scale-105 shadow-xl">
                 Book Now →
               </span>
-              <span className="text-[10px] text-white/30">50% deposit · Instant confirmation</span>
+                <span className="text-[10px] text-white/30">Deposit request · Booking review</span>
             </div>
           </Link>
         </div>
@@ -424,7 +424,7 @@ export default function Home() {
           <div className="flex items-end justify-between mb-10">
             <div>
               <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-2">Our Store</p>
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Shop Best Sellers</h2>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Shop Preview</h2>
             </div>
             <Link to="/shop" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-pink-500 hover:text-pink-600 transition-colors">
               View All <ChevronRight size={16} />
@@ -468,7 +468,7 @@ export default function Home() {
                 <ShoppingBag size={34} className="text-pink-400 mx-auto mb-3" />
                 <h3 className="font-display text-xl font-bold text-gray-900 mb-2">Products are being prepared</h3>
                 <p className="text-sm text-gray-500 max-w-xl mx-auto">
-                  Best sellers will appear here as the shop catalogue is prepared.
+                  Launch products are being curated before they are added to the shop.
                 </p>
               </div>
             )}
@@ -502,27 +502,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ───────────────────────────────────────────── */}
+      {/* ── PLATFORM STANDARDS ─────────────────────────────────────── */}
       <section className="py-16 bg-white">
         <div className="max-w-[1280px] mx-auto px-6">
           <div className="text-center mb-12">
-            <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-3">Client Love</p>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">What Our Clients Say</h2>
+            <p className="text-pink-500 text-sm font-semibold uppercase tracking-wider mb-3">Platform Standards</p>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-gray-900">Built for a Cleaner Beauty Journey</h2>
           </div>
           <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
             className="grid lg:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
+            {platformHighlights.map(({ icon: Icon, ...item }, i) => (
               <motion.div key={i} variants={cardItem}
                 className="bg-[#FAFAFA] rounded-2xl p-6 border border-gray-100">
-                <Stars val={t.rating} size={14} />
-                <p className="text-gray-700 text-sm leading-relaxed my-4">"{t.text}"</p>
-                <div className="flex items-center gap-3">
-                  <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
-                  <div>
-                    <p className="font-bold text-sm text-gray-900">{t.name}</p>
-                    <p className="text-xs text-gray-500">{t.role}</p>
-                  </div>
+                <div className="w-12 h-12 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center mb-5">
+                  <Icon size={22} />
                 </div>
+                <p className="text-xs font-bold text-pink-500 uppercase tracking-wide mb-2">{item.label}</p>
+                <h3 className="font-display text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{item.text}</p>
               </motion.div>
             ))}
           </motion.div>

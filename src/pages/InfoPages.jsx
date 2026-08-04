@@ -40,8 +40,8 @@ const faqs = [
   {
     category: 'Shop',
     items: [
-      { id: 'shop-products', question: 'When will products be available?', answer: 'The shop catalogue is being prepared. Coming soon product cards will be replaced as items are released.' },
-      { id: 'checkout', question: 'Can I pay for products now?', answer: 'Checkout will open when the shop launches.' },
+      { id: 'shop-products', question: 'When will products be available?', answer: 'The shop catalogue is being curated carefully. Product details will be published as each item is ready for customers.' },
+      { id: 'checkout', question: 'Can I pay for products now?', answer: 'Payments are not open yet. Checkout will be enabled once product, delivery and fulfilment details are ready.' },
     ],
   },
 ]
@@ -74,7 +74,7 @@ export function AboutUs() {
     <div className="min-h-screen bg-white">
       <PageHero
         title="About Rejuveefy"
-        body="Rejuveefy is being built as a reviewed beauty marketplace for clients, providers and partners."
+        body="Rejuveefy is a reviewed beauty marketplace for clients, providers and partners."
         label="About"
       />
 
@@ -89,7 +89,7 @@ export function AboutUs() {
               The public experience is designed to show verified providers, real products, real bookings and reviewed partner access.
             </p>
             <p className="text-sm text-gray-500 leading-relaxed mb-6">
-              The current build keeps incomplete areas clean while provider, affiliate, checkout and review workflows are completed.
+              Rejuveefy keeps provider discovery, beauty services, product shopping and partner access in one clean customer journey.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link to="/book" className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
@@ -313,20 +313,20 @@ export function ReturnsRefunds() {
   const [open, setOpen] = useState({})
   const toggle = (id) => setOpen(prev => ({ ...prev, [id]: !prev[id] }))
   const items = [
-    { id: 'products', q: 'Are product returns live?', a: 'Returns policy details will be shown before product checkout opens.' },
-    { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking cancellation rules will be shown before full provider scheduling launches. For now, contact support about any booking record.' },
-    { id: 'refunds', q: 'How will refunds work?', a: 'Refund details will be shown clearly before checkout opens.' },
+    { id: 'products', q: 'How will product returns work?', a: 'Return instructions will be published before product payments are accepted, so customers can review the policy before placing an order.' },
+    { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking cancellation rules will be shown clearly as provider scheduling opens. For now, contact support about any saved booking request.' },
+    { id: 'refunds', q: 'How will refunds work?', a: 'Refund guidance will be shown before checkout is enabled, including how eligible product or booking refunds are handled.' },
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Returns & Refunds" body="Policy details will stay clear as checkout and provider booking rules are finalised." label="Returns & Refunds" />
+      <PageHero title="Returns & Refunds" body="Clear customer policies for products, bookings and eligible refunds." label="Returns & Refunds" />
       <div className="max-w-[1000px] mx-auto px-4 lg:px-6 py-10">
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           {[
-            { icon: RotateCcw, title: 'Policy Details', sub: 'Final rules will be shown before launch.' },
-            { icon: Truck, title: 'Delivery Details', sub: 'Shipping and delivery details will be shown at launch.' },
-            { icon: Package, title: 'Order Details', sub: 'Return options appear after checkout.' },
+            { icon: RotateCcw, title: 'Policy Details', sub: 'Rules will be published before payments open.' },
+            { icon: Truck, title: 'Delivery Details', sub: 'Shipping information will be shown before order payment.' },
+            { icon: Package, title: 'Order Details', sub: 'Return options will be linked to eligible orders.' },
           ].map(({ icon: Icon, title, sub }) => (
             <div key={title} className="bg-pink-50 rounded-2xl p-5 text-center">
               <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
@@ -360,7 +360,7 @@ export function TrackOrder() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Track Order" body="Order tracking will appear when the shop checkout launches." label="Track Order" />
+      <PageHero title="Track Order" body="Check the status of a Rejuveefy order when order tracking is available." label="Track Order" />
       <div className="max-w-[700px] mx-auto px-4 lg:px-6 py-10">
         <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-6 mb-6">
           <div className="space-y-3">
@@ -383,8 +383,8 @@ export function TrackOrder() {
         {checked && (
           <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6 text-center">
             <Package size={30} className="text-pink-500 mx-auto mb-3" />
-            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Tracking Coming Soon</h2>
-            <p className="text-sm text-gray-500">Order status will appear here when checkout and fulfilment tracking launch.</p>
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Tracking Not Available Yet</h2>
+            <p className="text-sm text-gray-500">Order tracking is shown here once product checkout and fulfilment updates are active.</p>
           </div>
         )}
       </div>
@@ -405,7 +405,7 @@ export function Careers() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Careers" body="Open roles will appear here when recruitment opens." label="Careers" />
+      <PageHero title="Careers" body="Open roles are shared here when recruitment is active." label="Careers" />
       <section id="jobs" className="bg-gray-50 py-12">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <h2 className="font-display text-2xl font-bold text-gray-900 mb-6">Open Positions</h2>

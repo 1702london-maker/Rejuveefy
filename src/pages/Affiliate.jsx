@@ -33,7 +33,7 @@ const steps = [
   },
   {
     title: 'Track',
-    desc: 'Referral links, conversions and payout details will appear after approval.',
+    desc: 'Referral links, conversion reporting and payout details open after approval.',
     icon: BarChart2,
   },
 ]

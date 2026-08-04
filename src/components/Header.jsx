@@ -18,7 +18,6 @@ const nav = [
       { label: 'Hair Styling', path: '/book/hair-styling' },
       { label: 'Makeup', path: '/book/makeup' },
       { label: 'Barbers', path: '/book/barbers' },
-      { label: 'Training', path: '/training' },
     ],
   },
   {
@@ -73,7 +72,7 @@ export default function Header() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    if (q.trim()) { navigate(`/shop?q=${q}`); setSearchOpen(false); setQ('') }
+    if (q.trim()) { navigate(`/book?service=${q}`); setSearchOpen(false); setQ('') }
   }
 
   const isActive = (path) => path === '/' ? pathname === '/' : pathname.startsWith(path)
@@ -151,7 +150,7 @@ export default function Header() {
             {searchOpen ? (
               <form onSubmit={handleSearch} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5 border border-gray-200">
                 <input autoFocus value={q} onChange={e => setQ(e.target.value)}
-                  placeholder="Search products..." className="bg-transparent text-sm outline-none w-36 text-gray-800" />
+                  placeholder="Search services..." className="bg-transparent text-sm outline-none w-36 text-gray-800" />
                 <button type="button" onClick={() => { setSearchOpen(false); setQ('') }}><X size={15} className="text-gray-400" /></button>
               </form>
             ) : (

@@ -69,7 +69,7 @@ function VerifyingProviderGrid() {
           <div className="p-4">
             <p className="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Verifying details</p>
             <h3 className="text-sm font-semibold text-gray-900 mt-1">{label}</h3>
-            <p className="text-xs text-gray-400 mt-1">Profile coming soon</p>
+            <p className="text-xs text-gray-400 mt-1">Profile in review</p>
             <div className="flex gap-1 mt-3">
               {[1, 2, 3].map(i => <span key={i} className={`h-1.5 rounded-full flex-1 ${index % 2 ? 'bg-pink-100' : 'bg-pink-200'}`} />)}
             </div>
@@ -87,7 +87,7 @@ function EmptyDirectory() {
         <ShieldCheck size={34} className="text-pink-400 mx-auto mb-3" />
         <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Provider profiles are being verified</h2>
         <p className="text-sm text-gray-500 max-w-xl mx-auto mb-5">
-          New provider profiles are being checked and prepared. Details will appear here soon.
+          New provider profiles are being reviewed and completed before they go live.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link to="/book/maye" className="bg-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-pink-600 transition-colors">
@@ -237,7 +237,7 @@ export default function Providers() {
               <section className="mt-8">
                 <div className="flex items-end justify-between gap-4 mb-4">
                   <div>
-                    <h2 className="font-display text-xl font-bold text-gray-900">More providers coming soon</h2>
+                    <h2 className="font-display text-xl font-bold text-gray-900">More verified providers in review</h2>
                     <p className="text-sm text-gray-500">New profiles are being verified and prepared.</p>
                   </div>
                   <Link to="/my-portal" className="hidden sm:inline-flex text-sm font-semibold text-pink-500 hover:text-pink-600">
@@ -349,7 +349,7 @@ export function ProviderProfile() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">Services will appear once this provider completes their setup.</p>
+                <p className="text-sm text-gray-400">Services are being completed for this provider.</p>
               )}
             </section>
           </div>

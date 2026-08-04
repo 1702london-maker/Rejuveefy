@@ -206,7 +206,7 @@ export default function Shop() {
             { icon: ShieldCheck, title: 'Curated Selection', sub: 'Beauty essentials launching soon' },
             { icon: RotateCcw, title: 'Clear Returns', sub: 'Policy details will be shown before checkout' },
             { icon: Truck, title: 'Delivery Details', sub: 'Shipping options will be confirmed at launch' },
-            { icon: CreditCard, title: 'Secure Checkout', sub: 'Payments will open with the shop launch' },
+            { icon: CreditCard, title: 'Secure Checkout', sub: 'Payments activate with the shop launch' },
           ].map(({ icon: Icon, title, sub }) => (
             <div key={title} className="flex items-center gap-3">
               <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
@@ -343,7 +343,7 @@ export function ProductDetail() {
 
         <section className="mt-10 border-t border-gray-100 pt-6">
           <h2 className="text-base font-semibold text-gray-900 mb-3">Product Information</h2>
-          <p className="text-sm text-gray-600 leading-relaxed">{product.description || 'Product information will appear here once completed.'}</p>
+          <p className="text-sm text-gray-600 leading-relaxed">{product.description || 'Product information is being completed.'}</p>
           {product.ingredients && (
             <>
               <h3 className="text-sm font-semibold text-gray-900 mt-5 mb-2">Ingredients</h3>
@@ -352,7 +352,7 @@ export function ProductDetail() {
           )}
           <div className="flex items-center gap-2 text-sm text-gray-500 mt-5">
             <CheckCircle size={15} className="text-pink-500" />
-            Reviews and Q&A will appear after real customer activity.
+            Reviews and Q&A are shown after real customer activity.
           </div>
         </section>
       </div>

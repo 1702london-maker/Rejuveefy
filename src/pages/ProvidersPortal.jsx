@@ -17,7 +17,13 @@ import {
 import { useApp } from '../context/AppContext'
 import { fetchProviderApplication, fetchProviderBookings, fetchProviderByUser, submitProviderApplication, updateBookingStatus, updateProviderAvailability, updateProviderProfile, updateProviderServices } from '../lib/db'
 
-const tabs = ['Overview', 'Bookings', 'Services', 'Calendar', 'Payouts', 'Profile']
+const tabs = [
+  { label: 'Overview', id: 'provider-overview' },
+  { label: 'Services', id: 'provider-services' },
+  { label: 'Profile', id: 'provider-profile' },
+  { label: 'Calendar', id: 'provider-calendar' },
+  { label: 'Bookings', id: 'provider-bookings' },
+]
 const weekDays = [
   { key: 'monday', label: 'Mon' },
   { key: 'tuesday', label: 'Tue' },
@@ -462,15 +468,20 @@ export default function ProvidersPortal() {
       </div>
 
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-8">
-        <div className="flex gap-1 mb-8 bg-white border border-gray-100 rounded-xl p-1 w-fit overflow-x-auto max-w-full">
+        <div className="sticky top-14 z-30 flex gap-1 mb-8 bg-white border border-gray-100 rounded-xl p-1 w-fit overflow-x-auto max-w-full shadow-sm">
           {tabs.map(tab => (
-            <button key={tab} disabled className="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-gray-400 cursor-not-allowed">
-              {tab}
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => document.getElementById(tab.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap text-gray-600 hover:bg-pink-50 hover:text-pink-600 transition-colors"
+            >
+              {tab.label}
             </button>
           ))}
         </div>
 
-        <div className="bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div id="provider-overview" className="scroll-mt-32 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <p className="font-display text-xl font-bold">Provider setup</p>
             <p className="text-pink-100 text-sm mt-1">
@@ -501,7 +512,7 @@ export default function ProvidersPortal() {
               <div>
                 <h2 className="font-display text-xl font-bold text-gray-900 mb-1">Approved Provider Access</h2>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  Your profile is active. Service editing, calendar management and payout setup will open from this portal as each tool is completed.
+                  Your profile is active. Keep services, availability and booking requests up to date from this portal.
                 </p>
                 {provider && (
                   <Link to={`/providers/${provider.slug}`} className="inline-flex mt-4 bg-pink-500 text-white rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-pink-600">
@@ -575,7 +586,7 @@ export default function ProvidersPortal() {
           <EmptyPanel
             icon={Calendar}
             title="Bookings"
-            body={application?.status === 'approved' ? `${bookings.length} booking request${bookings.length === 1 ? '' : 's'} connected to your profile.` : 'Client appointments will appear here once your provider profile is approved and taking bookings.'}
+            body={application?.status === 'approved' ? `${bookings.length} booking request${bookings.length === 1 ? '' : 's'} connected to your profile.` : 'Client appointment requests are shown here after your provider profile is approved and taking bookings.'}
             action={<span className="inline-flex items-center gap-2 text-gray-400 text-sm font-semibold"><Clock size={15} /> {loadingBookings ? 'Checking bookings' : application?.status === 'approved' ? 'Live booking queue' : 'Waiting for approval'}</span>}
           />
           <EmptyPanel
@@ -586,7 +597,7 @@ export default function ProvidersPortal() {
           />
         </div>
 
-        <form onSubmit={saveServices} className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+        <form id="provider-services" onSubmit={saveServices} className="scroll-mt-32 bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 className="font-semibold text-gray-900">Services</h2>
@@ -652,7 +663,7 @@ export default function ProvidersPortal() {
           </div>
         </form>
 
-        <form onSubmit={saveProfile} className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+        <form id="provider-profile" onSubmit={saveProfile} className="scroll-mt-32 bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 className="font-semibold text-gray-900">Public profile</h2>
@@ -723,7 +734,7 @@ export default function ProvidersPortal() {
           </div>
         </form>
 
-        <form onSubmit={saveAvailability} className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+        <form id="provider-calendar" onSubmit={saveAvailability} className="scroll-mt-32 bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 className="font-semibold text-gray-900">Calendar availability</h2>
@@ -799,7 +810,7 @@ export default function ProvidersPortal() {
           </div>
         </form>
 
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
+        <div id="provider-bookings" className="scroll-mt-32 bg-white border border-gray-100 rounded-2xl overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <h2 className="font-semibold text-gray-900">Booking requests</h2>
@@ -838,20 +849,11 @@ export default function ProvidersPortal() {
                 <p className="text-sm font-semibold text-gray-900">No booking requests yet</p>
                 <p className="text-sm text-gray-500 mt-1">
                   {application?.status === 'approved'
-                    ? 'New client booking requests will appear here once your profile receives appointments.'
+                    ? 'New client booking requests are listed here after clients submit them from your public profile.'
                     : 'Booking requests unlock after the provider application is approved.'}
                 </p>
               </div>
             )}
-          </div>
-        </div>
-
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Recent provider activity</h2>
-          </div>
-          <div className="p-8 text-center">
-            <p className="text-sm text-gray-500">No live provider activity yet.</p>
           </div>
         </div>
       </div>

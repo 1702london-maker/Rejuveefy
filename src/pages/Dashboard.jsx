@@ -367,7 +367,7 @@ export function ReferAndEarn() {
                 <Gift size={32} />
               </div>
               <h1 className="font-display text-2xl font-bold mb-2">Referrals</h1>
-              <p className="text-pink-100 text-sm">Share your unique link. Reward details will appear when the referral programme opens.</p>
+              <p className="text-pink-100 text-sm">Share your unique link. Reward details are shown when the referral programme is active for your account.</p>
             </div>
 
             <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
