@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Search, Heart, ShoppingBag, ChevronDown, X, Menu, User } from 'lucide-react'
+import { Search, Heart, ChevronDown, X, Menu, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../context/AppContext'
 
@@ -52,7 +52,7 @@ const nav = [
 ]
 
 export default function Header() {
-  const { cartCount, wishlist } = useApp()
+  const { wishlist } = useApp()
   const [open, setOpen] = useState(null)
   const [mobile, setMobile] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -164,15 +164,6 @@ export default function Header() {
               {wishlist.length > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-pink-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">
                   {wishlist.length}
-                </span>
-              )}
-            </Link>
-
-            <Link to="/cart" className="relative p-2 rounded-lg text-gray-500 hover:text-pink-500 hover:bg-pink-50 transition-colors">
-              <ShoppingBag size={18} />
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-pink-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold">
-                  {cartCount}
                 </span>
               )}
             </Link>

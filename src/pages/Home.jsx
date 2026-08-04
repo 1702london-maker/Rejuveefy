@@ -61,7 +61,7 @@ export default function Home() {
   const [newsletterDone, setNewsletterDone] = useState(false)
   const [providers, setProviders] = useState([])
   const [products, setProducts] = useState([])
-  const { addToCart, toggleWishlist, inWishlist } = useApp()
+  const { toggleWishlist, inWishlist } = useApp()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export default function Home() {
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-3">
                 <span className="text-[10px] font-black bg-pink-500 text-white px-3 py-1.5 rounded-full tracking-widest uppercase">✨ Founder's Studio</span>
-                <span className="text-[10px] font-bold bg-white/10 text-white/80 px-3 py-1.5 rounded-full">10+ Years</span>
+                <span className="text-[10px] font-bold bg-white/10 text-white/80 px-3 py-1.5 rounded-full">Founder-led</span>
                 <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full">● Available Now</span>
               </div>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight mb-2">
@@ -455,9 +455,9 @@ export default function Home() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-gray-900">GBP {Number(p.price).toFixed(2)}</span>
-                    <button onClick={() => addToCart({ ...p, id: p.id || i })}
-                      className="flex items-center gap-1.5 bg-pink-500 hover:bg-pink-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
-                      <ShoppingBag size={12} /> Add
+                    <button type="button" disabled
+                      className="flex items-center gap-1.5 bg-gray-100 text-gray-500 text-xs font-bold px-3 py-2 rounded-lg cursor-not-allowed">
+                      <ShoppingBag size={12} /> Preview
                     </button>
                   </div>
                 </div>

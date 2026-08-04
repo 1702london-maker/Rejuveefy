@@ -20,12 +20,12 @@ const cols = [
   {
     title: 'Shop',
     links: [
-      { l: 'Hair Care', p: '/shop/hair-care' },
-      { l: 'Hair Bundles', p: '/shop/hair-bundles' },
-      { l: 'Hair Accessories', p: '/shop/accessories' },
-      { l: 'Lashes', p: '/shop/lashes' },
-      { l: 'New Arrivals', p: '/shop?sort=new' },
-      { l: 'Best Sellers', p: '/shop?sort=bestseller' },
+      { l: 'Shop Preview', p: '/shop' },
+      { l: 'Hair Care Preview', p: '/shop/hair-care' },
+      { l: 'Hair Bundles Preview', p: '/shop/hair-bundles' },
+      { l: 'Accessories Preview', p: '/shop/accessories' },
+      { l: 'Lashes Preview', p: '/shop/lashes' },
+      { l: 'Launch Updates', p: '/shop#updates' },
     ],
   },
   {

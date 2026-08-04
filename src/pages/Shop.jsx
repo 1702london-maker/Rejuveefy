@@ -65,7 +65,7 @@ function Stars({ val = 0, size = 12 }) {
 }
 
 function ProductCard({ product }) {
-  const { addToCart, toggleWishlist, inWishlist } = useApp()
+  const { toggleWishlist, inWishlist } = useApp()
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden card-hover group">
@@ -95,9 +95,9 @@ function ProductCard({ product }) {
           <span className="text-sm font-bold text-gray-900">GBP {Number(product.price || 0).toFixed(2)}</span>
           {product.compare_price && <span className="text-[10px] text-gray-400 line-through">GBP {Number(product.compare_price).toFixed(2)}</span>}
         </div>
-        <button onClick={() => addToCart(product)}
-          className="w-full flex items-center justify-center gap-1.5 bg-pink-500 text-white text-[10px] font-semibold py-1.5 rounded-full hover:bg-pink-600 transition-colors">
-          <ShoppingBag size={10} /> Add to Cart
+        <button type="button" disabled
+          className="w-full flex items-center justify-center gap-1.5 bg-gray-100 text-gray-500 text-[10px] font-semibold py-1.5 rounded-full cursor-not-allowed">
+          <ShoppingBag size={10} /> Launch Preview
         </button>
       </div>
     </div>
@@ -247,7 +247,7 @@ export function ShopCategory() {
 
 export function ProductDetail() {
   const { id } = useParams()
-  const { addToCart, toggleWishlist, inWishlist } = useApp()
+  const { toggleWishlist, inWishlist } = useApp()
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -310,9 +310,9 @@ export function ProductDetail() {
             <p className="text-sm text-gray-600 leading-relaxed mb-5">{product.description || 'Product details are being completed.'}</p>
 
             <div className="flex gap-3 mb-5">
-              <button onClick={() => addToCart(product)}
-                className="flex-1 bg-pink-500 text-white py-3 rounded-xl font-semibold text-sm hover:bg-pink-600 transition-colors flex items-center justify-center gap-2">
-                <ShoppingBag size={16} /> Add to Cart
+              <button type="button" disabled
+                className="flex-1 bg-gray-100 text-gray-500 py-3 rounded-xl font-semibold text-sm cursor-not-allowed flex items-center justify-center gap-2">
+                <ShoppingBag size={16} /> Product Launch Preview
               </button>
               <button onClick={() => toggleWishlist(product)}
                 className={`p-3 border rounded-xl transition-colors ${inWishlist(product.id) ? 'border-pink-500 bg-pink-50 text-pink-500' : 'border-gray-200 text-gray-400 hover:border-pink-300'}`}>

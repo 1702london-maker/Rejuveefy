@@ -439,10 +439,10 @@ export default function ProvidersPortal() {
             Sign in to manage your Rejuveefy provider application, services, calendar, bookings and payouts.
           </p>
           <div className="flex flex-col gap-3">
-            <Link to="/login" className="bg-pink-500 text-white rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
+            <Link to="/login?next=/providers-portal" className="bg-pink-500 text-white rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
               Sign In
             </Link>
-            <Link to="/register?type=provider" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
+            <Link to="/register?type=provider&next=/providers-portal" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
               Create Provider Account
             </Link>
           </div>

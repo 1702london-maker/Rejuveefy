@@ -46,6 +46,23 @@ function isWithinAvailability(availability, date, time) {
   return availability.days.includes(day) && time >= availability.start && time <= availability.end
 }
 
+function generateTimeSlots(availability, date) {
+  if (!availability?.days?.length || !date) return []
+  const day = dayKeyFromDate(date)
+  if (!availability.days.includes(day)) return []
+  const [startHour = 9, startMinute = 0] = String(availability.start || '09:00').split(':').map(Number)
+  const [endHour = 17, endMinute = 0] = String(availability.end || '17:00').split(':').map(Number)
+  const start = startHour * 60 + startMinute
+  const end = endHour * 60 + endMinute
+  const slots = []
+  for (let minutes = start; minutes <= end; minutes += 60) {
+    const h = String(Math.floor(minutes / 60)).padStart(2, '0')
+    const m = String(minutes % 60).padStart(2, '0')
+    slots.push(`${h}:${m}`)
+  }
+  return slots
+}
+
 function Stars({ val = 0, size = 12 }) {
   return (
     <div className="flex gap-0.5">
@@ -393,6 +410,7 @@ export function BookingFlow() {
   const chosen = services.find(s => String(s.name) === selectedService)
   const availability = provider?.availability || null
   const availabilityDays = availability?.days?.map(day => dayLabels[day] || day).join(', ')
+  const timeSlots = generateTimeSlots(availability, selectedDate)
 
   const submit = async (e) => {
     e.preventDefault()
@@ -479,13 +497,30 @@ export function BookingFlow() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-semibold text-gray-600 mb-1 block">Date</label>
-              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+              <input type="date" value={selectedDate} onChange={e => { setSelectedDate(e.target.value); setSelectedTime('') }}
                 className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none focus:border-pink-400" />
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-600 mb-1 block">Time</label>
-              <input type="time" value={selectedTime} onChange={e => setSelectedTime(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none focus:border-pink-400" />
+              {availability?.days?.length ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {timeSlots.map(slot => (
+                    <button key={slot} type="button" onClick={() => setSelectedTime(slot)}
+                      className={`rounded-xl border px-3 py-3 text-xs font-semibold transition-colors ${selectedTime === slot ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-200 text-gray-600 hover:border-pink-300'}`}>
+                      {slot}
+                    </button>
+                  ))}
+                  {selectedDate && timeSlots.length === 0 && (
+                    <p className="col-span-3 rounded-xl bg-amber-50 px-3 py-3 text-xs text-amber-700">No listed availability for this date. Choose one of the provider availability days.</p>
+                  )}
+                  {!selectedDate && (
+                    <p className="col-span-3 rounded-xl bg-gray-50 px-3 py-3 text-xs text-gray-500">Select a date to see available times.</p>
+                  )}
+                </div>
+              ) : (
+                <input type="time" value={selectedTime} onChange={e => setSelectedTime(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none focus:border-pink-400" />
+              )}
             </div>
           </div>
 

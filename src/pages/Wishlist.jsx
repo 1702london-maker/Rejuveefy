@@ -3,14 +3,9 @@ import { Heart, ShoppingBag, Trash2, Star, ArrowRight } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function Wishlist() {
-  const { wishlist, removeFromWishlist, addToCart } = useApp()
+  const { wishlist, removeFromWishlist } = useApp()
 
   const wishlistProducts = wishlist
-
-  const handleMoveToCart = (product) => {
-    addToCart(product)
-    removeFromWishlist(product.id)
-  }
 
   if (wishlistProducts.length === 0) {
     return (
@@ -102,10 +97,11 @@ export default function Wishlist() {
                 {/* Actions */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleMoveToCart(product)}
-                    className="flex-1 bg-pink-500 text-white text-xs font-semibold py-2.5 rounded-xl hover:bg-pink-600 transition-colors flex items-center justify-center gap-1.5"
+                    type="button"
+                    disabled
+                    className="flex-1 bg-gray-100 text-gray-500 text-xs font-semibold py-2.5 rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5"
                   >
-                    <ShoppingBag size={13} /> Add to Cart
+                    <ShoppingBag size={13} /> Launch Preview
                   </button>
                   <Link to={`/product/${product.id}`}
                     className="px-3 py-2.5 border border-gray-200 rounded-xl text-gray-500 hover:border-pink-300 hover:text-pink-500 transition-colors">

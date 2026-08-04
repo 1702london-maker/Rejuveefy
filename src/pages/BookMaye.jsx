@@ -681,7 +681,7 @@ function Step6({ details, setDetails, onBack, onNext }) {
   return (
     <div>
       <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Your <span className="text-pink-500 italic font-light">Details</span></h2>
-      <p className="text-sm text-gray-500 font-medium mb-8 leading-relaxed">Enter your contact information. A confirmation will be sent after booking.</p>
+      <p className="text-sm text-gray-500 font-medium mb-8 leading-relaxed">Enter your contact information. Maye will confirm after reviewing your request and deposit details.</p>
       <div className="flex flex-col gap-4">
         <div>
           <label className="text-[9px] font-bold tracking-[2px] uppercase text-gray-500 block mb-1.5">Full Name *</label>
@@ -959,11 +959,11 @@ export default function BookMaye() {
                 Book <span className="text-pink-400 italic font-light">Maye</span>
               </h1>
               <p className="text-base text-white/60 font-medium mb-5 leading-relaxed max-w-xl">
-                Hair Artist &amp; Makeup Specialist · 10+ Years Experience · From Africa to the UK · Southampton · Portsmouth · London
+                Hair Artist &amp; Makeup Specialist · Founder-led appointments · Southampton · Portsmouth · London
               </p>
               <div className="flex items-center gap-1.5 mb-4">
                 {[1,2,3,4,5].map(i => <Star key={i} size={14} className="text-pink-400 fill-pink-400" />)}
-                <span className="text-sm text-white/50 font-medium ml-2">5.0 · 500+ clients served</span>
+                <span className="text-sm text-white/50 font-medium ml-2">Reviewed booking requests · Direct founder access</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {['Braiding','Cornrows','Dreadlocks','Makeup','Bridal','Wig Styling'].map(t => (
@@ -979,7 +979,7 @@ export default function BookMaye() {
                 </p>
               </blockquote>
               <div className="grid grid-cols-2 gap-3 mt-6">
-                {[{n:'10+',l:'Years'},{n:'3',l:'UK Cities'},{n:'500+',l:'Clients'},{n:'5.0',l:'Rating'}].map(s => (
+                {[{n:'3',l:'UK Cities'},{n:'24h',l:'Review'},{n:'50%',l:'Deposit Request'},{n:'1:1',l:'Founder-led'}].map(s => (
                   <div key={s.l} className="bg-white/5 border border-white/10 p-3 text-center">
                     <p className="text-2xl font-bold text-white">{s.n}</p>
                     <p className="text-[9px] font-bold tracking-[2px] uppercase text-pink-400 mt-1">{s.l}</p>

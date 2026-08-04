@@ -17,7 +17,7 @@ import Cart, { Checkout, OrderSuccess } from './pages/Cart'
 import AIHairAnalysis, { AISkinAnalysis } from './pages/AIAnalyzer'
 import MyBookings, { DashboardHome, ReferAndEarn, ReviewsRatings } from './pages/Dashboard'
 import { AboutUs, ContactUs, FAQ, BookingHelp, ReturnsRefunds, TrackOrder, Careers, PrivacyPolicy, TermsConditions, CookiePolicy, Accessibility } from './pages/InfoPages'
-import Login, { Register, ForgotPassword } from './pages/Auth'
+import Login, { Register, ForgotPassword, ResetPassword } from './pages/Auth'
 import Wishlist from './pages/Wishlist'
 import Affiliate from './pages/Affiliate'
 import AffiliatePortal from './pages/AffiliatePortal'
@@ -32,7 +32,7 @@ function ScrollToTop() {
   return null
 }
 
-const noLayoutRoutes = ['/login', '/register', '/forgot-password']
+const noLayoutRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
 
 const pageVariants = {
   initial: { opacity: 0, y: 18 },
@@ -143,6 +143,7 @@ export default function App() {
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
           <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
+          <Route path="/reset-password" element={<PageWrapper><ResetPassword /></PageWrapper>} />
 
           {/* 404 fallback */}
           <Route path="*" element={

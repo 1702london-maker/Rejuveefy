@@ -37,8 +37,10 @@ function AuthLayout({ children, image }) {
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 
-async function signInWithProvider(provider, accountType = 'client') {
-  const target = accountType === 'provider'
+async function signInWithProvider(provider, accountType = 'client', redirectPath = null) {
+  const target = redirectPath?.startsWith('/')
+    ? redirectPath
+    : accountType === 'provider'
     ? '/providers-portal'
     : accountType === 'affiliate'
       ? '/affiliate'
@@ -75,7 +77,7 @@ export default function Login() {
   const socialSignIn = async (provider) => {
     setError('')
     try {
-      await signInWithProvider(provider)
+      await signInWithProvider(provider, 'client', nextPath)
     } catch (err) {
       setError(err.message || 'Social sign-in failed. Please try again.')
     }
@@ -199,13 +201,13 @@ export function Register() {
     })
     if (err) { setError(err.message); setLoading(false); return }
     setLoading(false)
-    navigate(nextPath && nextPath.startsWith('/') ? nextPath : form.accountType === 'provider' ? '/providers-portal' : form.accountType === 'affiliate' ? '/affiliate' : '/dashboard')
+    navigate(nextPath && nextPath.startsWith('/') ? nextPath : form.accountType === 'provider' ? '/providers-portal' : form.accountType === 'affiliate' ? '/affiliate-portal' : '/dashboard')
   }
 
   const socialSignUp = async (provider) => {
     setError('')
     try {
-      await signInWithProvider(provider, form.accountType)
+      await signInWithProvider(provider, form.accountType, nextPath)
     } catch (err) {
       setError(err.message || 'Social sign-up failed. Please try again.')
     }
@@ -418,6 +420,95 @@ export function ForgotPassword() {
               Back to Sign In
             </Link>
           </div>
+        )}
+      </div>
+    </AuthLayout>
+  )
+}
+
+export function ResetPassword() {
+  const navigate = useNavigate()
+  const [form, setForm] = useState({ password: '', confirm: '' })
+  const [showPw, setShowPw] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
+
+  const mismatch = form.confirm && form.password !== form.confirm
+  const tooShort = form.password && form.password.length < 8
+
+  const submit = async (e) => {
+    e.preventDefault()
+    if (mismatch || tooShort) return
+    setError('')
+    setLoading(true)
+    const { error: err } = await supabase.auth.updateUser({ password: form.password })
+    setLoading(false)
+    if (err) { setError(err.message); return }
+    setDone(true)
+  }
+
+  return (
+    <AuthLayout image="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&h=1200&fit=crop">
+      <div>
+        <Link to="/login" className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-pink-500 transition-colors mb-8">
+          <ArrowLeft size={15} /> Back to Sign In
+        </Link>
+
+        {done ? (
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <CheckCircle size={32} className="text-green-500" />
+            </div>
+            <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Password Updated</h1>
+            <p className="text-sm text-gray-500 mb-6">Your password has been changed. You can now sign in with your new password.</p>
+            <button onClick={() => navigate('/login')} className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
+              Sign In
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="w-14 h-14 bg-pink-100 rounded-2xl flex items-center justify-center mb-5">
+              <Lock size={24} className="text-pink-500" />
+            </div>
+            <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Create New Password</h1>
+            <p className="text-sm text-gray-500 mb-6">Enter a new password for your Rejuveefy account.</p>
+
+            {error && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold px-3 py-2.5 rounded-xl">{error}</div>
+            )}
+
+            <form onSubmit={submit} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-600 mb-1 block">New Password</label>
+                <div className="relative">
+                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type={showPw ? 'text' : 'password'} value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} required placeholder="Create a new password"
+                    className="w-full border border-gray-200 rounded-xl pl-10 pr-11 py-3 text-sm outline-none focus:border-pink-400 transition-colors" />
+                  <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                {tooShort && <p className="text-[10px] text-red-500 mt-1">Use at least 8 characters.</p>}
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-600 mb-1 block">Confirm Password</label>
+                <div className="relative">
+                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input type="password" value={form.confirm} onChange={e => setForm(p => ({ ...p, confirm: e.target.value }))} required placeholder="Repeat your new password"
+                    className={`w-full border rounded-xl pl-10 pr-3 py-3 text-sm outline-none focus:border-pink-400 transition-colors ${mismatch ? 'border-red-300' : 'border-gray-200'}`} />
+                </div>
+                {mismatch && <p className="text-[10px] text-red-500 mt-1">Passwords do not match.</p>}
+              </div>
+
+              <button type="submit" disabled={loading || !form.password || !form.confirm || mismatch || tooShort}
+                className="w-full bg-pink-500 text-white py-3.5 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+                {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : null}
+                Update Password
+              </button>
+            </form>
+          </>
         )}
       </div>
     </AuthLayout>

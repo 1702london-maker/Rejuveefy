@@ -33,15 +33,23 @@ const faqs = [
   {
     category: 'Bookings',
     items: [
-      { id: 'booking-data', question: 'Why are some provider lists empty?', answer: 'Only approved providers are shown. Empty states mean profiles are still being verified and prepared.' },
-      { id: 'booking-status', question: 'Where can I see bookings?', answer: 'Signed-in clients can see booking activity in the dashboard once bookings are saved against their account.' },
+      { id: 'booking-data', question: 'Why are some provider lists empty?', answer: 'Only approved providers are shown. When a category is empty, Rejuveefy is still reviewing providers for that service before listing them publicly.' },
+      { id: 'booking-status', question: 'Where can I see bookings?', answer: 'Signed-in clients can view saved booking requests and status updates from their dashboard.' },
+      { id: 'booking-confirmation', question: 'Are bookings confirmed immediately?', answer: 'Booking requests are submitted for review and provider confirmation. You should treat the appointment as pending until the status is updated or support confirms the booking.' },
     ],
   },
   {
     category: 'Shop',
     items: [
       { id: 'shop-products', question: 'When will products be available?', answer: 'The shop catalogue is being curated carefully. Product details will be published as each item is ready for customers.' },
-      { id: 'checkout', question: 'Can I pay for products now?', answer: 'Payments are not open yet. Checkout will be enabled once product, delivery and fulfilment details are ready.' },
+      { id: 'checkout', question: 'Can I pay for products now?', answer: 'Product payment is not active yet. Rejuveefy will show delivery, fulfilment, returns and refund terms before checkout is opened to customers.' },
+    ],
+  },
+  {
+    category: 'Support',
+    items: [
+      { id: 'support-contact', question: 'How do I contact support?', answer: 'Use the contact page for booking questions, account access, provider applications, affiliate applications and shop enquiries.' },
+      { id: 'support-response', question: 'What should I include in a support message?', answer: 'Include the email used on your account, the relevant booking or application details, and a short description of what you need help with.' },
     ],
   },
 ]
@@ -245,7 +253,7 @@ export function FAQ() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Frequently Asked Questions" body="Answers for the current Rejuveefy build and reviewed access flows." label="FAQ" />
+      <PageHero title="Frequently Asked Questions" body="Clear answers for accounts, bookings, provider access, affiliate access and shop availability." label="FAQ" />
       <div className="max-w-[800px] mx-auto px-4 lg:px-6 py-10">
         <div className="mb-8 flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
           <Search size={15} className="text-gray-400" />
@@ -278,13 +286,13 @@ export function BookingHelp() {
   const guides = [
     { icon: Search, title: 'Browse services', sub: 'Start from the booking page or provider directory.' },
     { icon: Users, title: 'Choose a provider', sub: 'Only active approved providers are shown.' },
-    { icon: Calendar, title: 'Request a time', sub: 'Booking records are saved against your account.' },
-    { icon: CheckCircle, title: 'Track status', sub: 'Pending, confirmed and completed activity appears in your dashboard.' },
+    { icon: Calendar, title: 'Request a time', sub: 'Submit your preferred date, time and service details.' },
+    { icon: CheckCircle, title: 'Track status', sub: 'Review saved requests and status updates in your dashboard.' },
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Booking Help" body="How client booking works as approved provider profiles go live." label="Booking Help" />
+      <PageHero title="Booking Help" body="How to request appointments and follow booking status through Rejuveefy." label="Booking Help" />
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6 py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {guides.map(({ icon: Icon, title, sub }) => (
@@ -299,7 +307,7 @@ export function BookingHelp() {
         </div>
         <div className="bg-pink-50 rounded-2xl p-6 text-center">
           <h3 className="font-bold text-gray-900 mb-2">Need help with a booking?</h3>
-          <p className="text-sm text-gray-500 mb-4">Send the details through the contact form so support can review the record.</p>
+          <p className="text-sm text-gray-500 mb-4">Send the booking details through the contact form so support can review the request.</p>
           <Link to="/contact" className="inline-block bg-pink-500 text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
             Contact Support
           </Link>
@@ -313,20 +321,20 @@ export function ReturnsRefunds() {
   const [open, setOpen] = useState({})
   const toggle = (id) => setOpen(prev => ({ ...prev, [id]: !prev[id] }))
   const items = [
-    { id: 'products', q: 'How will product returns work?', a: 'Return instructions will be published before product payments are accepted, so customers can review the policy before placing an order.' },
-    { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking cancellation rules will be shown clearly as provider scheduling opens. For now, contact support about any saved booking request.' },
-    { id: 'refunds', q: 'How will refunds work?', a: 'Refund guidance will be shown before checkout is enabled, including how eligible product or booking refunds are handled.' },
+    { id: 'products', q: 'How do product returns work?', a: 'Product payments are not active yet. Return instructions, eligibility windows and item condition rules will be shown before customers can place paid product orders.' },
+    { id: 'bookings', q: 'Can bookings be cancelled?', a: 'Booking requests can be reviewed by contacting support. Cancellation terms for confirmed appointments should be checked before the appointment is accepted.' },
+    { id: 'refunds', q: 'How are refunds handled?', a: 'Refund eligibility depends on the type of purchase, appointment status and payment method. Rejuveefy will publish the applicable refund steps before taking product checkout payments.' },
   ]
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Returns & Refunds" body="Clear customer policies for products, bookings and eligible refunds." label="Returns & Refunds" />
+      <PageHero title="Returns & Refunds" body="Customer guidance for product returns, booking changes and eligible refunds." label="Returns & Refunds" />
       <div className="max-w-[1000px] mx-auto px-4 lg:px-6 py-10">
         <div className="grid sm:grid-cols-3 gap-4 mb-10">
           {[
-            { icon: RotateCcw, title: 'Policy Details', sub: 'Rules will be published before payments open.' },
-            { icon: Truck, title: 'Delivery Details', sub: 'Shipping information will be shown before order payment.' },
-            { icon: Package, title: 'Order Details', sub: 'Return options will be linked to eligible orders.' },
+            { icon: RotateCcw, title: 'Policy Details', sub: 'Return terms are shown before checkout opens.' },
+            { icon: Truck, title: 'Delivery Details', sub: 'Shipping guidance is provided before order payment.' },
+            { icon: Package, title: 'Order Details', sub: 'Eligible return options connect to paid orders.' },
           ].map(({ icon: Icon, title, sub }) => (
             <div key={title} className="bg-pink-50 rounded-2xl p-5 text-center">
               <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3">
@@ -360,7 +368,7 @@ export function TrackOrder() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Track Order" body="Check the status of a Rejuveefy order when order tracking is available." label="Track Order" />
+      <PageHero title="Track Order" body="Use your order number and email address to check product fulfilment status." label="Track Order" />
       <div className="max-w-[700px] mx-auto px-4 lg:px-6 py-10">
         <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-6 mb-6">
           <div className="space-y-3">
@@ -383,8 +391,8 @@ export function TrackOrder() {
         {checked && (
           <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6 text-center">
             <Package size={30} className="text-pink-500 mx-auto mb-3" />
-            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Tracking Not Available Yet</h2>
-            <p className="text-sm text-gray-500">Order tracking is shown here once product checkout and fulfilment updates are active.</p>
+            <h2 className="font-display text-xl font-bold text-gray-900 mb-2">No Tracking Record Found</h2>
+            <p className="text-sm text-gray-500">Tracking records are available for paid product orders after fulfilment updates are active. Check the details entered or contact support for help.</p>
           </div>
         )}
       </div>
@@ -405,7 +413,7 @@ export function Careers() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Careers" body="Open roles are shared here when recruitment is active." label="Careers" />
+      <PageHero title="Careers" body="Explore open Rejuveefy roles and application details." label="Careers" />
       <section id="jobs" className="bg-gray-50 py-12">
         <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
           <h2 className="font-display text-2xl font-bold text-gray-900 mb-6">Open Positions</h2>
@@ -444,8 +452,8 @@ export function Careers() {
           {filtered.length === 0 && (
             <div className="text-center py-12 text-gray-400">
               <Briefcase size={40} className="mx-auto mb-3 text-gray-200" />
-              <p className="text-sm">No open roles right now.</p>
-              <p className="text-xs mt-1">Check back when recruitment opens.</p>
+              <p className="text-sm">No open roles are listed right now.</p>
+              <p className="text-xs mt-1">Recruitment updates are posted here when roles are available.</p>
             </div>
           )}
         </div>
@@ -460,10 +468,11 @@ export function PrivacyPolicy() {
       <PageHero title="Privacy Policy" body="How Rejuveefy handles account, booking, provider and affiliate information." label="Privacy" />
       <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
         {[
-          ['Information We Collect', 'Rejuveefy collects information you provide when creating an account, submitting applications, making booking requests, joining the affiliate programme, contacting support, or using site forms.'],
-          ['How Information Is Used', 'Information is used to manage accounts, review provider and affiliate applications, process booking requests, support users, improve services, and send relevant account or application updates.'],
-          ['Reviewed Access', 'Provider and affiliate access is reviewed before public activity or referral tools are enabled. We keep incomplete public data hidden until it is ready.'],
-          ['Your Choices', 'You can contact Rejuveefy to request updates, corrections, or deletion of information where applicable. Some records may need to be retained for account, booking, legal, or operational reasons.'],
+          ['Information We Collect', 'Rejuveefy collects information you provide when creating an account, submitting applications, making booking requests, joining the affiliate programme, contacting support, or using website forms.'],
+          ['How Information Is Used', 'Information is used to manage accounts, review provider and affiliate applications, handle booking requests, support users, improve services, and send relevant account or application updates.'],
+          ['Reviewed Access', 'Provider and affiliate access is reviewed before public listings, booking tools or referral activity are enabled. Incomplete public profiles are kept hidden from customers.'],
+          ['Account & Communication Data', 'Rejuveefy may use your email address to send verification messages, application updates, booking notices, support replies and important service information.'],
+          ['Your Choices', 'You can contact Rejuveefy to request updates, corrections, access to your information, or deletion where applicable. Some records may need to be retained for account, booking, legal, fraud-prevention or operational reasons.'],
         ].map(([title, body]) => (
           <div key={title} className="border border-gray-100 rounded-2xl p-6">
             <h2 className="font-display text-xl font-bold text-gray-900 mb-2">{title}</h2>
@@ -472,7 +481,7 @@ export function PrivacyPolicy() {
         ))}
         <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6">
           <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Contact</h2>
-          <p className="text-sm text-gray-500">For privacy questions, contact support through the Rejuveefy contact page.</p>
+          <p className="text-sm text-gray-500">For privacy questions or data requests, contact support through the Rejuveefy contact page.</p>
         </div>
       </section>
     </div>
@@ -482,13 +491,14 @@ export function PrivacyPolicy() {
 export function TermsConditions() {
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Terms & Conditions" body="The current service terms for using Rejuveefy accounts, bookings, provider tools and affiliate access." label="Terms" />
+      <PageHero title="Terms & Conditions" body="Service terms for Rejuveefy accounts, bookings, provider tools, affiliate access and shop activity." label="Terms" />
       <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
         {[
-          ['Account Use', 'Users are responsible for keeping account details accurate and secure. Provider and affiliate tools are only available after review and approval.'],
-          ['Bookings', 'Booking requests are saved as pending until confirmed. Providers or admin may confirm, complete, or cancel booking requests according to availability and operational review.'],
-          ['Provider & Affiliate Applications', 'Submitting an application does not guarantee approval. Rejuveefy may review, approve, reject, suspend, or request more information before access is granted.'],
-          ['Shop & Training', 'Shop checkout, training enrolment, product fulfilment, returns and refund details will be shown clearly before those services become fully available.'],
+          ['Account Use', 'Users are responsible for keeping account details accurate, protecting login access and using the platform lawfully. Provider and affiliate tools are only available after review and approval.'],
+          ['Bookings', 'Booking requests are submitted as pending until confirmed. Rejuveefy, providers or support may review, confirm, complete, decline or cancel booking requests according to availability and operational requirements.'],
+          ['Provider & Affiliate Applications', 'Submitting an application does not guarantee approval. Rejuveefy may review, approve, reject, suspend, remove or request more information before access is granted or continued.'],
+          ['Shop & Training', 'Product checkout, training enrolment, fulfilment, returns and refund terms must be reviewed before purchase where those services are active. Product payment remains unavailable until the checkout flow is opened.'],
+          ['Content & Availability', 'Services, products, providers, prices and training information may change. Rejuveefy may remove listings, correct errors or limit access where required for quality, safety or compliance.'],
           ['Changes', 'Rejuveefy may update these terms as the platform develops. Continued use of the service means you accept the latest terms shown on this page.'],
         ].map(([title, body]) => (
           <div key={title} className="border border-gray-100 rounded-2xl p-6">
@@ -509,7 +519,7 @@ export function CookiePolicy() {
         {[
           ['Essential Cookies', 'Some cookies are needed for account sessions, navigation, forms, cart state and basic site security.'],
           ['Preference Cookies', 'Preference cookies may remember choices such as interface settings, saved cart items or wishlist activity.'],
-          ['Analytics & Marketing', 'Analytics and marketing tools will only be used where configured and appropriate. Rejuveefy will keep these choices clear as the platform grows.'],
+          ['Analytics & Marketing', 'Analytics and marketing tools may be used to understand site performance, improve customer journeys and measure campaigns where configured and appropriate.'],
           ['Managing Cookies', 'You can control cookies through your browser settings. Blocking some cookies may affect account, cart, checkout or portal features.'],
         ].map(([title, body]) => (
           <div key={title} className="border border-gray-100 rounded-2xl p-6">
@@ -525,12 +535,12 @@ export function CookiePolicy() {
 export function Accessibility() {
   return (
     <div className="min-h-screen bg-white">
-      <PageHero title="Accessibility" body="Rejuveefy is designed to be usable, readable and accessible as the service develops." label="Accessibility" />
+      <PageHero title="Accessibility" body="Rejuveefy aims to provide a readable, usable and accessible customer experience." label="Accessibility" />
       <section className="max-w-[900px] mx-auto px-4 lg:px-6 py-12 space-y-6">
         {[
           ['Readable Interface', 'We aim to keep text clear, contrast strong, buttons recognisable and forms easy to understand across mobile and desktop.'],
           ['Keyboard & Screen Reader Support', 'Interactive areas should remain reachable through standard browser controls, semantic links, labels and focus states.'],
-          ['Ongoing Improvements', 'As booking, provider, affiliate, shop and training features expand, accessibility checks should be part of each release.'],
+          ['Ongoing Improvements', 'Accessibility reviews should be part of updates to booking, provider, affiliate, shop and training features.'],
           ['Feedback', 'If something is difficult to use, contact Rejuveefy through the contact page so the issue can be reviewed.'],
         ].map(([title, body]) => (
           <div key={title} className="border border-gray-100 rounded-2xl p-6">

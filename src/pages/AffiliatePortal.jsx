@@ -75,10 +75,10 @@ export default function AffiliatePortal() {
             Sign in to manage your affiliate application, referral links, commission reporting and payouts.
           </p>
           <div className="flex flex-col gap-3">
-            <Link to="/login" className="bg-pink-500 text-white rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
+            <Link to="/login?next=/affiliate-portal" className="bg-pink-500 text-white rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-600 transition-colors">
               Sign In
             </Link>
-            <Link to="/affiliate#apply" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
+            <Link to="/register?type=affiliate&next=/affiliate-portal" className="border border-pink-200 text-pink-600 rounded-full px-5 py-3 text-sm font-semibold hover:bg-pink-50 transition-colors">
               Apply as Affiliate
             </Link>
           </div>
