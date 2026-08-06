@@ -46,6 +46,22 @@ export async function fetchProvider(slug) {
   return normaliseProvider(data)
 }
 
+async function updateOwnedProvider(providerId, patch) {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) throw new Error('Sign in again to update your provider profile.')
+  const response = await fetch('/api/provider-profile', {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ providerId, patch }),
+  })
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(payload.error || 'Provider profile update failed.')
+  return normaliseProvider(payload.provider)
+}
+
 export async function fetchProviderByUser(userId) {
   const { data, error } = await supabase
     .from('providers')
@@ -64,46 +80,25 @@ export async function updateProviderServices(providerId, services) {
     .filter(price => Number.isFinite(price) && price > 0)
   const priceFrom = prices.length ? Math.min(...prices) : 0
 
-  const { data, error } = await supabase
-    .from('providers')
-    .update({
+  return updateOwnedProvider(providerId, {
       services,
       speciality: firstService?.name || 'Beauty Professional',
       price_from: priceFrom,
     })
-    .eq('id', providerId)
-    .select()
-    .single()
-  if (error) throw error
-  return normaliseProvider(data)
 }
 
 export async function updateProviderProfile(providerId, profile) {
-  const { data, error } = await supabase
-    .from('providers')
-    .update({
+  return updateOwnedProvider(providerId, {
       name: profile.name,
       speciality: profile.speciality,
       location: profile.location,
       bio: profile.bio,
       image_url: profile.image_url || null,
     })
-    .eq('id', providerId)
-    .select()
-    .single()
-  if (error) throw error
-  return normaliseProvider(data)
 }
 
 export async function updateProviderAvailability(providerId, availability) {
-  const { data, error } = await supabase
-    .from('providers')
-    .update({ availability })
-    .eq('id', providerId)
-    .select()
-    .single()
-  if (error) throw error
-  return normaliseProvider(data)
+  return updateOwnedProvider(providerId, { availability })
 }
 
 // ── PRODUCTS ──────────────────────────────────────────────────────────────────
