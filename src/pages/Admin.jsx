@@ -15,13 +15,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import {
-  approveProviderApplication,
-  fetchAdminReviewData,
-  updateAffiliateApplicationStatus,
-  updateBookingStatus,
-  updateProviderApplicationStatus,
-} from '../lib/db'
+import { supabase } from '../lib/supabase'
 
 const tabs = [
   { id: 'providers', label: 'Providers', icon: ShieldCheck },
@@ -151,6 +145,22 @@ function ApplicationCard({ item, type, onStatus, busy }) {
   )
 }
 
+async function adminRequest(method = 'GET', body = null) {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) throw new Error('Admin session is not available.')
+  const response = await fetch('/api/admin-review', {
+    method,
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : null,
+  })
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(payload.error || 'Admin review request failed.')
+  return payload
+}
+
 function MessageCard({ item }) {
   return (
     <div className="bg-white border border-gray-100 rounded-2xl shadow-card p-5">
@@ -217,7 +227,7 @@ export default function Admin() {
     setError('')
     setLoading(true)
     try {
-      setData(await fetchAdminReviewData())
+      setData(await adminRequest())
     } catch (err) {
       setError(err.message || 'Could not load review data.')
     } finally {
@@ -241,9 +251,7 @@ export default function Admin() {
     setBusy(true)
     setError('')
     try {
-      const result = status === 'approved'
-        ? await approveProviderApplication(id)
-        : { application: await updateProviderApplicationStatus(id, status), provider: null }
+      const result = await adminRequest('POST', { type: 'provider', id, status })
       const updated = result.application
       const providerSlug = result.provider?.slug
       setData(prev => ({
@@ -261,7 +269,7 @@ export default function Admin() {
     setBusy(true)
     setError('')
     try {
-      const updated = await updateAffiliateApplicationStatus(id, status)
+      const { application: updated } = await adminRequest('POST', { type: 'affiliate', id, status })
       setData(prev => ({
         ...prev,
         affiliateApplications: prev.affiliateApplications.map(item => item.id === id ? updated : item),
@@ -277,7 +285,7 @@ export default function Admin() {
     setBusy(true)
     setError('')
     try {
-      const updated = await updateBookingStatus(id, status)
+      const { booking: updated } = await adminRequest('POST', { type: 'booking', id, status })
       setData(prev => ({
         ...prev,
         bookings: prev.bookings.map(item => item.id === id ? { ...item, ...updated } : item),
