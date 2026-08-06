@@ -415,8 +415,7 @@ export default function ProvidersPortal() {
         email: user.email,
         services: form.services.split(',').map(item => item.trim()).filter(Boolean),
         location: form.location,
-        experience: form.experience,
-        bio: form.bio,
+        bio: [form.experience, form.bio].filter(Boolean).join('\n\n'),
         status: 'pending',
       })
       setApplication(created)
