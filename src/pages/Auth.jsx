@@ -42,6 +42,8 @@ function AuthLayout({ children, image }) {
 
 // ── LOGIN ─────────────────────────────────────────────────────────────────────
 
+const socialAuthEnabled = import.meta.env.VITE_ENABLE_SOCIAL_AUTH === 'true'
+
 async function signInWithProvider(provider, accountType = 'client', redirectPath = null) {
   const target = redirectPath
     ? safeNextPath(redirectPath)
@@ -81,6 +83,10 @@ export default function Login() {
   }
   const socialSignIn = async (provider) => {
     setError('')
+    if (!socialAuthEnabled) {
+      setError('Google and Facebook sign-in are being connected. Please use email sign-in for now.')
+      return
+    }
     try {
       await signInWithProvider(provider, 'client', nextPath)
     } catch (err) {
@@ -179,7 +185,6 @@ export default function Login() {
 
 // ── REGISTER ──────────────────────────────────────────────────────────────────
 export function Register() {
-  const navigate = useNavigate()
   const { search } = useLocation()
   const params = new URLSearchParams(search)
   const initialType = params.get('type') === 'provider' ? 'provider' : params.get('type') === 'affiliate' ? 'affiliate' : 'client'
@@ -189,6 +194,7 @@ export function Register() {
   const [loading, setLoading] = useState(false)
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
   const upd = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
@@ -202,15 +208,22 @@ export function Register() {
     const { error: err } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
-      options: { data: { full_name: form.name, phone: form.phone, account_type: form.accountType } }
+      options: {
+        emailRedirectTo: `${window.location.origin}/login?next=${encodeURIComponent(nextPath || '/my-portal')}`,
+        data: { full_name: form.name, phone: form.phone, account_type: form.accountType },
+      }
     })
     if (err) { setError(err.message); setLoading(false); return }
     setLoading(false)
-    navigate(nextPath || '/my-portal')
+    setRegisteredEmail(form.email)
   }
 
   const socialSignUp = async (provider) => {
     setError('')
+    if (!socialAuthEnabled) {
+      setError('Google and Facebook sign-up are being connected. Please use email signup for now.')
+      return
+    }
     try {
       await signInWithProvider(provider, form.accountType, nextPath)
     } catch (err) {
@@ -224,6 +237,22 @@ export function Register() {
         <Link to="/" className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-pink-500 transition-colors mb-6">
           <ArrowLeft size={15} /> Back to Home
         </Link>
+
+        {registeredEmail ? (
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <CheckCircle size={32} className="text-green-500" />
+            </div>
+            <h1 className="font-display text-2xl font-bold text-gray-900 mb-2">Check Your Email</h1>
+            <p className="text-sm text-gray-500 mb-2">Your Rejuveefy account has been created.</p>
+            <p className="text-sm font-semibold text-pink-500 mb-5">{registeredEmail}</p>
+            <p className="text-xs text-gray-400 mb-6">Open the verification email, then sign in to continue to My Portal.</p>
+            <Link to={`/login?next=${encodeURIComponent(nextPath || '/my-portal')}`} className="inline-block bg-pink-500 text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-pink-600 transition-colors">
+              Go to Sign In
+            </Link>
+          </div>
+        ) : (
+          <>
 
         <div className="lg:hidden text-center mb-6">
           <span className="font-display text-2xl font-bold text-pink-500">Rejuveefy</span>
@@ -355,6 +384,8 @@ export function Register() {
           Already have an account?{' '}
           <Link to={`/login${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ''}`} className="text-pink-500 font-semibold hover:underline">Sign In</Link>
         </p>
+          </>
+        )}
       </div>
     </AuthLayout>
   )
