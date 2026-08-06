@@ -414,8 +414,11 @@ export default function ProvidersPortal() {
         full_name: userDisplay?.name || user.email,
         email: user.email,
         services: form.services.split(',').map(item => item.trim()).filter(Boolean),
-        location: form.location,
-        bio: [form.experience, form.bio].filter(Boolean).join('\n\n'),
+        bio: [
+          form.location ? `Location: ${form.location}` : '',
+          form.experience,
+          form.bio,
+        ].filter(Boolean).join('\n\n'),
         status: 'pending',
       })
       setApplication(created)
