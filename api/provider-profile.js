@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     if (providerError) throw providerError
     if (provider.user_id !== auth.user.id) return json(res, 403, { error: 'Provider profile access required.' })
 
-    const allowed = ['services', 'speciality', 'price_from', 'name', 'location', 'bio', 'image_url', 'availability']
+    const allowed = ['services', 'speciality', 'price_from', 'name', 'location', 'bio', 'image_url', 'availability', 'is_active']
     const cleanPatch = Object.fromEntries(Object.entries(patch).filter(([key]) => allowed.includes(key)))
     if (!Object.keys(cleanPatch).length) return json(res, 400, { error: 'No allowed provider fields to update.' })
 
