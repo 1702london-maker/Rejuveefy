@@ -134,13 +134,14 @@ export async function fetchUserBookings(userId) {
 }
 
 export async function fetchProviderBookings(providerId) {
-  const { data, error } = await supabase
-    .from('bookings')
-    .select('*')
-    .eq('provider_id', providerId)
-    .order('booking_date', { ascending: false })
-  if (error) throw error
-  return data || []
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) throw new Error('Sign in again to view provider bookings.')
+  const response = await fetch(`/api/provider-bookings?providerId=${encodeURIComponent(providerId)}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  })
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(payload.error || 'Could not load provider bookings.')
+  return payload.bookings || []
 }
 
 export async function createBooking(booking) {
@@ -364,14 +365,19 @@ export async function updateAffiliateApplicationStatus(id, status) {
 }
 
 export async function updateBookingStatus(id, status) {
-  const { data, error } = await supabase
-    .from('bookings')
-    .update({ status })
-    .eq('id', id)
-    .select()
-    .single()
-  if (error) throw error
-  return data
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) throw new Error('Sign in again to update booking status.')
+  const response = await fetch('/api/provider-bookings', {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ bookingId: id, status }),
+  })
+  const payload = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(payload.error || 'Could not update booking status.')
+  return payload.booking
 }
 
 // ── CONTACT ───────────────────────────────────────────────────────────────────
